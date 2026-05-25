@@ -67,5 +67,36 @@ window.NEWS_DATA = {
       "letter": "MS"
     }
   ],
-  "articles": []
+  "articles": [
+    {
+      "source": "Kontan",
+      "title": "IHSG Berpeluang Menguat Selasa (26/5), Saham Bank Jadi Motor Saat Asing Net Sell",
+      "url": "https://investasi.kontan.co.id/news/ihsg-berpeluang-menguat-selasa-265-saham-bank-jadi-motor-saat-asing-net-sell",
+      "published": "Mon, 25 May 2026 21:35:03 +0700"
+    },
+    {
+      "source": "Kontan",
+      "title": "BI Rate Naik, Investor Obligasi Kini Ubah Strategi Fokus Kupon & Tenor Pendek",
+      "url": "https://investasi.kontan.co.id/news/bi-rate-naik-investor-obligasi-kini-ubah-strategi-fokus-kupon-tenor-pendek",
+      "published": "Mon, 25 May 2026 20:37:12 +0700"
+    },
+    {
+      "source": "Kontan",
+      "title": "Kinerja Sumber Global (SGER) Ditopang Harga Batubara hingga Diversifikasi Bisnis",
+      "url": "https://investasi.kontan.co.id/news/kinerja-sumber-global-sger-ditopang-harga-batubara-hingga-diversifikasi-bisnis",
+      "published": "Mon, 25 May 2026 20:15:49 +0700"
+    },
+    {
+      "source": "Kontan",
+      "title": "Harga Aluminium Melesat, Emiten Ini Berpotensi Diuntungkan",
+      "url": "https://investasi.kontan.co.id/news/harga-aluminium-melesat-emiten-ini-berpotensi-diuntungkan",
+      "published": "Mon, 25 May 2026 19:42:06 +0700"
+    },
+    {
+      "source": "Kontan",
+      "title": "Aksi Net Sell dari Pasar Saham Capai Rp 44 T, Ini Saham Incaran Investor Asing",
+      "url": "https://investasi.kontan.co.id/news/aksi-net-sell-dari-pasar-saham-capai-rp-44-t-ini-saham-incaran-investor-asing",
+      "published": "Mon, 25 May 2026 19:33:35 +0700"
+    }
+  ]
 };
