@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELMU.AI — Investor ESG Indonesia</title>
+<meta name="description" content="Elmu — chatbot edukasi investasi ESG untuk investor ritel Indonesia. Knowledge-based sustainable profit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EA; --cream-deep:#F2EAD3;
+  --emerald:#0F4C3A; --emerald-deep:#0A3527; --emerald-light:#2E7D5B;
+  --gold:#B8860B; --gold-light:#D4B670; --gold-pale:#FFF7DC;
+  --ink:#1A2B26; --muted:#5A6B66; --red:#8B2E2E; --green-good:#2D8659;
+  --panel-bg:#FFFFFF; --border:rgba(15,76,58,0.15);
+  --shadow:0 10px 40px -10px rgba(10,53,39,0.18);
+  --hint-bg:rgba(15,76,58,0.06);
+}
+[data-theme="dark"]{
+  --cream:#0F1612; --cream-deep:#1A2922;
+  --emerald:#4BCB94; --emerald-deep:#2D9B6B; --emerald-light:#6FE4A8;
+  --gold:#E5B547; --gold-light:#F5D584; --gold-pale:#3A3318;
+  --ink:#E8E2D3; --muted:#9CADA5; --red:#FF8585; --green-good:#5FD491;
+  --panel-bg:#1C2620; --border:rgba(75,203,148,0.20);
+  --shadow:0 10px 40px -10px rgba(0,0,0,0.5);
+  --hint-bg:rgba(75,203,148,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Manrope',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(212,182,112,0.10) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(15,76,58,0.06) 0%, transparent 40%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><g fill='none' stroke='%230F4C3A' stroke-width='0.5' opacity='0.05'><polygon points='50,5 90,30 90,70 50,95 10,70 10,30'/><polygon points='50,18 78,35 78,65 50,82 22,65 22,35'/><circle cx='50' cy='50' r='10'/></g></svg>");
+  transition:background-color 0.3s;
+}
+[data-theme="dark"] body{
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(229,181,71,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(75,203,148,0.04) 0%, transparent 40%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><g fill='none' stroke='%234BCB94' stroke-width='0.5' opacity='0.06'><polygon points='50,5 90,30 90,70 50,95 10,70 10,30'/><polygon points='50,18 78,35 78,65 50,82 22,65 22,35'/><circle cx='50' cy='50' r='10'/></g></svg>");
+}
+.container{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+
+/* Header */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.logo-mark{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--emerald-light) 0%,var(--emerald-deep) 100%);display:grid;place-items:center;box-shadow:var(--shadow);position:relative;flex-shrink:0}
+.logo-mark svg{width:38px;height:38px}
+.logo-spark{position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--gold-light),var(--gold));box-shadow:0 0 8px rgba(212,182,112,0.5)}
+.logo-spark::after{content:"";position:absolute;top:3px;left:3px;width:6px;height:6px;border-radius:50%;background:var(--gold-pale)}
+.brand-text h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px;color:var(--emerald);letter-spacing:1px;line-height:1}
+.brand-text .tagline{font-size:11.5px;color:var(--gold);font-weight:600;letter-spacing:2px;margin-top:4px;text-transform:uppercase}
+.meta{font-size:11.5px;color:var(--muted);text-align:right;line-height:1.5}
+.meta strong{color:var(--emerald);font-weight:600}
+
+/* Header controls */
+.header-controls{display:flex;gap:8px;align-items:center}
+.hdr-btn{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--border);background:var(--panel-bg);color:var(--emerald);cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;transition:all 0.2s;display:grid;place-items:center}
+.hdr-btn:hover{border-color:var(--emerald);background:var(--hint-bg)}
+.hdr-btn svg{width:18px;height:18px}
+
+/* Context banner */
+.context-banner{background:linear-gradient(90deg,rgba(139,46,46,0.06),rgba(139,46,46,0.02));border:1px solid rgba(139,46,46,0.2);border-left:3px solid var(--red);padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:12.5px;color:var(--red);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.context-banner strong{font-weight:700}
+.context-banner .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Tabs */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--hint-bg);padding:6px;border-radius:14px;margin-bottom:20px}
+.tab{padding:12px 6px;border:none;background:transparent;cursor:pointer;border-radius:10px;font-family:inherit;font-weight:600;font-size:12.5px;color:var(--emerald);transition:all 0.25s ease;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tab:hover{background:var(--hint-bg)}
+.tab.active{background:var(--emerald);color:var(--cream);box-shadow:var(--shadow)}
+[data-theme="dark"] .tab.active{color:#0F1612}
+.tab svg{width:18px;height:18px}
+.tab .sub{font-size:9.5px;opacity:0.7;font-weight:500}
+
+/* Panel */
+.panel{background:var(--panel-bg);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;min-height:580px;display:flex;flex-direction:column}
+.panel-head{padding:22px 26px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--hint-bg) 0%,transparent 100%);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.panel-head h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;color:var(--emerald);line-height:1}
+.panel-head p{font-size:13px;color:var(--muted);margin-top:4px}
+.panel-body{flex:1;padding:24px 26px;overflow-y:auto;max-height:62vh}
+
+/* Character banner (Sari persona — chat header style) */
+.character-banner{display:flex;align-items:center;gap:12px;padding:14px 26px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--cream-deep) 0%,transparent 100%)}
+.character-avatar-wrap{position:relative;flex-shrink:0;width:48px;height:48px;border-radius:50%;padding:2px;background:linear-gradient(135deg,var(--gold-light),var(--gold));box-shadow:0 3px 8px rgba(184,134,11,0.22)}
+.character-avatar{width:100%;height:100%;border-radius:50%;border:2px solid var(--emerald);object-fit:cover;background:var(--cream);display:block}
+.character-avatar.placeholder{display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--emerald);font-weight:600;background:linear-gradient(135deg,var(--cream),var(--cream-deep))}
+.character-info{flex:1;min-width:0}
+.character-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--emerald);font-weight:600;line-height:1.1}
+.character-subtitle{font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-top:3px}
+.character-status{font-size:10.5px;color:var(--green-good);margin-top:3px;display:flex;align-items:center;gap:5px}
+.character-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green-good);animation:pulse 2s infinite}
+@media (max-width:600px){
+  .character-banner{padding:12px 18px;gap:10px}
+  .character-avatar-wrap{width:40px;height:40px}
+  .character-name{font-size:16px}
+  .character-subtitle{font-size:9.5px}
+}
+
+/* "Today's market" mini-panel (live data via fetch_data.py) */
+.market-panel{padding:8px 26px;background:rgba(15,76,58,0.04);border-bottom:1px solid var(--border);font-size:11.5px;display:none}
+.market-panel.show{display:block}
+[data-theme="dark"] .market-panel{background:rgba(75,203,148,0.05)}
+.mp-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mp-item{display:flex;align-items:center;gap:6px}
+.mp-label{color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;font-size:9.5px}
+.mp-value{color:var(--emerald);font-weight:700;font-family:'Courier New',monospace;font-size:12.5px}
+.mp-change{font-weight:700;font-size:11.5px}
+.mp-change.pos{color:var(--green-good)}
+.mp-change.neg{color:var(--red)}
+.mp-meta{margin-left:auto;color:var(--muted);font-size:10px;font-style:italic}
+.mp-sample{color:var(--gold);font-weight:600}
+@media (max-width:600px){
+  .market-panel{padding:8px 18px}
+  .mp-meta{font-size:9.5px}
+}
+
+/* Chat — WhatsApp-style bubbles with per-message avatar + timestamp */
+#chatMessages{display:flex;flex-direction:column;gap:10px}
+.chat-date-sep{align-self:center;font-size:10.5px;color:var(--muted);background:var(--cream-deep);padding:4px 12px;border-radius:12px;font-weight:600;letter-spacing:0.3px;margin:4px 0;text-transform:capitalize}
+.msg{display:flex;align-items:flex-end;gap:8px;max-width:88%;animation:fadeUp 0.3s ease}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:var(--cream) url('avatar.png') center/cover no-repeat;border:1.5px solid var(--emerald);flex-shrink:0;align-self:flex-end;margin-bottom:2px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.msg.user .msg-avatar{display:none}
+.msg-bubble{padding:9px 13px 6px;border-radius:14px;font-size:14.5px;line-height:1.55;position:relative;min-width:60px}
+.msg.bot .msg-bubble{background:var(--cream-deep);color:var(--ink);border-bottom-left-radius:4px}
+.msg.user .msg-bubble{background:var(--emerald);color:var(--cream);border-bottom-right-radius:4px}
+[data-theme="dark"] .msg.user .msg-bubble{color:#0F1612}
+.msg.bot .msg-bubble strong{color:var(--emerald)}
+.msg.bot .msg-bubble .accent{color:var(--gold);font-weight:600}
+.msg-time{font-size:10px;opacity:0.55;display:block;text-align:right;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:0.2px}
+.msg-meta{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic}
+.msg.typing .msg-bubble{display:flex;gap:4px;align-items:center;min-height:24px;padding:12px 14px}
+.typ-dot{display:inline-block;width:7px;height:7px;background:var(--emerald);border-radius:50%;opacity:0.35;animation:typPulse 1.3s infinite ease-in-out}
+.typ-dot:nth-child(2){animation-delay:0.18s}
+.typ-dot:nth-child(3){animation-delay:0.36s}
+@keyframes typPulse{0%,60%,100%{opacity:0.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.quick-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{background:var(--panel-bg);border:1px solid var(--border);color:var(--emerald);padding:8px 14px;border-radius:20px;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.2s}
+.chip:hover{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
+[data-theme="dark"] .chip:hover{color:#0F1612}
+.dym{margin-top:-2px;margin-left:40px;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dym a{color:var(--emerald);text-decoration:none;font-weight:600;cursor:pointer;border-bottom:1px dashed var(--emerald);padding-bottom:1px}
+.dym a:hover{color:var(--gold);border-color:var(--gold)}
+.chat-input-wrap{padding:18px 26px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--panel-bg)}
+.chat-input{flex:1;padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;background:var(--cream);color:var(--ink);outline:none;transition:border 0.2s}
+.chat-input:focus{border-color:var(--emerald)}
+.send-btn{background:var(--emerald);color:var(--cream);border:none;padding:0 22px;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;transition:background 0.2s}
+[data-theme="dark"] .send-btn{color:#0F1612}
+.send-btn:hover{background:var(--emerald-deep)}
+
+/* Teach modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel-bg);border-radius:16px;max-width:520px;width:100%;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--emerald);margin-bottom:8px}
+.modal p{color:var(--muted);font-size:13.5px;line-height:1.6;margin-bottom:14px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:12px;color:var(--emerald);font-weight:700;margin-bottom:6px;letter-spacing:0.5px}
+.modal-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--cream);color:var(--ink);outline:none}
+.modal-input:focus{border-color:var(--emerald)}
+.modal-input.textarea{min-height:80px;resize:vertical;line-height:1.5}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.btn-secondary{background:transparent;border:1.5px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px}
+.btn-secondary:hover{border-color:var(--emerald);color:var(--emerald)}
+.btn-primary{background:var(--emerald);color:var(--cream);border:none;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px}
+[data-theme="dark"] .btn-primary{color:#0F1612}
+.btn-primary:hover{background:var(--emerald-deep)}
+
+/* Lessons */
+.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.lesson-pill{padding:10px 14px;border:1.5px solid var(--border);background:var(--panel-bg);border-radius:10px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--emerald);font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:8px}
+.lesson-pill .num{background:var(--cream-deep);color:var(--emerald);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700}
+.lesson-pill:hover{border-color:var(--emerald)}
+.lesson-pill.active{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
+[data-theme="dark"] .lesson-pill.active{color:#0F1612}
+.lesson-pill.active .num{background:var(--gold);color:var(--emerald-deep)}
+.lesson-content{animation:fadeUp 0.4s ease}
+.lesson-content h3{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--emerald);font-weight:600;margin-bottom:6px}
+.lesson-content .subtitle{color:var(--muted);font-size:13px;margin-bottom:18px;font-style:italic}
+.lesson-content h4{font-size:15px;color:var(--emerald);margin:18px 0 8px;font-weight:700;display:flex;align-items:center;gap:8px}
+.lesson-content h4::before{content:"";width:4px;height:16px;background:var(--gold);border-radius:2px}
+.lesson-content p{font-size:14.5px;line-height:1.75;color:var(--ink);margin-bottom:10px}
+.lesson-content ul{margin:8px 0 14px 22px}
+.lesson-content ul li{font-size:14px;line-height:1.7;margin-bottom:6px;color:var(--ink)}
+.lesson-content .term{color:var(--gold);font-weight:700}
+.lesson-content .callout{background:var(--cream-deep);border-left:3px solid var(--gold);padding:14px 16px;border-radius:8px;margin:14px 0;font-size:13.5px;line-height:1.65;color:var(--ink)}
+.lesson-content .alert-callout{background:rgba(139,46,46,0.08);border-left:3px solid var(--red);padding:14px 16px;border-radius:8px;margin:14px 0;font-size:13.5px;line-height:1.65;color:var(--ink)}
+.lesson-content .alert-callout strong{color:var(--red)}
+.lesson-nav-btns{display:flex;justify-content:space-between;margin-top:24px;padding-top:18px;border-top:1px solid var(--border)}
+.nav-btn{background:transparent;border:1.5px solid var(--emerald);color:var(--emerald);padding:10px 18px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;transition:all 0.2s}
+.nav-btn:hover{background:var(--emerald);color:var(--cream)}
+[data-theme="dark"] .nav-btn:hover{color:#0F1612}
+.nav-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Expert system */
+.expert-step{animation:fadeUp 0.4s ease}
+.expert-step h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--emerald);margin-bottom:6px}
+.expert-step .step-label{color:var(--gold);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+.expert-step .question{font-size:16px;color:var(--ink);margin-bottom:18px;line-height:1.5}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.opt-card{background:var(--panel-bg);border:1.5px solid var(--border);padding:16px;border-radius:12px;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.2s}
+.opt-card:hover{border-color:var(--emerald);transform:translateY(-2px);box-shadow:var(--shadow)}
+.opt-card .opt-title{font-weight:700;color:var(--emerald);font-size:14px;margin-bottom:4px}
+.opt-card .opt-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.progress-bar{height:4px;background:var(--cream-deep);border-radius:2px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--emerald) 0%,var(--gold) 100%);transition:width 0.4s ease}
+.result-card{background:linear-gradient(135deg,var(--emerald) 0%,var(--emerald-deep) 100%);color:var(--cream);padding:28px;border-radius:14px;margin-top:8px;animation:fadeUp 0.5s ease}
+[data-theme="dark"] .result-card{color:#E8E2D3}
+.result-card .badge{background:var(--gold);color:var(--emerald-deep);padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;display:inline-block;margin-bottom:12px}
+.result-card h3{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold-light);margin-bottom:10px}
+.result-card p{font-size:14px;line-height:1.7;opacity:0.95;margin-bottom:10px}
+.result-card .rec-list{margin-top:16px}
+.result-card .rec-item{background:rgba(255,255,255,0.08);padding:13px 14px;border-radius:10px;margin-bottom:8px;font-size:13.5px;line-height:1.55;border-left:3px solid var(--gold)}
+.result-card .rec-item strong{color:var(--gold-light)}
+.broker-tag{display:inline-block;background:rgba(255,255,255,0.12);padding:3px 10px;border-radius:14px;font-size:11px;margin:4px 4px 0 0;color:var(--gold-light);font-weight:600}
+.restart-btn{background:var(--gold);color:var(--emerald-deep);border:none;padding:11px 22px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;margin-top:18px;transition:all 0.2s}
+.restart-btn:hover{background:var(--gold-pale);color:var(--emerald-deep)}
+.rules-fired{background:rgba(0,0,0,0.2);padding:14px;border-radius:10px;margin-top:16px;font-size:12px;font-family:'Courier New',monospace;line-height:1.6;color:rgba(255,255,255,0.85)}
+.rules-fired .rt{color:var(--gold-light);font-weight:700;display:block;margin-bottom:6px;font-family:inherit;letter-spacing:1px}
+.export-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.export-btn{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:9px 16px;border-radius:9px;cursor:pointer;font-family:inherit;font-weight:600;font-size:12px;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.export-btn:hover{background:rgba(255,255,255,0.25)}
+.export-btn svg{width:14px;height:14px}
+
+/* Simulator */
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:22px}
+.sim-field{background:var(--cream-deep);padding:14px;border-radius:10px}
+.sim-field label{display:block;font-size:11.5px;color:var(--emerald);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;text-transform:uppercase}
+.sim-field input,.sim-field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:var(--panel-bg);color:var(--ink);outline:none}
+.sim-field input:focus,.sim-field select:focus{border-color:var(--emerald)}
+.sim-field .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.sim-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:18px 0}
+.sim-card{background:var(--panel-bg);border:1.5px solid var(--border);border-radius:10px;padding:14px}
+.sim-card .sim-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.sim-card .sim-value{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--emerald);font-weight:600;margin-top:4px;line-height:1.1}
+.sim-card.scenario{border-left:3px solid var(--gold)}
+.sim-card .sim-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.sim-card.scenario.esg{border-left-color:var(--green-good)}
+.sim-card.scenario.sukuk{border-left-color:var(--gold)}
+.sim-card.scenario.jci{border-left-color:var(--muted)}
+.sim-chart-wrap{background:var(--cream-deep);border-radius:12px;padding:16px;margin-top:14px}
+.sim-chart-wrap h4{font-size:13px;color:var(--emerald);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px}
+.sim-chart{width:100%;height:280px;max-height:50vh;display:block}
+@media (max-width:600px){ .sim-chart{height:220px} }
+.sim-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11.5px;color:var(--muted)}
+.sim-legend span{display:flex;align-items:center;gap:6px}
+.sim-legend i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.sim-note{font-size:11.5px;color:var(--muted);margin-top:10px;font-style:italic;line-height:1.5}
+
+/* Data tab: sub-tabs */
+.subtabs{display:flex;gap:8px;margin-bottom:18px;border-bottom:1.5px solid var(--border);padding-bottom:0}
+.subtab{background:transparent;border:none;padding:10px 18px;font-family:inherit;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all 0.2s}
+.subtab:hover{color:var(--emerald)}
+.subtab.active{color:var(--emerald);border-bottom-color:var(--gold)}
+.data-meta{font-size:11.5px;color:var(--muted);margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.data-meta .pill{background:var(--cream-deep);padding:3px 10px;border-radius:14px;font-weight:600;color:var(--emerald)}
+
+/* News tab */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.news-card{background:var(--panel-bg);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-decoration:none;color:var(--ink);transition:all 0.2s;display:flex;flex-direction:column;gap:8px}
+.news-card:hover{border-color:var(--emerald);transform:translateY(-2px);box-shadow:var(--shadow)}
+.news-card .nc-head{display:flex;align-items:center;gap:10px}
+.news-card .nc-logo{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;letter-spacing:0.5px;flex-shrink:0}
+.news-card .nc-name{font-weight:700;font-size:14px;color:var(--emerald)}
+.news-card .nc-tag{font-size:11px;color:var(--muted)}
+.news-card .nc-action{font-size:11.5px;color:var(--gold);font-weight:600;margin-top:auto}
+.news-articles{margin-top:22px}
+.news-articles h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--emerald);margin-bottom:12px;font-weight:600}
+.news-list{display:flex;flex-direction:column;gap:8px}
+.news-article{background:var(--cream-deep);padding:12px 14px;border-radius:10px;border-left:3px solid var(--gold);text-decoration:none;color:var(--ink);transition:all 0.2s;display:block}
+.news-article:hover{transform:translateX(4px)}
+.news-article .na-source{font-size:10.5px;color:var(--emerald);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.news-article .na-title{font-size:13.5px;color:var(--ink);margin-top:3px;line-height:1.45}
+.news-article .na-date{font-size:11px;color:var(--muted);margin-top:3px}
+.news-empty{background:var(--cream-deep);padding:16px;border-radius:10px;font-size:13px;color:var(--muted);line-height:1.6;text-align:center}
+.news-empty code{background:rgba(15,76,58,0.12);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--emerald)}
+
+/* Stocks tab */
+.stocks-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.stocks-filter{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--panel-bg);color:var(--ink);font-family:inherit;font-size:13px;cursor:pointer}
+.stocks-filter.active{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
+[data-theme="dark"] .stocks-filter.active{color:#0F1612}
+.stocks-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+.stocks-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+.stocks-table th{background:var(--cream-deep);color:var(--emerald);text-align:left;padding:10px 12px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1.5px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+.stocks-table th:hover{background:var(--hint-bg)}
+.stocks-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--ink)}
+.stocks-table tr:hover td{background:var(--hint-bg)}
+.stocks-table .ticker-cell{font-weight:700;color:var(--emerald);font-family:'Courier New',monospace}
+.stocks-table .stock-name{font-weight:600;color:var(--ink)}
+.stocks-table .stock-sector{font-size:11px;color:var(--muted);margin-top:2px}
+.stocks-table .pos{color:var(--green-good);font-weight:700}
+.stocks-table .neg{color:var(--red);font-weight:700}
+.stocks-table .flag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9.5px;font-weight:700;margin-right:3px;letter-spacing:0.5px}
+.stocks-table .flag-k{background:#E8F5EE;color:#1A5C3F}
+.stocks-table .flag-e{background:#FFF7DC;color:#7A5A0B}
+.stocks-table .flag-s{background:#E8EEF5;color:#1A3F5C}
+[data-theme="dark"] .stocks-table .flag-k{background:rgba(75,203,148,0.2);color:var(--green-good)}
+[data-theme="dark"] .stocks-table .flag-e{background:rgba(229,181,71,0.2);color:var(--gold)}
+[data-theme="dark"] .stocks-table .flag-s{background:rgba(91,127,191,0.2);color:#9CB5DB}
+.stocks-table .esg-bars{display:flex;gap:3px}
+.stocks-table .esg-bar{width:18px;text-align:center;padding:2px 0;border-radius:3px;font-size:10px;font-weight:700;color:#fff}
+.benchmark-card{background:var(--cream-deep);padding:14px;border-radius:10px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center}
+.benchmark-card .bc-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.benchmark-card .bc-value{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--emerald);font-weight:600}
+.benchmark-card .bc-change{font-size:12.5px;font-weight:700;margin-left:6px}
+
+/* Quiz */
+.quiz-intro{text-align:center;padding:30px 20px}
+.quiz-intro h3{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--emerald);margin-bottom:10px}
+.quiz-intro p{color:var(--muted);font-size:14px;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6}
+.quiz-start-btn{background:var(--emerald);color:var(--cream);border:none;padding:14px 32px;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;transition:all 0.2s}
+[data-theme="dark"] .quiz-start-btn{color:#0F1612}
+.quiz-start-btn:hover{background:var(--emerald-deep);transform:translateY(-2px);box-shadow:var(--shadow)}
+.quiz-question{animation:fadeUp 0.4s ease}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:12px;color:var(--muted)}
+.quiz-meta .qnum{color:var(--emerald);font-weight:700}
+.quiz-question h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink);margin-bottom:18px;line-height:1.4}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{background:var(--panel-bg);border:1.5px solid var(--border);padding:14px 16px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px;text-align:left;color:var(--ink);transition:all 0.2s;display:flex;align-items:center;gap:12px}
+.quiz-opt:hover{border-color:var(--emerald);background:var(--cream-deep)}
+.quiz-opt .letter{width:26px;height:26px;border-radius:50%;background:var(--cream-deep);color:var(--emerald);display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.quiz-opt.correct{border-color:#2D8659;background:#E8F5EE;color:#1A5C3F}
+.quiz-opt.correct .letter{background:#2D8659;color:#fff}
+.quiz-opt.wrong{border-color:#C44536;background:#FBE9E7;color:#7A2A20}
+.quiz-opt.wrong .letter{background:#C44536;color:#fff}
+[data-theme="dark"] .quiz-opt.correct{background:rgba(45,134,89,0.2);color:#9FE7BC}
+[data-theme="dark"] .quiz-opt.wrong{background:rgba(196,69,54,0.2);color:#F2A99F}
+.quiz-feedback{margin-top:14px;padding:14px;border-radius:10px;background:var(--cream-deep);font-size:13.5px;line-height:1.6;animation:fadeUp 0.3s ease;color:var(--ink)}
+.quiz-feedback strong{color:var(--emerald)}
+.quiz-next-btn{background:var(--emerald);color:var(--cream);border:none;padding:11px 22px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;margin-top:14px}
+[data-theme="dark"] .quiz-next-btn{color:#0F1612}
+.quiz-result{text-align:center;padding:20px 0}
+.quiz-result .score-circle{width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,var(--emerald) 0%,var(--gold) 100%);display:grid;place-items:center;margin:0 auto 20px;color:var(--cream);box-shadow:var(--shadow)}
+[data-theme="dark"] .quiz-result .score-circle{color:#0F1612}
+.quiz-result .score-num{font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:600;line-height:1}
+.quiz-result .score-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.9;margin-top:4px}
+.quiz-result h3{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--emerald);margin-bottom:8px}
+.quiz-result p{color:var(--muted);font-size:14px;margin-bottom:18px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6}
+
+/* Footer */
+footer{margin-top:24px;text-align:center;font-size:12px;color:var(--muted);line-height:1.6}
+footer .proverb{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);display:block;margin-bottom:6px;font-size:14px}
+footer .disclaimer{font-size:10.5px;color:var(--muted);margin-top:8px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6}
+footer .footer-link{font-size:11px;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--muted);padding-bottom:1px;cursor:pointer;margin-left:8px;transition:color 0.2s}
+footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
+
+/* Animations + scroll */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hide{display:none !important}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(15,76,58,0.2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(15,76,58,0.4)}
+
+/* Print styles for PDF export */
+@media print{
+  body{background:white !important;color:black}
+  body::before,body::after{display:none !important}
+  .container{max-width:none;padding:10px}
+  header,.context-banner,.tabs,footer,.chat-input-wrap,.panel-head,.restart-btn,.export-row,.quiz-start-btn,.modal-overlay,.hdr-btn,.lesson-nav,.lesson-nav-btns,#chatBody,.sim-grid{display:none !important}
+  .panel{box-shadow:none;border:none;min-height:auto}
+  .panel-body{max-height:none;overflow:visible;padding:0}
+  .result-card{break-inside:avoid;page-break-inside:avoid;color:black !important;background:white !important;border:1.5px solid #0F4C3A !important;padding:18px;color-adjust:exact;-webkit-print-color-adjust:exact}
+  .result-card *{color:black !important}
+  .result-card .badge{background:#B8860B !important;color:white !important;-webkit-print-color-adjust:exact}
+  .result-card h3{color:#0F4C3A !important}
+  .result-card .rec-item{background:#FAF6EA !important;border-left:3px solid #B8860B !important}
+  .rules-fired{background:#F2EAD3 !important}
+  .result-card strong,.result-card .rec-item strong{color:#0F4C3A !important}
+  .broker-tag{background:#F2EAD3 !important;color:#0F4C3A !important}
+}
+
+@media (max-width:780px){
+  .tabs{grid-template-columns:repeat(3,1fr)}
+  .tab .sub{display:none}
+}
+@media (max-width:600px){
+  .container{padding:18px 14px 40px}
+  .brand-text h1{font-size:24px}
+  .panel-head h2{font-size:22px}
+  .meta{display:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="brand">
+      <div class="logo-mark">
+        <div class="logo-spark"></div>
+        <svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 -85 C55 -75, 87 -45, 87 0 C87 50, 50 85, 0 90 C-50 85, -87 50, -87 0 C-87 -45, -55 -75, 0 -85 Z" fill="none"/>
+          <path d="M -42 -32 L 36 -32" stroke="#FAF6EA" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <path d="M -42 0 L 24 0" stroke="#FAF6EA" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <path d="M -42 32 L 36 32" stroke="#FAF6EA" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <path d="M -42 -32 L -42 32" stroke="#FAF6EA" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <circle cx="48" cy="0" r="4" fill="#D4B670"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>ELMU.AI</h1>
+        <div class="tagline" id="tagline">Cuan Lestari, Berbasis Elmu</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <button class="hdr-btn" id="langToggle" title="Bahasa/English" aria-label="Toggle language"><span id="langIcon">EN</span></button>
+      <button class="hdr-btn" id="themeToggle" title="Light/Dark theme" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+    </div>
+    <div class="meta">
+      <strong id="metaDegree">Master of Finance · FinTech</strong><br>
+      <span id="metaSchool">Asia Pacific University · 2026</span>
+    </div>
+  </header>
+
+  <div class="context-banner">
+    <span class="dot"></span>
+    <span id="bannerText"><strong>JAN 2026 ·</strong> MSCI mempertimbangkan menurunkan status Indonesia ke <em>frontier market</em>. ~USD 80 miliar kapitalisasi pasar hilang. Saatnya investor ritel paham ESG &amp; tata kelola.</span>
+  </div>
+
+  <!-- Tabs cut to 3 core components per assignment brief (chatbot + teaching + expert system).
+       Simulate, Data, and Quiz modules are implemented but disabled for the submission version.
+       See docs/future-work.md for re-enablement notes. -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span class="label" data-i18n="tab.chat">Tanya</span><span class="sub" data-i18n="tab.chat_sub">Ask</span>
+    </button>
+    <button class="tab" data-mode="learn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span class="label" data-i18n="tab.learn">Belajar</span><span class="sub" data-i18n="tab.learn_sub">Learn</span>
+    </button>
+    <button class="tab" data-mode="advise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H3v10h6V11zM21 3h-6v18h6V3zM15 7H9v14h6V7z"/></svg>
+      <span class="label" data-i18n="tab.advise">Saran</span><span class="sub" data-i18n="tab.advise_sub">Advise</span>
+    </button>
+    <!--
+    <button class="tab" data-mode="simulate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+      <span class="label" data-i18n="tab.simulate">Simulasi</span><span class="sub" data-i18n="tab.simulate_sub">Simulate</span>
+    </button>
+    <button class="tab" data-mode="data">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+      <span class="label" data-i18n="tab.data">Data</span><span class="sub" data-i18n="tab.data_sub">Markets</span>
+    </button>
+    <button class="tab" data-mode="quiz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="label" data-i18n="tab.quiz">Kuis</span><span class="sub" data-i18n="tab.quiz_sub">Quiz</span>
+    </button>
+    -->
+  </div>
+
+  <div class="panel">
+
+    <div id="mode-chat">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.chat">Tanya Elmu</h2>
+          <p data-i18n="head.chat_sub">Tanya apa saja tentang ESG investing, regulasi Indonesia, atau krisis MSCI 2026</p>
+        </div>
+      </div>
+      <div class="character-banner">
+        <div class="character-avatar-wrap">
+          <img src="avatar.png" alt="Sari" class="character-avatar" id="characterAvatar" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'character-avatar placeholder',textContent:'S'}))">
+        </div>
+        <div class="character-info">
+          <div class="character-name">Sari</div>
+          <div class="character-subtitle" data-i18n="character.subtitle">Asisten Investasi ESG</div>
+          <div class="character-status" data-i18n="character.status">Online · siap membantu</div>
+        </div>
+      </div>
+      <div class="market-panel" id="marketPanel">
+        <div class="mp-row">
+          <div class="mp-item">
+            <span class="mp-label">IHSG</span>
+            <span class="mp-value" id="mpJci">—</span>
+            <span class="mp-change" id="mpJciChange">—</span>
+          </div>
+          <div class="mp-item" id="mpMoverWrap" style="display:none">
+            <span class="mp-label" data-i18n="market.topGainer">Top Gainer</span>
+            <span class="mp-value" id="mpMover">—</span>
+            <span class="mp-change pos" id="mpMoverChange">—</span>
+          </div>
+          <div class="mp-meta" id="mpMeta">—</div>
+        </div>
+      </div>
+      <div class="panel-body" id="chatBody">
+        <div id="chatMessages"></div>
+      </div>
+      <div class="chat-input-wrap">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Coba: 'Apa itu ESG?' atau 'MSCI Indonesia kenapa?'" autocomplete="off">
+        <button class="send-btn" id="sendBtn" data-i18n="btn.send">Kirim</button>
+      </div>
+    </div>
+
+    <div id="mode-learn" class="hide">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.learn">Lima Pelajaran ESG</h2>
+          <p data-i18n="head.learn_sub">Dari dasar sampai konteks Indonesia · From fundamentals to Indonesian context</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="lesson-nav" id="lessonNav"></div>
+        <div class="lesson-content" id="lessonContent"></div>
+        <div class="lesson-nav-btns">
+          <button class="nav-btn" id="prevLesson" data-i18n="btn.prev">← Sebelumnya</button>
+          <button class="nav-btn" id="nextLesson" data-i18n="btn.next">Selanjutnya →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="mode-advise" class="hide">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.advise">Saran Personal</h2>
+          <p data-i18n="head.advise_sub">Rule-based expert system · Jawab 5 pertanyaan untuk rekomendasi ESG</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div id="expertContent"></div>
+      </div>
+    </div>
+
+    <!-- Simulate / Data / Quiz panels disabled for submission. JS functions kept intact for re-enable.
+    <div id="mode-simulate" class="hide">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.simulate">Simulator Portofolio</h2>
+          <p data-i18n="head.simulate_sub">Proyeksi pertumbuhan dengan DCA vs benchmark JCI &amp; Sukuk</p>
+        </div>
+      </div>
+      <div class="panel-body" id="simulateBody"></div>
+    </div>
+
+    <div id="mode-data" class="hide">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.data">Data &amp; Berita Pasar</h2>
+          <p data-i18n="head.data_sub">Saham IDX ESG &amp; sumber berita ekonomi Indonesia</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="subtabs" id="subtabs">
+          <button class="subtab active" data-sub="news" data-i18n="sub.news">Berita</button>
+          <button class="subtab" data-sub="stocks" data-i18n="sub.stocks">Saham IDX</button>
+        </div>
+        <div id="sub-news"></div>
+        <div id="sub-stocks" class="hide"></div>
+      </div>
+    </div>
+
+    <div id="mode-quiz" class="hide">
+      <div class="panel-head">
+        <div>
+          <h2 data-i18n="head.quiz">Tes Pengetahuan ESG</h2>
+          <p data-i18n="head.quiz_sub">10 pertanyaan · Uji pemahaman tentang ESG investing di Indonesia</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div id="quizContent"></div>
+      </div>
+    </div>
+    -->
+
+  </div>
+
+  <footer>
+    <span class="proverb" id="proverb">"Elemu sebua wa'ebolo dödö" — the greatest knowledge is patience (Nias proverb)</span>
+    <span id="footerCredit">ELMU.AI · Educational prototype · Master of Finance FinTech project</span>
+    <a class="footer-link" id="resetName" data-i18n="footer.resetname">Reset nama</a>
+    <div class="disclaimer" id="disclaimer">
+      <strong>Disclaimer:</strong> Tools ini hanya untuk edukasi, BUKAN saran investasi yang teregulasi. Semua keputusan investasi adalah tanggung jawab pribadi. Konsultasikan dengan penasihat keuangan berlisensi OJK sebelum berinvestasi.
+    </div>
+  </footer>
+
+</div>
+
+<div class="modal-overlay" id="teachModal">
+  <div class="modal">
+    <h3 id="teachTitle">Ajari Elemu</h3>
+    <p id="teachDesc">Saya belum tahu jawaban itu. Mau ajari saya? Jawaban kamu akan disimpan di browser ini dan dipakai untuk pertanyaan serupa nantinya.</p>
+    <div class="modal-field">
+      <label id="teachQLabel">Pertanyaan kamu</label>
+      <input type="text" class="modal-input" id="teachQ" readonly>
+    </div>
+    <div class="modal-field">
+      <label id="teachALabel">Jawaban yang seharusnya</label>
+      <textarea class="modal-input textarea" id="teachA" placeholder="Tulis jawaban yang menurut kamu tepat..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" id="teachCancel" data-i18n="btn.cancel">Batal</button>
+      <button class="btn-primary" id="teachSave" data-i18n="btn.save">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="stocks.js"></script>
+<script src="news.js"></script>
+<script src="knowledge.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Elemu Lestari · elmu.ai · main app
+   Bilingual (id/en), themed, persistent, multi-tab
+   ============================================================ */
+
+/* ===== Storage wrapper ===== */
+const STORE = {
+  get(key, fallback){
+    try{ const v = localStorage.getItem('elemu_'+key); return v===null?fallback:JSON.parse(v); }
+    catch(e){ return fallback; }
+  },
+  set(key, val){
+    try{ localStorage.setItem('elemu_'+key, JSON.stringify(val)); }catch(e){}
+  },
+  del(key){
+    try{ localStorage.removeItem('elemu_'+key); }catch(e){}
+  }
+};
+
+/* ===== Tokenizer + Jaccard matcher ===== */
+const STOP = new Set(['a','an','the','is','are','was','were','be','been','being','of','to','for','in','on','at','by','with','from','as','that','this','these','those','it','its','and','or','but','if','then','than','so','i','me','my','you','your','we','our','us','he','she','they','them','his','her','him','their','what','which','who','whom','when','where','why','how','do','does','did','done','have','has','had','can','could','should','would','will','shall','may','might','must','not','no','yes','also','very','just','some','any','all','each','every','more','most','other','another','only','own','same','too','one','two','three','itu','ini','dan','atau','tapi','tetapi','dengan','dari','ke','di','yang','adalah','akan','sudah','telah','saya','aku','kamu','kita','kami','mereka','dia','mereka','apa','apa-apa','siapa','kapan','dimana','kenapa','mengapa','bagaimana','gimana','bisa','dapat','harus','perlu','mau','ingin','suka','juga','sekali','sangat','agak','cuma','hanya','saja','lagi','masih','sudah','belum','tidak','bukan','iya','ya','nggak','ngga','enggak','aja','dong','sih','dong','kok','deh','tuh','nih','toh','pun','lah','kah','tah','-nya','nya']);
+
+function tokenize(s){
+  if(!s) return [];
+  return String(s).toLowerCase()
+    .replace(/[^a-z0-9À-ſ\s]/g,' ')
+    .split(/\s+/)
+    .filter(t => t.length>=2 && !STOP.has(t));
+}
+function jaccard(a,b){
+  if(!a.length || !b.length) return 0;
+  const A = new Set(a), B = new Set(b);
+  let inter = 0;
+  for(const x of A) if(B.has(x)) inter++;
+  const union = new Set([...A,...B]).size;
+  return union===0 ? 0 : inter/union;
+}
+function expandWithSynonyms(tokens, syn){
+  const out = new Set(tokens);
+  for(const t of tokens){
+    if(syn[t]) syn[t].forEach(s => tokenize(s).forEach(x => out.add(x)));
+  }
+  for(const key in syn){
+    const keyTokens = tokenize(key);
+    if(keyTokens.some(k=>tokens.includes(k))){
+      keyTokens.forEach(k=>out.add(k));
+      syn[key].forEach(s=>tokenize(s).forEach(x=>out.add(x)));
+    }
+  }
+  return [...out];
+}
+
+/* ===== Number formatting ===== */
+function fmtRp(n){
+  if(n===null||n===undefined||isNaN(n)) return '—';
+  if(Math.abs(n)>=1e12) return 'Rp '+(n/1e12).toFixed(1).replace('.',',')+' T';
+  if(Math.abs(n)>=1e9)  return 'Rp '+(n/1e9).toFixed(1).replace('.',',')+' M';
+  if(Math.abs(n)>=1e6)  return 'Rp '+(n/1e6).toFixed(1).replace('.',',')+' jt';
+  if(Math.abs(n)>=1e3)  return 'Rp '+(n/1e3).toFixed(0)+'rb';
+  return 'Rp '+Math.round(n).toLocaleString('id-ID');
+}
+function fmtPct(n,signed=true){
+  if(n===null||n===undefined||isNaN(n)) return '—';
+  const s = signed ? (n>=0?'+':'') : '';
+  return s + n.toFixed(1) + '%';
+}
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ===== "Today's market" panel renderer ===== */
+function renderMarketPanel(){
+  const panel = document.getElementById('marketPanel');
+  if(!panel) return;
+  const data = window.STOCKS_DATA;
+  if(!data || !data.benchmark){ panel.classList.remove('show'); return; }
+  const bm = data.benchmark;
+  if(bm.jci_value == null){ panel.classList.remove('show'); return; }
+
+  const jci = document.getElementById('mpJci');
+  const jciChange = document.getElementById('mpJciChange');
+  if(jci) jci.textContent = bm.jci_value.toLocaleString('id-ID');
+  if(jciChange){
+    const v = bm.jci_ytd;
+    if(v != null){
+      jciChange.textContent = (v>=0?'+':'') + v.toFixed(1) + '% YTD';
+      jciChange.className = 'mp-change ' + (v>=0?'pos':'neg');
+    } else {
+      jciChange.textContent = '—';
+      jciChange.className = 'mp-change';
+    }
+  }
+
+  // Top gainer from ESG-eligible stocks (KEHATI or ESG Leaders only)
+  const moverWrap = document.getElementById('mpMoverWrap');
+  const mover = document.getElementById('mpMover');
+  const moverChange = document.getElementById('mpMoverChange');
+  if(moverWrap && mover && moverChange && Array.isArray(data.stocks)){
+    const candidates = data.stocks
+      .filter(s => (s.kehati || s.esg_leaders) && typeof s.change_ytd === 'number')
+      .sort((a,b) => b.change_ytd - a.change_ytd);
+    if(candidates.length > 0 && candidates[0].change_ytd > 0){
+      mover.textContent = candidates[0].ticker;
+      moverChange.textContent = '+'+candidates[0].change_ytd.toFixed(1)+'%';
+      moverWrap.style.display = '';
+    } else {
+      moverWrap.style.display = 'none';
+    }
+  }
+
+  const meta = document.getElementById('mpMeta');
+  if(meta){
+    const isSample = !!data.is_sample;
+    const updated = data.updated || '—';
+    const updatedLabel = t('market.updated');
+    meta.innerHTML = isSample
+      ? '<span class="mp-sample">⚠ '+escapeHTML(t('market.sample'))+'</span> · '+escapeHTML(updated)
+      : '🟢 '+escapeHTML(updatedLabel)+' '+escapeHTML(updated);
+  }
+  panel.classList.add('show');
+}
+
+/* ===== Time-aware greeting helpers ===== */
+function getGreeting(){
+  const h = new Date().getHours();
+  if(h >= 4  && h < 11) return t('greeting.morning');
+  if(h >= 11 && h < 15) return t('greeting.afternoon');
+  if(h >= 15 && h < 18) return t('greeting.evening');
+  return t('greeting.night');
+}
+function fmtChatTime(){
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+function fmtChatDate(){
+  const L = window.CURRENT_LANG || 'id';
+  const locale = L === 'en' ? 'en-US' : 'id-ID';
+  return new Date().toLocaleDateString(locale, { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+/* ===== Conversational pre-filter ===== */
+/* Matches common chit-chat patterns BEFORE the FAQ matcher runs, so Elmu
+   replies naturally to greetings/thanks/goodbyes instead of treating them
+   as a name (during onboarding) or a low-confidence FAQ query. */
+const CONVERSATIONAL = [
+  /* ----- Meta-questions about Sari (her identity / how she knows things) ----- */
+  {
+    type:'how_know_my_name',
+    re:/(how\s+do\s+you\s+know|how\s+did\s+you\s+know|how\s+come\s+you\s+know|bagaimana\s+(kamu|sari)\s+(tahu|tau)|gimana\s+(kamu|sari)\s+(tahu|tau)|dari\s*mana\s+(kamu\s+|sari\s+)?(tahu|tau)|kok\s+(tahu|tau)|kenapa\s+(tahu|tau))[\s\S]*(my\s+name|nama\s+(saya|aku|gue|gw))/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const who = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L==='en'
+        ? "Because you told me when we first met"+who+"! 🌿 I remember your name in this browser\'s memory (localStorage). If you want me to forget, click <em>Reset nama</em> in the footer."
+        : "Karena kamu memberitahu saya saat kita pertama bertemu"+who+"! 🌿 Saya ingat nama kamu di memori browser ini (localStorage). Kalau mau hapus, klik <em>Reset nama</em> di footer.";
+    }
+  },
+  {
+    type:'what_my_name',
+    re:/(what.{0,2}s\s+my\s+name|do\s+you\s+(know|remember)\s+my\s+name|nama\s+(saya|aku|gue)\s+(apa|siapa)|siapa\s+nama\s+(saya|aku|gue)|inget\s+nama\s+(saya|aku)|ingat\s+nama\s+(saya|aku))/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      if(!name) return L==='en'
+        ? "I don\'t know yet — you haven\'t told me your name 😊 Want to share it?"
+        : "Saya belum tahu — kamu belum kasih tahu nama 😊 Mau cerita?";
+      return L==='en'
+        ? "Your name is <strong>"+escapeHTML(name)+"</strong>! 🌿"
+        : "Nama kamu <strong>"+escapeHTML(name)+"</strong>! 🌿";
+    }
+  },
+  {
+    type:'your_name',
+    re:/(what.{0,2}s\s+your\s+name|your\s+name\s+(is|please)|siapa\s+nama\s+(kamu|sari)|nama\s+(kamu|sari)\s+(apa|siapa))/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "My name is <strong>Sari</strong> 🌿 — I\'m the ESG investment assistant in ELMU.AI."
+        : "Nama saya <strong>Sari</strong> 🌿 — asisten investasi ESG di ELMU.AI.";
+    }
+  },
+  {
+    type:'who_are_you',
+    re:/(who\s+are\s+you|what\s+are\s+you|tell\s+me\s+about\s+(yourself|sari)|siapa\s+(kamu|sari)\s*(itu)?|tentang\s+(kamu|sari)|kamu\s+(siapa|itu\s+apa)|are\s+you\s+(a\s+)?(bot|robot|ai|human|real))/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I\'m <strong>Sari</strong>, the ESG investment assistant in <strong>ELMU.AI</strong> 🌿 — built as a Master of Finance (FinTech) prototype at Asia Pacific University. I help Indonesian retail investors understand ESG, OJK regulations, the 2026 MSCI crisis, and green investment products. I\'m a rule-based chatbot, not a generative AI."
+        : "Saya <strong>Sari</strong>, asisten investasi ESG di <strong>ELMU.AI</strong> 🌿 — proyek prototipe Master of Finance (FinTech) di Asia Pacific University. Saya bantu investor ritel Indonesia memahami ESG, regulasi OJK, krisis MSCI 2026, dan produk investasi hijau. Saya chatbot berbasis aturan (rule-based), bukan AI generatif.";
+    }
+  },
+  {
+    type:'what_can_you_do',
+    re:/(what\s+can\s+you\s+do|what\s+do\s+you\s+do|how\s+can\s+you\s+help|help\s+me\s+with\s+what|apa\s+(yang\s+)?(kamu|sari)\s+bisa|(kamu|sari)\s+bisa\s+apa|kemampuan\s+(kamu|sari)|fungsi\s+(kamu|sari)|tolong\s+apa|bantu\s+apa)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I can help you with:<br>• ESG concepts (E/S/G pillars, ratings, greenwashing)<br>• Indonesian regulations (OJK, IDX, KEHATI Index, POJK 51)<br>• MSCI Indonesia crisis (Jan 2026 — what happened &amp; why)<br>• Green products (Green Sukuk, ESG mutual funds, IDXCarbon)<br>• Platform comparison (Bibit · Ajaib · Stockbit · IPOT)<br>• Net Zero 2060 &amp; JETP energy transition<br>Try asking about any of those! 🌿"
+        : "Saya bisa bantu kamu soal:<br>• Konsep ESG (pilar E/S/G, rating, greenwashing)<br>• Regulasi Indonesia (OJK, IDX, KEHATI Index, POJK 51)<br>• Krisis MSCI Indonesia (Jan 2026 — apa &amp; kenapa)<br>• Produk hijau (Green Sukuk, reksa dana ESG, IDXCarbon)<br>• Bandingkan platform (Bibit · Ajaib · Stockbit · IPOT)<br>• Net Zero 2060 &amp; JETP transisi energi<br>Coba tanya tentang itu! 🌿";
+    }
+  },
+  {
+    type:'knowledge_source',
+    re:/(how\s+do\s+you\s+know\s+(this|that|about|all)|where\s+did\s+you\s+learn|where\s+is\s+(your|the)\s+(info|source|data)|sumber\s+(kamu|info|data)|dari\s+mana\s+(info|sumbernya))/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "My knowledge comes from publicly available sources: OJK regulations (POJK 51/2017, POJK 13/2025), IDX/BEI publications, KEHATI Foundation reports, academic papers (Berg/Friede on ESG), Sustainable Finance Roadmap II, and content curated by my developer. I\'m an educational prototype — always cross-check with OJK-licensed advisors before real investments."
+        : "Pengetahuan saya bersumber dari materi publik: peraturan OJK (POJK 51/2017, POJK 13/2025), publikasi IDX/BEI, laporan Yayasan KEHATI, paper akademik (Berg/Friede tentang ESG), Sustainable Finance Roadmap II, dan konten yang dikurasi pengembang saya. Saya prototipe edukasi — selalu konsultasi penasihat berlisensi OJK sebelum investasi sungguhan.";
+    }
+  },
+  {
+    type:'is_real',
+    re:/(are\s+you\s+(real|a\s+human|alive)|kamu\s+(beneran|asli|real|manusia|hidup)|kamu\s+bot|chatbot)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I\'m a chatbot 🤖🌿 — built with rules and pattern matching, not a generative AI. So I have a defined knowledge base on ESG investing. I\'m honest about my limits: if I don\'t know, I\'ll say so."
+        : "Saya chatbot 🤖🌿 — dibangun dengan aturan dan pola, bukan AI generatif. Jadi saya punya basis pengetahuan tertentu soal ESG investing. Saya jujur soal batas saya: kalau tidak tahu, akan saya akui.";
+    }
+  },
+  {
+    type:'how_to_reset',
+    re:/(reset\s+(my\s+)?name|forget\s+(my\s+)?name|hapus\s+nama|lupa\s+nama|ganti\s+nama|change\s+(my\s+)?name)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "To reset your name, scroll to the bottom of the page and click the <em>Reset nama</em> link in the footer. I\'ll forget your name and ask again on next reload."
+        : "Untuk reset nama, scroll ke bawah halaman dan klik link <em>Reset nama</em> di footer. Saya akan lupa nama kamu dan tanya lagi saat reload.";
+    }
+  },
+  /* ----- Investment-advice deflection (regulatory-honest) ----- */
+  {
+    type:'investment_advice',
+    re:/(give\s+me\s+(an\s+)?(advice|advise)|need\s+(an\s+)?(advice|advise)|what\s+(should|to)\s+(i\s+)?(buy|invest|sell|pick|choose)|should\s+i\s+(buy|invest|sell)|recommend(\s+me)?\s+(a\s+)?(stock|fund|saham|investment)|is\s+\w+\s+(a\s+)?good\s+(buy|investment|stock)|when\s+(to|should)\s+(buy|sell)|kasih(\s+(saya|aku))?\s+(saran|rekomendasi|advise|advice)|sarankan|rekomendasi(\s+saham)?|investasi\s+apa(\s+yang)?|beli\s+(saham\s+)?apa|saham\s+apa(\s+yang)?|kapan\s+(beli|jual)|harus\s+beli\s+apa|saham\s+(terbaik|bagus)\s+(apa|buat)|invest\s+(this|next|in)\s+(week|month))/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? '<strong>'+escapeHTML(name)+'</strong>' : (L==='en'?'friend':'kawan');
+      if(L==='en'){
+        return "Honest answer, "+n+": I can\'t give specific buy/sell advice. 🌿<br><br>" +
+          "<strong>Three reasons:</strong><br>" +
+          "1. <strong>Regulatory</strong> — only OJK-licensed Investment Advisors (<em>Penasihat Investasi</em>) can give personalized recommendations in Indonesia. I\'m an educational tool, not a licensed advisor.<br>" +
+          "2. <strong>I have no live market data</strong> — I\'m a rule-based knowledge base, not connected to real-time prices, news, or trades.<br>" +
+          "3. <strong>Your situation is unique</strong> — your risk tolerance, horizon, capital, and goals matter more than \"what\'s hot this week\".<br><br>" +
+          "<strong>What I CAN help with:</strong><br>" +
+          "• Use the <strong>Saran</strong> tab — answer 5 questions → get a personalized strategy framework<br>" +
+          "• Ask me about specific concepts (\"what is ESG\", \"Bibit vs Ajaib\") to build your own framework<br>" +
+          "• Read company sustainability reports before investing<br>" +
+          "• Cross-check any \"hot tip\" against at least 2 independent sources<br>" +
+          "• For real money decisions: consult an OJK-licensed financial advisor";
+      }
+      return "Jawaban jujur, "+n+": Sari tidak bisa kasih saran spesifik beli/jual saham. 🌿<br><br>" +
+        "<strong>Tiga alasan:</strong><br>" +
+        "1. <strong>Regulasi</strong> — hanya Penasihat Investasi berlisensi OJK yang boleh kasih rekomendasi beli/jual personal di Indonesia. Sari alat edukasi, bukan penasihat berlisensi.<br>" +
+        "2. <strong>Saya tidak punya data pasar live</strong> — saya basis pengetahuan berbasis aturan, tidak terkoneksi ke harga, berita, atau transaksi real-time.<br>" +
+        "3. <strong>Situasi kamu unik</strong> — toleransi risiko, horizon, modal, dan tujuan kamu lebih penting daripada \"apa yang sedang panas minggu ini\".<br><br>" +
+        "<strong>Yang bisa Sari bantu:</strong><br>" +
+        "• Pakai tab <strong>Saran</strong> — jawab 5 pertanyaan → dapat framework strategi personal<br>" +
+        "• Tanya saya konsep tertentu (\"apa itu ESG\", \"Bibit vs Ajaib\") untuk bangun framework sendiri<br>" +
+        "• Baca sustainability report perusahaan sebelum investasi<br>" +
+        "• Cross-check setiap \"tips panas\" dengan minimal 2 sumber independen<br>" +
+        "• Untuk keputusan uang sungguhan: konsultasi penasihat keuangan berlisensi OJK";
+    }
+  },
+  /* ----- General conversational patterns ----- */
+  {
+    type:'greeting',
+    re:/^\s*(halo+|haloo+|hai+|hello+|hi+|hey+|selamat\s*(pagi|siang|sore|malam)|assalamualaikum|salam)\s*[!.?,]*\s*$/i,
+    reply:(name)=>{
+      const g = getGreeting();
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      const L = window.CURRENT_LANG;
+      const tail = L==='en' ? '! 🌿 How can I help you today?' : '! 🌿 Ada yang bisa Sari bantu?';
+      return escapeHTML(g)+n+tail;
+    }
+  },
+  {
+    type:'wellbeing',
+    re:/^\s*(apa\s*kabar(nya)?|gimana\s*kabar(nya)?|how\s*(are|r)\s*(you|u)|how\s*do\s*you\s*do)\s*[!.?]*\s*$/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L==='en'
+        ? "I\'m doing great"+n+", thanks for asking! 🌿 Ready to talk ESG investing?"
+        : "Sari baik"+n+", terima kasih sudah bertanya! 🌿 Siap ngobrol soal ESG investing?";
+    }
+  },
+  {
+    type:'thanks',
+    re:/^\s*(makasih|terima\s*kasih|trims|mksh|thanks|thank\s*you|thx|tq)\s*[!.?]*\s*$/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L==='en'
+        ? "You\'re welcome"+n+"! 🌿 Anything else I can help with?"
+        : "Sama-sama"+n+"! 🌿 Ada lagi yang bisa Sari bantu?";
+    }
+  },
+  {
+    type:'goodbye',
+    re:/^\s*(bye|sampai\s*jumpa|dadah|see\s*you|cya|goodbye|selamat\s*tinggal|wassalam)\s*[!.?]*\s*$/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L==='en'
+        ? "See you"+n+"! 🌱 Good luck building a sustainable portfolio."
+        : "Sampai jumpa"+n+"! 🌱 Semoga sukses bangun portofolio yang lestari.";
+    }
+  },
+  {
+    type:'affirm',
+    re:/^\s*(ok|okay|oke|okeh|sip|siap|baik|baiklah|nice|good|cool|mantap|alright)\s*[!.?]*\s*$/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en' ? "👍 What would you like to know next?" : "👍 Apa lagi yang ingin kamu tahu?";
+    }
+  },
+  {
+    type:'compliment',
+    re:/^\s*(keren|hebat|pintar|amazing|awesome|impressive|smart|good\s*bot)\s*[!.?]*\s*$/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en' ? "Aw, thanks! 😊 Have more questions about ESG?" : "Wah, makasih! 😊 Ada pertanyaan lain soal ESG?";
+    }
+  }
+];
+function matchConversational(query){
+  if(!query) return null;
+  for(const c of CONVERSATIONAL){ if(c.re.test(query)) return c; }
+  return null;
+}
+
+/* Varied unknown-reply for natural feel. Short queries get an ELIZA-style
+   elaboration prompt; longer ones get a varied "I don't know" response. */
+function getUnknownReply(query){
+  const L = window.CURRENT_LANG;
+  const wordCount = (query.match(/\S+/g) || []).length;
+  if(wordCount <= 2){
+    const elaborate = L === 'en' ? [
+      "Could you elaborate a bit? I want to give you something useful.",
+      "Tell me more — what aspect of that interests you?",
+      "I want to make sure I help correctly. What\'s the context?",
+      "Just that? Could you expand a little?"
+    ] : [
+      "Bisa dijelaskan sedikit? Saya ingin kasih jawaban yang bermanfaat.",
+      "Ceritakan lebih dulu — sisi mana yang menarik buat kamu?",
+      "Biar saya bantu dengan tepat — apa konteksnya?",
+      "Cuma itu saja? Bisa diperluas sedikit?"
+    ];
+    return elaborate[Math.floor(Math.random()*elaborate.length)];
+  }
+  const standard = L === 'en' ? [
+    "Hmm, I\'m not sure about that one. Could you ask it differently?",
+    "That\'s outside what I currently know. Want to try one of the topics below?",
+    "I don\'t have a clear answer for that. Could you give me a bit more context?",
+    "Not in my knowledge base yet. Try one of the suggested topics?"
+  ] : [
+    "Hmm, saya belum yakin dengan pertanyaan itu. Bisa coba dengan kata-kata yang berbeda?",
+    "Wah, itu di luar pengetahuan saya saat ini. Mau coba salah satu topik di bawah?",
+    "Saya butuh sedikit petunjuk lagi. Bisa kasih konteks lebih?",
+    "Belum ada di basis pengetahuan saya. Coba salah satu topik di bawah?"
+  ];
+  return standard[Math.floor(Math.random()*standard.length)];
+}
+
+/* Detect explicit name-update phrases like "my name is X", "panggil saya X".
+   Returns the cleaned new name or null. Strict patterns to avoid false matches
+   like "i am tired" or "saya senang". */
+function detectNameUpdate(v){
+  if(!v) return null;
+  const patterns = [
+    /^\s*my\s+name\s+is\s+([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*call\s+me\s+([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*nama\s+(?:saya|aku|gue|gw)\s+(?:adalah\s+|itu\s+)?([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*nama(?:ku|nya)\s+([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*panggil\s+(?:saya|aku|gue|gw)\s+([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*saya\s+bernama\s+([a-zA-ZÀ-ſ'\s-]{2,30})\s*[!.?]*\s*$/i,
+    /^\s*aku\s+([A-Z][a-zA-ZÀ-ſ'\s-]{1,29})\s*[!.?]*\s*$/,           // strict: capitalized
+    /^\s*i'?m\s+([A-Z][a-zA-ZÀ-ſ'\s-]{1,29})\s*[!.?]*\s*$/            // strict: capitalized
+  ];
+  for(const p of patterns){
+    const m = v.match(p);
+    if(m && m[1]){
+      const cleaned = cleanName(m[1]);
+      if(cleaned) return cleaned;
+    }
+  }
+  return null;
+}
+
+/* Validate + clean a name input. Returns cleaned name or null if invalid. */
+function cleanName(raw){
+  if(!raw) return null;
+  // Allow letters (latin + diacritics), digits, spaces, hyphen, apostrophe; strip rest
+  const cleaned = raw.replace(/[^a-zA-ZÀ-ſ0-9\s'-]/g,'').trim().replace(/\s+/g,' ');
+  if(cleaned.length < 2 || cleaned.length > 30) return null;
+  // Title-case first letter of each word for nicer display
+  return cleaned.split(' ').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
+
+/* ===== I18N ===== */
+const I18N = {
+  id:{
+    'tab.chat':'Tanya','tab.chat_sub':'Ask',
+    'tab.learn':'Belajar','tab.learn_sub':'Learn',
+    'tab.advise':'Saran','tab.advise_sub':'Advise',
+    'tab.simulate':'Simulasi','tab.simulate_sub':'Simulate',
+    'tab.data':'Data','tab.data_sub':'Markets',
+    'tab.quiz':'Kuis','tab.quiz_sub':'Quiz',
+    'head.chat':'Tanya Elmu',
+    'character.subtitle':'Asisten Investasi ESG',
+    'character.status':'Online · siap membantu',
+    'market.topGainer':'Top Gainer',
+    'market.updated':'Update',
+    'market.sample':'Data sampel',
+    'greeting.morning':'Selamat pagi',
+    'greeting.afternoon':'Selamat siang',
+    'greeting.evening':'Selamat sore',
+    'greeting.night':'Selamat malam',
+    'location.label':'Bursa Efek Indonesia · Jakarta',
+    'intro.first':'Saya <strong>Sari</strong>, asisten investasi ESG kamu. Boleh tahu nama kamu dulu?',
+    'intro.returning':'Senang bertemu lagi. Apa yang ingin kamu pelajari hari ini tentang ESG?',
+    'name.welcome':'Senang berkenalan dengan',
+    'name.welcome_suffix':'! 🌿 Sekarang kamu bisa tanya saya apa saja tentang ESG investing, regulasi Indonesia, krisis MSCI 2026, atau produk investasi hijau.',
+    'name.invalid':'Nama tidak valid. Coba lagi dengan 2–30 huruf, tanpa simbol aneh.',
+    'name.reask':'Jadi, boleh tahu nama kamu dulu?',
+    'footer.resetname':'Reset nama',
+    'reset.confirm':'Reset nama kamu? Bot akan menanyakan nama lagi saat reload.',
+    'head.chat_sub':'Tanya apa saja tentang ESG investing, regulasi Indonesia, atau krisis MSCI 2026',
+    'head.learn':'Lima Pelajaran ESG',
+    'head.learn_sub':'Dari dasar sampai konteks Indonesia',
+    'head.advise':'Saran Personal',
+    'head.advise_sub':'Rule-based expert system · Jawab 5 pertanyaan untuk rekomendasi ESG',
+    'head.simulate':'Simulator Portofolio',
+    'head.simulate_sub':'Proyeksi pertumbuhan dengan DCA vs benchmark JCI & Sukuk',
+    'head.data':'Data & Berita Pasar',
+    'head.data_sub':'Saham IDX ESG & sumber berita ekonomi Indonesia',
+    'head.quiz':'Tes Pengetahuan ESG',
+    'head.quiz_sub':'10 pertanyaan · Uji pemahaman tentang ESG investing di Indonesia',
+    'sub.news':'Berita','sub.stocks':'Saham IDX',
+    'btn.send':'Kirim','btn.prev':'← Sebelumnya','btn.next':'Selanjutnya →',
+    'btn.cancel':'Batal','btn.save':'Simpan','btn.restart':'↺ Mulai Ulang',
+    'btn.exportPdf':'📄 Simpan PDF','btn.exportPng':'🖼 Bagikan Kartu','btn.calc':'Hitung Proyeksi',
+    'tagline':'Cuan Lestari, Berbasis Elmu',
+    'meta.degree':'Master of Finance · FinTech',
+    'meta.school':'Asia Pacific University · 2026',
+    'banner.msci':'<strong>JAN 2026 ·</strong> MSCI mempertimbangkan menurunkan status Indonesia ke <em>frontier market</em>. ~USD 80 miliar kapitalisasi pasar hilang. Saatnya investor ritel paham ESG &amp; tata kelola.',
+    'proverb':'"Elemu sebua wa\'ebolo dödö" — pengetahuan terbesar adalah kesabaran (peribahasa Nias)',
+    'footer.credit':'ELMU.AI · Prototipe edukasi · Proyek Master of Finance FinTech',
+    'footer.disclaimer':'<strong>Disclaimer:</strong> Tools ini hanya untuk edukasi, BUKAN saran investasi yang teregulasi. Semua keputusan investasi adalah tanggung jawab pribadi. Konsultasikan dengan penasihat keuangan berlisensi OJK sebelum berinvestasi.',
+    'chat.placeholder':"Coba: 'Apa itu ESG?' atau 'MSCI Indonesia kenapa?'",
+    'chat.welcome':'Halo, saya <strong>Elmu</strong> 🌿 — chatbot edukasi investasi ESG untuk investor Indonesia. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau. Klik salah satu di bawah untuk mulai!',
+    'chat.unknown':"Saya belum yakin dengan pertanyaan itu. Coba salah satu topik di bawah, atau tanya dengan kalimat yang berbeda.",
+    'chat.didYouMean':'Mungkin maksud kamu',
+    'chat.confLow':'⚠ Tingkat keyakinan rendah — periksa juga sumber lain.',
+    'chat.learned':'💡 Jawaban ini diajarkan oleh kamu sebelumnya.',
+    'teach.title':'Ajari Elemu',
+    'teach.desc':'Saya belum tahu jawaban itu. Mau ajari saya? Jawaban kamu akan disimpan di browser ini dan dipakai untuk pertanyaan serupa nantinya.',
+    'teach.qlabel':'Pertanyaan kamu',
+    'teach.alabel':'Jawaban yang seharusnya',
+    'teach.thanks':'Terima kasih sudah mengajari saya! 🌿 Jawaban kamu sudah disimpan.',
+    'sim.initial':'Modal Awal','sim.initial_hint':'Investasi sekali di awal',
+    'sim.monthly':'DCA Bulanan','sim.monthly_hint':'Dollar-Cost Averaging (rutin)',
+    'sim.horizon':'Horizon (tahun)','sim.horizon_hint':'Lama investasi',
+    'sim.return':'Asumsi Return ESG (% / tahun)','sim.return_hint':'Default 9% (saham ESG agresif)',
+    'sim.final_esg':'Nilai Akhir · Saham ESG','sim.final_jci':'Nilai Akhir · JCI (Pasif)',
+    'sim.final_sukuk':'Nilai Akhir · Green Sukuk','sim.contributions':'Total Setoran',
+    'sim.profit':'Total Cuan',
+    'sim.chart_title':'Proyeksi Pertumbuhan (Bulanan)',
+    'sim.note':'Proyeksi pakai compound bulanan. Return riil dapat fluktuasi besar. JCI menggunakan rata-rata historis ~7%/tahun; ESG ~9%; Green Sukuk ~5,5%. Hanya untuk ilustrasi edukasi.',
+    'data.updated':'Data per','data.refresh':'Jalankan fetch_data.py untuk update',
+    'data.sample_warn':'⚠ Data sampel ilustratif — jalankan <code>python fetch_data.py</code> untuk data live.',
+    'news.dir_title':'Sumber Berita Ekonomi Indonesia',
+    'news.dir_desc':'Klik untuk buka langsung di situs sumber',
+    'news.articles_title':'Berita Terbaru',
+    'news.empty':'Belum ada artikel ter-fetch. Jalankan <code>python fetch_data.py</code> untuk ambil headline live via RSS.',
+    'stocks.filter_all':'Semua','stocks.filter_kehati':'KEHATI SRI','stocks.filter_esg':'IDX ESG Leaders',
+    'stocks.filter_syariah':'Syariah','stocks.filter_dividend':'Yield ≥ 5%',
+    'stocks.benchmark':'IHSG (JCI)','stocks.bench_ytd':'YTD','stocks.bench_1y':'1 Tahun',
+    'stocks.col_ticker':'Kode','stocks.col_name':'Nama','stocks.col_price':'Harga',
+    'stocks.col_1y':'1Y','stocks.col_ytd':'YTD','stocks.col_div':'Div %','stocks.col_pe':'PER',
+    'stocks.col_mcap':'Mkt Cap','stocks.col_flags':'Flag','stocks.col_esg':'ESG',
+    'expert.q1.label':'Pertanyaan 1 dari 5','expert.q2.label':'Pertanyaan 2 dari 5',
+    'expert.q3.label':'Pertanyaan 3 dari 5','expert.q4.label':'Pertanyaan 4 dari 5',
+    'expert.q5.label':'Pertanyaan 5 dari 5',
+    'expert.profile_label':'Profil Kamu',
+    'expert.intro':'Berdasarkan tujuan, toleransi risiko, horizon, modal, dan preferensi pilar ESG kamu, berikut rekomendasi strategi investasi ESG yang dipersonalisasi. Semua hanya rekomendasi edukasi — bukan saran finansial yang teregulasi.',
+    'expert.fired':'▣ JEJAK EXPERT SYSTEM — RULES FIRED',
+    'quiz.ready':'Siap uji pengetahuan ESG kamu?',
+    'quiz.desc':'10 pertanyaan pilihan ganda tentang prinsip ESG, regulasi Indonesia, krisis MSCI 2026, dan produk investasi. Penjelasan diberikan setelah setiap jawaban.',
+    'quiz.start':'▶ Mulai Kuis',
+    'quiz.qnum':'Pertanyaan','quiz.of':'dari','quiz.score':'Skor:',
+    'quiz.correct':'✓ Benar!','quiz.wrong':'✗ Kurang tepat.',
+    'quiz.next':'Pertanyaan Berikutnya →','quiz.last':'Lihat Hasil →',
+    'quiz.retry':'↺ Coba Lagi','quiz.pct':'Benar',
+    'quiz.win':'Selamat!','quiz.ok':'Bagus sekali!','quiz.try':'Terus belajar!',
+    'quiz.msg_high':'Luar biasa! Kamu sudah paham ESG investing untuk konteks Indonesia.',
+    'quiz.msg_mid':'Pemahaman bagus. Cek ulang tab Belajar untuk topik yang masih kurang.',
+    'quiz.msg_low':'Awal yang baik — kunjungi tab Belajar lagi dan coba lagi untuk perdalam konsepnya.'
+  },
+  en:{
+    'tab.chat':'Ask','tab.chat_sub':'Tanya',
+    'tab.learn':'Learn','tab.learn_sub':'Belajar',
+    'tab.advise':'Advise','tab.advise_sub':'Saran',
+    'tab.simulate':'Simulate','tab.simulate_sub':'Simulasi',
+    'tab.data':'Markets','tab.data_sub':'Data',
+    'tab.quiz':'Quiz','tab.quiz_sub':'Kuis',
+    'head.chat':'Ask Elmu',
+    'character.subtitle':'ESG Investment Assistant',
+    'character.status':'Online · ready to help',
+    'market.topGainer':'Top Gainer',
+    'market.updated':'Updated',
+    'market.sample':'Sample data',
+    'greeting.morning':'Good morning',
+    'greeting.afternoon':'Good afternoon',
+    'greeting.evening':'Good evening',
+    'greeting.night':'Good night',
+    'location.label':'Indonesia Stock Exchange · Jakarta',
+    'intro.first':'I\'m <strong>Sari</strong>, your ESG investment assistant. May I know your name first?',
+    'intro.returning':'Nice to see you again. What would you like to learn about ESG today?',
+    'name.welcome':'Nice to meet you,',
+    'name.welcome_suffix':'! 🌿 You can now ask me anything about ESG investing, Indonesian regulation, the 2026 MSCI crisis, or green investment products.',
+    'name.invalid':'Invalid name. Please use 2–30 letters, no weird symbols.',
+    'name.reask':'So, may I know your name first?',
+    'footer.resetname':'Reset name',
+    'reset.confirm':'Reset your name? The bot will ask again on reload.',
+    'head.chat_sub':'Ask anything about ESG investing, Indonesian regulation, or the 2026 MSCI crisis',
+    'head.learn':'Five ESG Lessons',
+    'head.learn_sub':'From fundamentals to Indonesian context',
+    'head.advise':'Personal Advice',
+    'head.advise_sub':'Rule-based expert system · Answer 5 questions for a personalized ESG recommendation',
+    'head.simulate':'Portfolio Simulator',
+    'head.simulate_sub':'Growth projection with DCA vs JCI & Sukuk benchmarks',
+    'head.data':'Markets & News',
+    'head.data_sub':'IDX ESG stocks & Indonesian economic news sources',
+    'head.quiz':'ESG Knowledge Test',
+    'head.quiz_sub':'10 questions · Test your understanding of ESG investing in Indonesia',
+    'sub.news':'News','sub.stocks':'IDX Stocks',
+    'btn.send':'Send','btn.prev':'← Previous','btn.next':'Next →',
+    'btn.cancel':'Cancel','btn.save':'Save','btn.restart':'↺ Restart',
+    'btn.exportPdf':'📄 Save PDF','btn.exportPng':'🖼 Share Card','btn.calc':'Calculate Projection',
+    'tagline':'Knowledge-based Sustainable Profit',
+    'meta.degree':'Master of Finance · FinTech',
+    'meta.school':'Asia Pacific University · 2026',
+    'banner.msci':'<strong>JAN 2026 ·</strong> MSCI considering downgrading Indonesia to <em>frontier market</em>. ~USD 80 billion in market cap erased. Time for retail investors to understand ESG &amp; governance.',
+    'proverb':'"Elemu sebua wa\'ebolo dödö" — the greatest knowledge is patience (Nias proverb)',
+    'footer.credit':'ELMU.AI · Educational prototype · Master of Finance FinTech project',
+    'footer.disclaimer':'<strong>Disclaimer:</strong> This tool is for educational purposes only, NOT regulated investment advice. All investment decisions are your own responsibility. Consult an OJK-licensed financial advisor before investing.',
+    'chat.placeholder':"Try: 'What is ESG?' or 'Why MSCI Indonesia?'",
+    'chat.welcome':'Hi, I\'m <strong>Elmu</strong> 🌿 — an ESG investing chatbot for Indonesian investors. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products. Click one below to get started!',
+    'chat.unknown':"I\'m not sure about that question. Try one of the topics below, or rephrase your question.",
+    'chat.didYouMean':'Did you mean',
+    'chat.confLow':'⚠ Low confidence — please verify with other sources too.',
+    'chat.learned':'💡 This answer was taught by you previously.',
+    'teach.title':'Teach Elemu',
+    'teach.desc':"I don\'t know the answer yet. Want to teach me? Your answer is saved in this browser and used for similar questions later.",
+    'teach.qlabel':'Your question',
+    'teach.alabel':'What should the answer be',
+    'teach.thanks':'Thanks for teaching me! 🌿 Your answer has been saved.',
+    'sim.initial':'Initial Amount','sim.initial_hint':'One-time upfront investment',
+    'sim.monthly':'Monthly DCA','sim.monthly_hint':'Dollar-Cost Averaging (recurring)',
+    'sim.horizon':'Horizon (years)','sim.horizon_hint':'Investment time horizon',
+    'sim.return':'Assumed ESG Return (% / year)','sim.return_hint':'Default 9% (aggressive ESG equity)',
+    'sim.final_esg':'Final Value · ESG Equity','sim.final_jci':'Final Value · JCI (Passive)',
+    'sim.final_sukuk':'Final Value · Green Sukuk','sim.contributions':'Total Contributions',
+    'sim.profit':'Total Profit',
+    'sim.chart_title':'Growth Projection (Monthly)',
+    'sim.note':'Projection uses monthly compounding. Actual returns can fluctuate significantly. JCI uses ~7%/yr historical average; ESG ~9%; Green Sukuk ~5.5%. For educational illustration only.',
+    'data.updated':'Data as of','data.refresh':'Run fetch_data.py to refresh',
+    'data.sample_warn':'⚠ Sample illustrative data — run <code>python fetch_data.py</code> for live data.',
+    'news.dir_title':'Indonesian Economic News Sources',
+    'news.dir_desc':'Click to open the source site directly',
+    'news.articles_title':'Latest Headlines',
+    'news.empty':'No articles fetched yet. Run <code>python fetch_data.py</code> to pull live headlines via RSS.',
+    'stocks.filter_all':'All','stocks.filter_kehati':'KEHATI SRI','stocks.filter_esg':'IDX ESG Leaders',
+    'stocks.filter_syariah':'Syariah','stocks.filter_dividend':'Yield ≥ 5%',
+    'stocks.benchmark':'JCI / IHSG','stocks.bench_ytd':'YTD','stocks.bench_1y':'1 Year',
+    'stocks.col_ticker':'Code','stocks.col_name':'Name','stocks.col_price':'Price',
+    'stocks.col_1y':'1Y','stocks.col_ytd':'YTD','stocks.col_div':'Div %','stocks.col_pe':'P/E',
+    'stocks.col_mcap':'Mkt Cap','stocks.col_flags':'Flag','stocks.col_esg':'ESG',
+    'expert.q1.label':'Question 1 of 5','expert.q2.label':'Question 2 of 5',
+    'expert.q3.label':'Question 3 of 5','expert.q4.label':'Question 4 of 5',
+    'expert.q5.label':'Question 5 of 5',
+    'expert.profile_label':'Your Profile',
+    'expert.intro':'Based on your goal, risk tolerance, horizon, capital, and ESG pillar preference, here are personalized ESG investment recommendations. These are educational recommendations only — not regulated financial advice.',
+    'expert.fired':'▣ EXPERT SYSTEM TRACE — RULES FIRED',
+    'quiz.ready':'Ready to test your ESG knowledge?',
+    'quiz.desc':'10 multiple-choice questions on ESG principles, Indonesian regulation, the 2026 MSCI crisis, and investment products. Explanation given after each answer.',
+    'quiz.start':'▶ Start Quiz',
+    'quiz.qnum':'Question','quiz.of':'of','quiz.score':'Score:',
+    'quiz.correct':'✓ Correct!','quiz.wrong':'✗ Not quite.',
+    'quiz.next':'Next Question →','quiz.last':'See Result →',
+    'quiz.retry':'↺ Try Again','quiz.pct':'Correct',
+    'quiz.win':'Congratulations!','quiz.ok':'Well done!','quiz.try':'Keep learning!',
+    'quiz.msg_high':'Outstanding! You\'ve grasped ESG investing for the Indonesian context.',
+    'quiz.msg_mid':'Good understanding. Revisit the Learn tab for topics still hazy.',
+    'quiz.msg_low':'Good start — visit the Learn tab and try again to deepen the concepts.'
+  }
+};
+function t(key){
+  const L = window.CURRENT_LANG || 'id';
+  return (I18N[L] && I18N[L][key]) || I18N.id[key] || key;
+}
+
+/* ===== Synonym dictionary (bilingual) ===== */
+const SYNONYMS = {
+  'esg':['esg','lst','sustainable','berkelanjutan','keberlanjutan','sustainability'],
+  'environment':['environment','environmental','lingkungan','iklim','climate','karbon','carbon','emisi','emission'],
+  'social':['social','sosial','komunitas','community','buruh','labor','tenaga kerja'],
+  'governance':['governance','tata kelola','transparansi','transparency','korupsi','corruption','board'],
+  'msci':['msci','frontier','downgrade','penurunan','review'],
+  'transparency':['transparency','transparansi','free-float','beneficial ownership','kepemilikan'],
+  'ojk':['ojk','otoritas','regulator','regulation','regulasi','aturan','rule'],
+  'idx':['idx','bei','bursa','exchange','bursa efek'],
+  'kehati':['kehati','sri','yayasan kehati'],
+  'sukuk':['sukuk','obligasi syariah','islamic bond','green sukuk','st','sr','sukuk ritel'],
+  'greenwashing':['greenwashing','green washing','klaim palsu','fake green'],
+  'rating':['rating','skor','score','peringkat','penilaian','divergence','perbedaan'],
+  'bibit':['bibit','bibit.id','robo','robo-advisor','robo advisor'],
+  'ajaib':['ajaib','ajaib.co.id'],
+  'stockbit':['stockbit','stockbit.com'],
+  'ipot':['ipot','indo premier','indopremier'],
+  'mulai':['mulai','start','begin','pemula','beginner','memulai','newbie','baru'],
+  'cuan':['cuan','untung','profit','return','keuntungan','gain','income','pendapatan','dividen','dividend'],
+  'risiko':['risiko','risk','bahaya','danger','volatilitas','volatility'],
+  'syariah':['syariah','islamic','islam','halal','islami','sharia'],
+  'literasi':['literasi','literacy','snlik','pengetahuan','knowledge','edukasi','education'],
+  'ritel':['ritel','retail','sid','investor pemula','gen-z','gen z','millennial','milenial'],
+  'saham':['saham','stock','equity','equities','shares','ekuitas'],
+  'reksadana':['reksadana','reksa dana','mutual fund','mutual','fund','rd'],
+  'horizon':['horizon','jangka','durasi','waktu','time','term'],
+  'modal':['modal','capital','dana','funds','money','uang','dollar'],
+  'dca':['dca','dollar cost','averaging','rutin','nabung','nabung saham','recurring'],
+  'simulasi':['simulasi','simulator','simulate','proyeksi','projection','calculate','hitung'],
+  'tentang':['tentang','about','who','siapa','what are you'],
+  'hello':['hello','halo','hai','hi','selamat','selamat pagi','selamat siang','selamat malam']
+};
+
+/* ===== FAQ knowledge base (bilingual) ===== */
+const FAQ_DATA = [
+  { id:'hello', kw_id:['halo','hai','selamat'], kw_en:['hello','hi'],
+    a_id:"Halo! 🌿 Saya <strong>Elmu</strong>, chatbot edukasi investasi ESG untuk investor Indonesia. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau. Klik salah satu chip di bawah untuk mulai!",
+    a_en:"Hi! 🌿 I\'m <strong>Elmu</strong>, an ESG investing education chatbot for Indonesian investors. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products. Click a chip below to begin!" },
+
+  { id:'about', kw_id:['siapa kamu','tentang kamu','elemu','elmu','siapa','nama'], kw_en:['who are you','about you','what are you','your name'],
+    a_id:"Nama saya <strong>Elmu</strong>. Nama lengkap saya adalah <strong>Elemu Lestari</strong> — gabungan kata <span class='accent'>Elemu</span> (kebijaksanaan, dalam Bahasa Nias) dan <span class='accent'>Lestari</span> (berkelanjutan, dalam Bahasa Indonesia). Saya dibangun sebagai proyek Master of Finance (FinTech) di Asia Pacific University untuk membantu investor ritel Indonesia memahami ESG investing — khususnya pasca krisis MSCI Januari 2026.",
+    a_en:"My name is <strong>Elmu</strong>. My full name is <strong>Elemu Lestari</strong> — combining <span class='accent'>Elemu</span> (wisdom, in Nias language) and <span class='accent'>Lestari</span> (sustainable, in Indonesian). Built as a Master of Finance (FinTech) project at Asia Pacific University to help Indonesian retail investors understand ESG investing — especially after the January 2026 MSCI crisis." },
+
+  { id:'esg', kw_id:['esg','lst','apa itu esg','definisi esg','environmental social governance'], kw_en:['esg','what is esg','definition esg','environmental social governance'],
+    a_id:"<strong>ESG</strong> = <span class='accent'>Environmental, Social, Governance</span>. Tiga pilar investasi berkelanjutan:<br>• <strong>E</strong>nvironment — dampak lingkungan (emisi karbon, energi terbarukan)<br>• <strong>S</strong>ocial — dampak sosial (hak buruh, komunitas)<br>• <strong>G</strong>overnance — tata kelola (transparansi, anti-korupsi)<br>Di Indonesia, regulator (OJK) memakai istilah <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola).",
+    a_en:"<strong>ESG</strong> = <span class='accent'>Environmental, Social, Governance</span>. Three pillars of sustainable investing:<br>• <strong>E</strong>nvironment — environmental impact (carbon emissions, renewable energy)<br>• <strong>S</strong>ocial — social impact (labor rights, communities)<br>• <strong>G</strong>overnance — corporate governance (transparency, anti-corruption)<br>In Indonesia, regulator OJK uses the term <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola)." },
+
+  { id:'msci', kw_id:['msci','frontier','downgrade','penurunan status','januari 2026'], kw_en:['msci','frontier','downgrade','january 2026'],
+    a_id:"<strong>Krisis MSCI Indonesia Januari 2026</strong> 🚨<br>Pada 28 Januari 2026, MSCI membekukan perubahan positif untuk saham Indonesia dan mempertimbangkan menurunkan status dari <em>emerging market</em> ke <em>frontier market</em>. Alasannya:<br>• Transparansi kepemilikan saham tidak jelas<br>• Akurasi data <em>free-float</em> diragukan<br>• Dugaan <em>coordinated trading</em><br>Akibatnya: ~<strong>USD 80 miliar</strong> kapitalisasi pasar hilang dalam 2 hari. CEO BEI &amp; Ketua OJK mundur. Goldman Sachs turunkan rekomendasi ke <em>underweight</em>.",
+    a_en:"<strong>MSCI Indonesia Crisis · January 2026</strong> 🚨<br>On 28 January 2026, MSCI froze positive changes to Indonesian stocks and considered downgrading from <em>emerging market</em> to <em>frontier market</em>. Reasons:<br>• Unclear ownership transparency<br>• Doubtful <em>free-float</em> data accuracy<br>• Suspected <em>coordinated trading</em><br>Impact: ~<strong>USD 80 billion</strong> in market cap lost in 2 days. IDX CEO &amp; OJK Chairman resigned. Goldman Sachs downgraded to <em>underweight</em>." },
+
+  { id:'transparency', kw_id:['indonesia kenapa','transparansi','free-float','beneficial ownership','coordinated'], kw_en:['why indonesia','transparency','free-float','beneficial ownership','coordinated trading'],
+    a_id:"<strong>Indonesia berisiko downgrade</strong> karena tiga masalah <span class='accent'>tata kelola</span> (governance):<br>1. <strong>Free-float palsu</strong> — banyak saham dilaporkan beredar bebas, tapi nyatanya dikontrol pihak terkait<br>2. <strong>Coordinated trading</strong> — dugaan saham digerakkan beberapa pihak terkoordinasi<br>3. <strong>Beneficial ownership</strong> — siapa pemilik akhirnya sering tersembunyi di balik holding<br>Inilah kenapa pilar <strong>G (Governance)</strong> dalam ESG sekarang paling penting di Indonesia.",
+    a_en:"<strong>Indonesia is at downgrade risk</strong> due to three <span class='accent'>governance</span> issues:<br>1. <strong>Fake free-float</strong> — many shares reported as freely circulating but actually controlled by related parties<br>2. <strong>Coordinated trading</strong> — suspected coordinated movement by linked actors<br>3. <strong>Beneficial ownership</strong> — ultimate owners often hidden behind holding structures<br>This is why <strong>G (Governance)</strong> in ESG is now most critical in Indonesia." },
+
+  { id:'ojk', kw_id:['ojk','otoritas jasa keuangan','pojk','regulator'], kw_en:['ojk','otoritas','regulator indonesia'],
+    a_id:"<strong>OJK</strong> (Otoritas Jasa Keuangan) adalah regulator pasar modal Indonesia. Pasca krisis MSCI 2026, OJK:<br>• Menurunkan batas wajib lapor kepemilikan dari <strong>5% jadi 1%</strong><br>• Mempercepat aturan <em>finfluencer</em> (regulasi influencer keuangan)<br>• Memperkuat <strong>POJK 13/2025</strong> tentang perilaku Perusahaan Efek<br>Lihat juga: <em>Sustainable Finance Roadmap Phase II</em> (2021–2025).",
+    a_en:"<strong>OJK</strong> (Indonesian Financial Services Authority) is Indonesia\'s capital markets regulator. After the 2026 MSCI crisis, OJK:<br>• Lowered mandatory ownership disclosure threshold from <strong>5% to 1%</strong><br>• Accelerated <em>finfluencer</em> rules (financial influencer regulation)<br>• Strengthened <strong>POJK 13/2025</strong> on Securities Companies conduct<br>See also: <em>Sustainable Finance Roadmap Phase II</em> (2021–2025)." },
+
+  { id:'idx', kw_id:['idx','bei','bursa efek','indeks esg'], kw_en:['idx','indonesia stock exchange','esg index'],
+    a_id:"<strong>IDX</strong> (Indonesia Stock Exchange / Bursa Efek Indonesia) menerbitkan beberapa indeks ESG:<br>• <strong>IDX ESG Leaders</strong> — saham dengan skor ESG tertinggi<br>• <strong>IDX KEHATI SRI</strong> — indeks SRI tertua (sejak 2009)<br>• <strong>ESG Sector Leaders KEHATI</strong> — leader per sektor<br>• <strong>IDX Climate</strong> — fokus iklim<br>Total ~25-30 saham tersebar dalam berbagai indeks ESG ini.",
+    a_en:"<strong>IDX</strong> (Indonesia Stock Exchange) publishes several ESG indices:<br>• <strong>IDX ESG Leaders</strong> — highest ESG-scored stocks<br>• <strong>IDX KEHATI SRI</strong> — oldest SRI index (since 2009)<br>• <strong>ESG Sector Leaders KEHATI</strong> — leader per sector<br>• <strong>IDX Climate</strong> — climate focus<br>~25-30 stocks across these indices total." },
+
+  { id:'kehati', kw_id:['kehati','sri','yayasan'], kw_en:['kehati','sri index','yayasan'],
+    a_id:"<strong>KEHATI SRI Index</strong> adalah indeks SRI tertua di Indonesia, diluncurkan 2009 oleh Bursa Efek Indonesia bekerja sama dengan <em>Yayasan Keanekaragaman Hayati Indonesia (KEHATI)</em>. Indeks ini berisi 25 saham yang lulus skrining ESG ketat. Contoh: BCA, Astra International, Unilever Indonesia, Telkom Indonesia.",
+    a_en:"<strong>KEHATI SRI Index</strong> is Indonesia\'s oldest SRI index, launched in 2009 by IDX in partnership with the <em>Indonesian Biodiversity Foundation (KEHATI)</em>. Contains 25 stocks that pass strict ESG screening. Examples: BCA, Astra International, Unilever Indonesia, Telkom Indonesia." },
+
+  { id:'sukuk', kw_id:['sukuk','green sukuk','obligasi syariah','sukuk ritel'], kw_en:['sukuk','green sukuk','islamic bond'],
+    a_id:"<strong>Green Sukuk Indonesia</strong> 🌱<br>Indonesia adalah penerbit <em>Green Sukuk</em> negara pertama di dunia (2018). Pemerintah menerbitkan <strong>Green Sukuk Ritel</strong> seri ST (Sukuk Tabungan) dan SR (Sukuk Ritel) yang khusus mendanai proyek hijau: energi terbarukan, transportasi rendah karbon, pengelolaan air. Minimum <strong>Rp 1 juta</strong>, return tahunan kompetitif dengan deposito.",
+    a_en:"<strong>Indonesia Green Sukuk</strong> 🌱<br>Indonesia is the world\'s first sovereign <em>Green Sukuk</em> issuer (2018). The government issues <strong>Retail Green Sukuk</strong> in ST (Savings Sukuk) and SR (Retail Sukuk) series, dedicated to green projects: renewables, low-carbon transport, water management. Min <strong>IDR 1 million</strong>, yields competitive with deposits." },
+
+  { id:'greenwashing', kw_id:['greenwashing','green washing','klaim palsu'], kw_en:['greenwashing','fake green','fake sustainability'],
+    a_id:"<strong>Greenwashing</strong> adalah praktik perusahaan yang <em>mengklaim ramah lingkungan</em> tanpa bukti substansial — hanya untuk pemasaran. Contoh:<br>• Perusahaan sawit pasang logo hijau tapi masih deforestasi<br>• Bank klaim 'net zero' tapi tetap biayai PLTU batubara<br>• Mutual fund 'ESG' yang isinya saham fossil fuel<br><strong>Cara hindari:</strong> cek rating dari pihak ketiga (FTSE Russell, MSCI ESG, Sustainalytics) dan baca <em>integrated report</em> perusahaannya.",
+    a_en:"<strong>Greenwashing</strong> is when companies <em>claim eco-friendliness</em> without substantial evidence — purely for marketing. Examples:<br>• Palm oil firms display green logos while still deforesting<br>• Banks claim 'net zero' while still financing coal plants<br>• 'ESG' mutual funds full of fossil fuel stocks<br><strong>Avoid by:</strong> checking third-party ratings (FTSE Russell, MSCI ESG, Sustainalytics) and reading the company\'s <em>integrated report</em>." },
+
+  { id:'rating', kw_id:['rating','divergence','perbedaan rating','skor esg'], kw_en:['rating','divergence','esg score','disagreement'],
+    a_id:"<strong>Masalah ESG Ratings</strong> 📊<br>Penelitian Berg, Kölbel &amp; Rigobon (2022, Review of Finance) menemukan: rating ESG dari berbagai provider <strong>sangat berbeda</strong> untuk perusahaan yang sama. Korelasi antar provider hanya ~0.54 — jauh lebih rendah dari rating kredit yang biasanya 0.99. Artinya: jangan percaya satu rating saja. Cross-check minimal 2 provider (MSCI ESG, Sustainalytics, FTSE Russell).",
+    a_en:"<strong>ESG Ratings Problem</strong> 📊<br>Research by Berg, Kölbel &amp; Rigobon (2022, Review of Finance) found: ESG ratings from different providers <strong>diverge significantly</strong> for the same company. Inter-provider correlation only ~0.54 — far below credit ratings which are typically 0.99. Lesson: don\'t trust a single rating. Cross-check at least 2 providers." },
+
+  { id:'bibit', kw_id:['bibit','robo','reksa dana'], kw_en:['bibit','robo-advisor'],
+    a_id:"<strong>Bibit</strong> adalah robo-advisor reksa dana terbesar di Indonesia, terdaftar OJK sebagai APERD. Punya kategori <strong>Syariah</strong> dan beberapa reksa dana ESG. Minimum mulai <strong>Rp 100.000</strong>. Cocok untuk pemula dengan modal kecil. Risiko: produk reksa dana tergantung manajer investasi — tetap perlu cek isi portofolio.",
+    a_en:"<strong>Bibit</strong> is Indonesia\'s largest mutual fund robo-advisor, OJK-licensed APERD. Has <strong>Syariah</strong> category and several ESG mutual funds. Min <strong>IDR 100,000</strong>. Suited for beginners with small capital. Risk: depends on the fund manager — still check the portfolio holdings." },
+
+  { id:'ajaib', kw_id:['ajaib','retail saham','aplikasi saham'], kw_en:['ajaib','retail stock app'],
+    a_id:"<strong>Ajaib</strong> adalah platform saham retail terbesar di Indonesia (3+ juta pengguna). Fee jual-beli kompetitif (~0.10%-0.18%). Cocok untuk investor pemula yang ingin akses saham langsung di BEI. Belum punya filter ESG khusus, tapi bisa beli konstituen IDX ESG Leaders &amp; KEHATI secara manual.",
+    a_en:"<strong>Ajaib</strong> is Indonesia\'s largest retail stock platform (3M+ users). Competitive fees (~0.10%-0.18%). Suited for new investors wanting direct IDX stock access. No dedicated ESG filter, but you can manually buy IDX ESG Leaders &amp; KEHATI constituents." },
+
+  { id:'stockbit', kw_id:['stockbit','komunitas saham'], kw_en:['stockbit','stock community'],
+    a_id:"<strong>Stockbit</strong> adalah platform saham dengan komunitas trader yang aktif. Fee mulai 0.10% beli / 0.25% jual. Punya fitur analisis fundamental dan teknikal yang lebih lengkap dari Ajaib. Cocok kalau kamu mau diskusi saham dengan komunitas dan belajar dari investor lain.",
+    a_en:"<strong>Stockbit</strong> is a stock platform with an active trader community. Fees from 0.10% buy / 0.25% sell. More complete fundamental and technical analysis than Ajaib. Good if you want stock discussions with community and learn from other investors." },
+
+  { id:'bibit-vs-ajaib', kw_id:['bibit vs ajaib','perbandingan bibit ajaib','bandingkan bibit ajaib','beda bibit ajaib','perbedaan bibit ajaib','bibit atau ajaib','pilih bibit ajaib'],
+    kw_en:['bibit vs ajaib','compare bibit ajaib','difference bibit ajaib','bibit or ajaib','bibit versus ajaib'],
+    a_id:"<strong>Bibit vs Ajaib</strong> — perbandingan singkat:<br><br>" +
+      "🤖 <strong>Bibit</strong> — robo-advisor reksa dana<br>" +
+      "• Hanya jual reksa dana (bukan saham individual)<br>" +
+      "• Mulai <strong>Rp 100.000</strong>, auto-rebalancing<br>" +
+      "• Punya kategori <strong>ESG</strong> &amp; <strong>Syariah</strong> bawaan<br>" +
+      "• Cocok pemula tanpa pengalaman pilih saham sendiri<br><br>" +
+      "📱 <strong>Ajaib</strong> — platform saham retail<br>" +
+      "• Beli saham langsung di BEI (3+ juta pengguna)<br>" +
+      "• Fee ~<strong>0.10%-0.18%</strong> per transaksi<br>" +
+      "• <em>Belum punya filter ESG bawaan</em> — kamu pilih sendiri konstituen IDX ESG Leaders / KEHATI<br>" +
+      "• Cocok kalau mau kontrol penuh atas saham yang dibeli<br><br>" +
+      "<strong>🎯 Kapan pakai mana:</strong><br>" +
+      "• Modal &lt; Rp 1 jt + pemula → <strong>Bibit</strong><br>" +
+      "• Mau saham individual ESG → <strong>Ajaib</strong><br>" +
+      "• Mau dua-duanya? Banyak investor ritel Indonesia pakai keduanya — Bibit untuk reksa dana rutin, Ajaib untuk saham pilihan.",
+    a_en:"<strong>Bibit vs Ajaib</strong> — quick comparison:<br><br>" +
+      "🤖 <strong>Bibit</strong> — mutual fund robo-advisor<br>" +
+      "• Mutual funds only (no individual stocks)<br>" +
+      "• From <strong>IDR 100,000</strong>, auto-rebalancing<br>" +
+      "• Built-in <strong>ESG</strong> &amp; <strong>Syariah</strong> categories<br>" +
+      "• Best for beginners with no stock-picking experience<br><br>" +
+      "📱 <strong>Ajaib</strong> — retail stock platform<br>" +
+      "• Buy IDX stocks directly (3M+ users)<br>" +
+      "• Fees ~<strong>0.10%-0.18%</strong> per trade<br>" +
+      "• <em>No built-in ESG filter</em> — you manually pick IDX ESG Leaders / KEHATI constituents<br>" +
+      "• Best if you want full control over which stocks you buy<br><br>" +
+      "<strong>🎯 When to use which:</strong><br>" +
+      "• Capital &lt; IDR 1M + beginner → <strong>Bibit</strong><br>" +
+      "• Want individual ESG stocks → <strong>Ajaib</strong><br>" +
+      "• Want both? Many Indonesian retail investors use both — Bibit for recurring mutual funds, Ajaib for hand-picked stocks." },
+
+  { id:'ipot', kw_id:['ipot','indo premier','premium broker'], kw_en:['ipot','indo premier'],
+    a_id:"<strong>IPOT</strong> (Indo Premier Online Trading) adalah broker saham yang sudah lama berdiri. Fee 0.19% beli / 0.29% jual. Cocok untuk investor yang butuh fitur lengkap: auto-order, multi-asset (saham, reksa dana, ETF, obligasi). Brand lebih premium.",
+    a_en:"<strong>IPOT</strong> (Indo Premier Online Trading) is a long-established stock broker. Fees 0.19% buy / 0.29% sell. Good for investors who need full features: auto-order, multi-asset (stocks, mutual funds, ETFs, bonds). More premium brand." },
+
+  { id:'start', kw_id:['mulai','pemula','baru','cara mulai','newbie'], kw_en:['start','begin','beginner','how to start','new investor'],
+    a_id:"<strong>Cara mulai investasi ESG di Indonesia</strong> 🌱<br>1. Buka rekening di broker OJK-terdaftar (Bibit untuk reksa dana, Ajaib/Stockbit/IPOT untuk saham)<br>2. Mulai dari Green Sukuk Ritel kalau mau aman (mulai Rp 1 juta)<br>3. Untuk saham: beli konstituen IDX ESG Leaders / KEHATI<br>4. Untuk reksa dana: pilih reksa dana berlabel ESG/SRI di Bibit<br>5. Pakai <strong>DCA</strong> (dollar-cost averaging) — investasi rutin bulanan<br>6. Diversifikasi: jangan all-in di 1 saham",
+    a_en:"<strong>How to start ESG investing in Indonesia</strong> 🌱<br>1. Open an account at an OJK-licensed broker (Bibit for mutual funds, Ajaib/Stockbit/IPOT for stocks)<br>2. Start with Retail Green Sukuk if you want safety (min IDR 1M)<br>3. For stocks: buy IDX ESG Leaders / KEHATI constituents<br>4. For mutual funds: pick ESG/SRI-labeled funds on Bibit<br>5. Use <strong>DCA</strong> (dollar-cost averaging) — invest monthly<br>6. Diversify: don\'t go all-in on one stock" },
+
+  { id:'profit', kw_id:['cuan','untung','profit','return','keuntungan'], kw_en:['profit','return','gain','income'],
+    a_id:"<strong>Apakah ESG menguntungkan?</strong> 💰<br>Penelitian Friede, Busch &amp; Bassen (2015) menganalisis 2000+ studi: <strong>~63% menunjukkan korelasi positif</strong> antara ESG dan kinerja keuangan. ESG bukan trade-off — perusahaan dengan tata kelola baik biasanya lebih tahan krisis, risiko lebih rendah, return jangka panjang kompetitif. Tapi ingat: <em>past performance does not guarantee future results</em>.",
+    a_en:"<strong>Is ESG profitable?</strong> 💰<br>Friede, Busch &amp; Bassen (2015) analyzed 2000+ studies: <strong>~63% showed positive correlation</strong> between ESG and financial performance. ESG is not a trade-off — well-governed companies tend to be more crisis-resilient, lower-risk, and competitive in long-term returns. But remember: <em>past performance does not guarantee future results</em>." },
+
+  { id:'syariah', kw_id:['syariah','islamic','halal','jii','issi'], kw_en:['syariah','islamic','halal','sharia'],
+    a_id:"<strong>ESG vs Syariah</strong> 🕌<br>ESG dan Syariah punya banyak kesamaan (eksklusi industri haram, fokus etika) tapi tidak identik:<br>• Syariah mengecualikan: alkohol, judi, babi, riba (bunga konvensional)<br>• ESG mengecualikan: senjata, tembakau, fossil fuel berat<br>Banyak perusahaan masuk keduanya. Di Indonesia ada <strong>Jakarta Islamic Index (JII)</strong> dan <strong>Indeks Saham Syariah Indonesia (ISSI)</strong>. Bibit dan Wahed punya portofolio Syariah.",
+    a_en:"<strong>ESG vs Syariah</strong> 🕌<br>ESG and Syariah share many features (exclusion of haram industries, ethics focus) but are not identical:<br>• Syariah excludes: alcohol, gambling, pork, riba (conventional interest)<br>• ESG excludes: weapons, tobacco, heavy fossil fuels<br>Many companies qualify for both. Indonesia has <strong>Jakarta Islamic Index (JII)</strong> and <strong>Indonesian Sharia Stock Index (ISSI)</strong>. Bibit and Wahed offer Syariah portfolios." },
+
+  { id:'risk', kw_id:['risiko','bahaya','volatilitas'], kw_en:['risk','danger','volatility'],
+    a_id:"<strong>Risiko investasi ESG di Indonesia</strong> ⚠️<br>1. <strong>Greenwashing</strong> — klaim hijau palsu<br>2. <strong>Rating divergence</strong> — beda provider beda penilaian<br>3. <strong>Likuiditas terbatas</strong> — saham ESG kadang kurang likuid<br>4. <strong>Volatilitas MSCI</strong> — krisis 2026 menunjukkan emerging market masih bisa shock<br>5. <strong>Regulasi berubah</strong> — POJK terus berevolusi<br>Mitigasi: diversifikasi, horizon panjang (5+ tahun), pakai DCA.",
+    a_en:"<strong>ESG investing risks in Indonesia</strong> ⚠️<br>1. <strong>Greenwashing</strong> — fake green claims<br>2. <strong>Rating divergence</strong> — providers disagree<br>3. <strong>Limited liquidity</strong> — ESG stocks can be illiquid<br>4. <strong>MSCI volatility</strong> — the 2026 crisis shows EM can shock<br>5. <strong>Regulatory churn</strong> — POJK keeps evolving<br>Mitigation: diversify, long horizon (5+ years), use DCA." },
+
+  { id:'snlik', kw_id:['snlik','literasi','17.78','rendah','kurang paham'], kw_en:['snlik','literacy','17.78','low literacy'],
+    a_id:"<strong>Literasi Pasar Modal Indonesia Masih Rendah</strong> 📉<br>Menurut <strong>SNLIK 2025</strong> (Survei Nasional Literasi dan Inklusi Keuangan), literasi pasar modal Indonesia hanya <strong>17.78%</strong> — jauh di bawah perbankan (65.5%) dan asuransi (45.45%). Inilah kenapa Elemu Lestari dibangun: untuk menutup gap edukasi ini, khususnya pasca krisis MSCI 2026.",
+    a_en:"<strong>Indonesian Capital Markets Literacy is Low</strong> 📉<br>Per <strong>SNLIK 2025</strong> (National Survey on Financial Literacy and Inclusion), capital markets literacy in Indonesia is only <strong>17.78%</strong> — far below banking (65.5%) and insurance (45.45%). This is why Elemu Lestari exists: to close this education gap, especially after the 2026 MSCI crisis." },
+
+  { id:'retail', kw_id:['ritel','retail','sid','21 juta','gen z','milenial'], kw_en:['retail','sid','21 million','gen z','millennial'],
+    a_id:"<strong>Pasar Ritel Indonesia Tumbuh Pesat</strong> 📈<br>Per Januari 2026, ada <strong>~21 juta SID</strong> di Indonesia menurut KSEI. Mayoritas Gen-Z &amp; Millennial. Pertumbuhan dari ~2 juta (2018) ke 21 juta (2026) — 10x lipat dalam 8 tahun. Tapi literasi tidak ikut tumbuh secepat itu — itulah ESG education gap yang Elemu Lestari coba isi.",
+    a_en:"<strong>Indonesian Retail Market Booming</strong> 📈<br>As of Jan 2026, KSEI reports <strong>~21 million SIDs</strong> in Indonesia. Mostly Gen-Z &amp; Millennials. Growth from ~2M (2018) to 21M (2026) — 10x in 8 years. But literacy hasn\'t kept pace — that\'s the ESG education gap Elemu Lestari tries to fill." },
+
+  { id:'thanks', kw_id:['terima kasih','makasih','thanks'], kw_en:['thanks','thank you'],
+    a_id:"Sama-sama! 🌿 Apa lagi yang ingin kamu pelajari? Coba tab <strong>Belajar</strong> untuk pelajaran lengkap atau <strong>Saran</strong> untuk rekomendasi personal.",
+    a_en:"You\'re welcome! 🌿 What else would you like to learn? Try the <strong>Learn</strong> tab for full lessons or <strong>Advise</strong> for personal recommendations." },
+
+  { id:'bye', kw_id:['bye','sampai jumpa','dadah'], kw_en:['bye','goodbye','see you'],
+    a_id:"Sampai jumpa! Semoga sukses membangun portofolio yang <em>lestari</em>. <strong>\"Cuan Lestari, Berbasis Elmu\"</strong> 🌱",
+    a_en:"See you! Wishing you success building a <em>sustainable</em> portfolio. <strong>\"Knowledge-based sustainable profit\"</strong> 🌱" },
+
+  { id:'simulator', kw_id:['simulator','simulasi','proyeksi','kalkulator'], kw_en:['simulator','projection','calculator'],
+    a_id:"Coba tab <strong>Simulasi</strong> 📈 untuk hitung proyeksi portofolio kamu. Masukkan modal awal, DCA bulanan, dan horizon — lihat berapa potensi nilai akhirnya dibanding benchmark JCI dan Green Sukuk.",
+    a_en:"Try the <strong>Simulate</strong> 📈 tab to project your portfolio. Enter initial capital, monthly DCA, and horizon — see the potential final value vs JCI and Green Sukuk benchmarks." },
+
+  { id:'data', kw_id:['data saham','saham idx','harga saham','daftar saham'], kw_en:['stock data','idx stocks','stock prices'],
+    a_id:"Buka tab <strong>Data</strong> untuk lihat ~25 saham IDX yang masuk indeks ESG (KEHATI SRI / IDX ESG Leaders), beserta harga, return 1 tahun, dividend yield, dan skor pilar ESG. Untuk data live, jalankan <code>python fetch_data.py</code>.",
+    a_en:"Open the <strong>Markets</strong> tab to see ~25 IDX stocks in ESG indices (KEHATI SRI / IDX ESG Leaders), with price, 1Y return, dividend yield, and ESG pillar scores. For live data, run <code>python fetch_data.py</code>." },
+
+  { id:'news', kw_id:['berita','news','cnbc','kontan','kompas','katadata','bisnis indonesia'], kw_en:['news','headlines','indonesian news'],
+    a_id:"Untuk berita ekonomi Indonesia, buka tab <strong>Data → Berita</strong>. Kami sediakan direktori sumber terpercaya: CNBC Indonesia, Bisnis Indonesia, Kontan, Kompas Money, Katadata, CNN Indonesia, Investor Daily, IDX Channel, dan MSCI. Klik kartu sumber untuk buka langsung ke situsnya.",
+    a_en:"For Indonesian economic news, open <strong>Markets → News</strong>. We provide a curated directory: CNBC Indonesia, Bisnis Indonesia, Kontan, Kompas Money, Katadata, CNN Indonesia, Investor Daily, IDX Channel, and MSCI. Click a source card to open it directly." },
+
+  { id:'pdf', kw_id:['pdf','simpan','download','export','cetak','print'], kw_en:['pdf','save','download','export','print'],
+    a_id:"Setelah selesai mengisi tab <strong>Saran</strong>, kamu bisa export hasil rekomendasi sebagai PDF atau bagikan sebagai kartu gambar (PNG). Tombolnya ada di kartu hasil — 📄 Simpan PDF dan 🖼 Bagikan Kartu.",
+    a_en:"After filling the <strong>Advise</strong> tab, you can export the result as PDF or share it as an image card (PNG). The buttons are on the result card — 📄 Save PDF and 🖼 Share Card." },
+
+  { id:'darkmode', kw_id:['gelap','mode gelap','dark mode','dark'], kw_en:['dark mode','dark theme','night mode'],
+    a_id:"Klik ikon 🌙 / ☀ di pojok kanan atas header untuk ganti mode terang/gelap. Preferensi kamu disimpan otomatis di browser.",
+    a_en:"Click the 🌙 / ☀ icon at the top-right of the header to switch light/dark mode. Your preference is saved automatically in the browser." },
+
+  { id:'language', kw_id:['bahasa','english','indonesia','switch','ganti'], kw_en:['language','english','indonesian','switch'],
+    a_id:"Klik tombol <strong>EN/ID</strong> di kanan atas untuk ganti bahasa Bahasa Indonesia / English. Pilihan kamu disimpan otomatis.",
+    a_en:"Click the <strong>EN/ID</strong> button at the top-right to switch between Bahasa Indonesia and English. Your choice is saved automatically." }
+];
+
+const SUGGESTED_ID = ["Apa itu ESG?","MSCI Indonesia kenapa?","Apa itu KEHATI Index?","Greenwashing itu apa?","Cara mulai investasi ESG","Bibit vs Ajaib"];
+const SUGGESTED_EN = ["What is ESG?","Why MSCI Indonesia?","What is KEHATI Index?","What is greenwashing?","How to start ESG investing","Bibit vs Ajaib"];
+
+/* ===== LESSONS (bilingual) ===== */
+const LESSONS = [
+  {
+    title:{id:"Apa itu ESG?", en:"What is ESG?"},
+    sub:{id:"Pelajaran 1 · Fondasi", en:"Lesson 1 · Foundations"},
+    html:{
+      id:`<h4>Definisi ESG</h4>
+<p><strong>ESG</strong> singkatan dari <span class="term">Environmental, Social, and Governance</span>. Di Indonesia, OJK memakai istilah <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola). ESG adalah kerangka untuk menilai perusahaan <em>melampaui</em> kinerja keuangan — termasuk dampak lingkungan, sosial, dan kualitas tata kelola.</p>
+<h4>Mengapa ESG penting sekarang?</h4>
+<ul>
+  <li>Aset ESG global mencapai <strong>USD 35+ triliun</strong> (GSIA, 2024)</li>
+  <li>21+ juta investor ritel Indonesia (KSEI, 2026) butuh panduan ESG</li>
+  <li>Literasi pasar modal Indonesia hanya <strong>17.78%</strong> (SNLIK, 2025)</li>
+  <li>Krisis MSCI Januari 2026 menyoroti pentingnya pilar Governance</li>
+</ul>
+<h4>ESG vs SRI vs Impact Investing</h4>
+<ul>
+  <li><span class="term">ESG investing</span> — menggunakan ESG sebagai filter risiko + alpha</li>
+  <li><span class="term">SRI</span> (Socially Responsible Investing) — fokus eksklusi industri haram</li>
+  <li><span class="term">Impact investing</span> — investasi yang sengaja menghasilkan dampak positif terukur</li>
+</ul>
+<div class="callout">🌿 <strong>Konteks Indonesia:</strong> OJK menerbitkan <em>Sustainable Finance Roadmap Phase II (2021–2025)</em> dan Kementerian Investasi/BKPM menerbitkan <em>Panduan Investasi Lestari</em> (2022) — kosakata resmi pemerintah untuk ESG.</div>`,
+      en:`<h4>Definition of ESG</h4>
+<p><strong>ESG</strong> stands for <span class="term">Environmental, Social, and Governance</span>. In Indonesia, OJK uses the term <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola). ESG is a framework for evaluating companies <em>beyond</em> financial performance — including environmental impact, social impact, and governance quality.</p>
+<h4>Why ESG matters now</h4>
+<ul>
+  <li>Global ESG assets reached <strong>USD 35+ trillion</strong> (GSIA, 2024)</li>
+  <li>21M+ Indonesian retail investors (KSEI, 2026) need ESG guidance</li>
+  <li>Indonesia\'s capital markets literacy is just <strong>17.78%</strong> (SNLIK, 2025)</li>
+  <li>The January 2026 MSCI crisis highlighted the criticality of the Governance pillar</li>
+</ul>
+<h4>ESG vs SRI vs Impact Investing</h4>
+<ul>
+  <li><span class="term">ESG investing</span> — uses ESG as a risk filter + alpha source</li>
+  <li><span class="term">SRI</span> (Socially Responsible Investing) — focuses on excluding forbidden industries</li>
+  <li><span class="term">Impact investing</span> — investments deliberately producing measurable positive impact</li>
+</ul>
+<div class="callout">🌿 <strong>Indonesian context:</strong> OJK published the <em>Sustainable Finance Roadmap Phase II (2021–2025)</em> and the Ministry of Investment/BKPM published the <em>Panduan Investasi Lestari</em> (2022) — official government vocabulary for ESG.</div>`
+    }
+  },
+  {
+    title:{id:"Tiga Pilar (E, S, G)", en:"The Three Pillars (E, S, G)"},
+    sub:{id:"Pelajaran 2 · Pilar dalam konteks Indonesia", en:"Lesson 2 · Pillars in the Indonesian context"},
+    html:{
+      id:`<h4>🌱 E — Environmental (Lingkungan)</h4>
+<p>Penilaian dampak lingkungan perusahaan. Untuk Indonesia, sangat relevan:</p>
+<ul>
+  <li>Emisi karbon (Scope 1, 2, 3)</li>
+  <li>Deforestasi (penting untuk sektor sawit, kehutanan)</li>
+  <li>Energi terbarukan vs fossil fuel</li>
+  <li>Pengelolaan air dan limbah</li>
+</ul>
+<h4>🤝 S — Social (Sosial)</h4>
+<p>Penilaian dampak sosial:</p>
+<ul>
+  <li>Hak buruh dan keselamatan kerja</li>
+  <li>Dampak ke komunitas lokal (terutama tambang &amp; sawit)</li>
+  <li>Diversitas dan inklusi karyawan</li>
+  <li>Supply chain due diligence (terutama untuk sawit &amp; tekstil)</li>
+</ul>
+<h4>🏛️ G — Governance (Tata Kelola)</h4>
+<p><strong>Pilar paling kritis untuk Indonesia saat ini</strong>, terutama setelah krisis MSCI 2026:</p>
+<ul>
+  <li>Independensi dewan komisaris</li>
+  <li>Transparansi kepemilikan (free-float, beneficial ownership)</li>
+  <li>Anti-korupsi dan kepatuhan</li>
+  <li>Pelaporan keuangan yang akurat</li>
+</ul>
+<div class="alert-callout"><strong>⚠️ MSCI 2026:</strong> Indonesia diancam downgrade ke <em>frontier market</em> karena masalah pilar <strong>G</strong> — bukan E atau S. Transparansi kepemilikan dan akurasi <em>free-float</em> adalah isu utamanya.</div>`,
+      en:`<h4>🌱 E — Environmental</h4>
+<p>Assessment of a company\'s environmental impact. For Indonesia, highly relevant:</p>
+<ul>
+  <li>Carbon emissions (Scope 1, 2, 3)</li>
+  <li>Deforestation (critical for palm oil, forestry sectors)</li>
+  <li>Renewables vs fossil fuels</li>
+  <li>Water and waste management</li>
+</ul>
+<h4>🤝 S — Social</h4>
+<p>Social impact assessment:</p>
+<ul>
+  <li>Labor rights and workplace safety</li>
+  <li>Impact on local communities (especially mining &amp; palm oil)</li>
+  <li>Employee diversity and inclusion</li>
+  <li>Supply chain due diligence (especially palm oil &amp; textiles)</li>
+</ul>
+<h4>🏛️ G — Governance</h4>
+<p><strong>The most critical pillar for Indonesia today</strong>, especially after the 2026 MSCI crisis:</p>
+<ul>
+  <li>Board of commissioners independence</li>
+  <li>Ownership transparency (free-float, beneficial ownership)</li>
+  <li>Anti-corruption and compliance</li>
+  <li>Accurate financial reporting</li>
+</ul>
+<div class="alert-callout"><strong>⚠️ MSCI 2026:</strong> Indonesia is threatened with downgrade to <em>frontier market</em> due to <strong>G</strong> pillar issues — not E or S. Ownership transparency and free-float accuracy are the key problems.</div>`
+    }
+  },
+  {
+    title:{id:"Regulasi Indonesia & Krisis MSCI", en:"Indonesian Regulation & MSCI Crisis"},
+    sub:{id:"Pelajaran 3 · OJK, IDX, dan momen 28 Januari 2026", en:"Lesson 3 · OJK, IDX, and the 28 January 2026 moment"},
+    html:{
+      id:`<h4>Regulator Utama</h4>
+<ul>
+  <li><span class="term">OJK</span> (Otoritas Jasa Keuangan) — regulator pasar modal</li>
+  <li><span class="term">IDX</span> (Indonesia Stock Exchange / BEI) — bursa</li>
+  <li><span class="term">KSEI</span> — kustodian sentral</li>
+  <li><span class="term">DSN-MUI</span> — otoritas Syariah</li>
+  <li><span class="term">BKPM</span> (Kementerian Investasi) — penerbit Panduan Investasi Lestari</li>
+</ul>
+<h4>Regulasi ESG Indonesia</h4>
+<ul>
+  <li><strong>POJK 51/2017</strong> — Penerapan Keuangan Berkelanjutan</li>
+  <li><strong>Sustainable Finance Roadmap Phase II</strong> (2021–2025)</li>
+  <li><strong>POJK 13/2025</strong> — Pengendalian Internal Perusahaan Efek (mengizinkan kerja sama dengan influencer)</li>
+  <li><strong>Aturan Finfluencer</strong> (rencana 2026) — lisensi untuk pemberi rekomendasi investasi</li>
+</ul>
+<h4>Krisis MSCI Januari 2026 — Linimasa</h4>
+<div class="alert-callout">
+  <strong>28 Jan 2026:</strong> MSCI umumkan konsultasi tentang aksesibilitas pasar Indonesia, membekukan perubahan positif.<br>
+  <strong>29 Jan:</strong> Pasar anjlok, ~USD 80 miliar kapitalisasi hilang dalam 2 hari.<br>
+  <strong>Februari:</strong> CEO BEI mundur. Goldman Sachs turunkan rekomendasi ke <em>underweight</em>.<br>
+  <strong>Maret:</strong> Ketua OJK mundur. OJK turunkan ambang wajib lapor kepemilikan dari 5% ke 1%.<br>
+  <strong>Mei:</strong> MSCI review berikutnya — keputusan downgrade final.
+</div>
+<h4>Apa Artinya untuk Investor Ritel?</h4>
+<p>Krisis ini bukan akhir — justru momentum untuk belajar. Pilar <strong>Governance</strong> sekarang jadi parameter utama dalam memilih saham Indonesia. Investor yang paham ESG akan punya keunggulan dalam menavigasi volatilitas ini.</p>`,
+      en:`<h4>Key Regulators</h4>
+<ul>
+  <li><span class="term">OJK</span> (Financial Services Authority) — capital markets regulator</li>
+  <li><span class="term">IDX</span> (Indonesia Stock Exchange) — the exchange itself</li>
+  <li><span class="term">KSEI</span> — central custodian</li>
+  <li><span class="term">DSN-MUI</span> — Syariah authority</li>
+  <li><span class="term">BKPM</span> (Ministry of Investment) — publisher of Sustainable Investment Guidelines</li>
+</ul>
+<h4>Indonesian ESG Regulations</h4>
+<ul>
+  <li><strong>POJK 51/2017</strong> — Sustainable Finance Implementation</li>
+  <li><strong>Sustainable Finance Roadmap Phase II</strong> (2021–2025)</li>
+  <li><strong>POJK 13/2025</strong> — Securities Companies Internal Control (allows influencer partnerships)</li>
+  <li><strong>Finfluencer Rules</strong> (planned 2026) — licensing for investment recommenders</li>
+</ul>
+<h4>MSCI Crisis January 2026 — Timeline</h4>
+<div class="alert-callout">
+  <strong>28 Jan 2026:</strong> MSCI announces consultation on Indonesia market accessibility, freezing positive changes.<br>
+  <strong>29 Jan:</strong> Market crashes, ~USD 80B market cap lost in 2 days.<br>
+  <strong>February:</strong> IDX CEO resigns. Goldman Sachs downgrades to <em>underweight</em>.<br>
+  <strong>March:</strong> OJK Chairman resigns. OJK lowers mandatory disclosure threshold from 5% to 1%.<br>
+  <strong>May:</strong> Next MSCI review — final downgrade decision.
+</div>
+<h4>What it means for retail investors</h4>
+<p>This crisis isn\'t the end — it\'s a learning moment. The <strong>Governance</strong> pillar is now the key parameter for choosing Indonesian stocks. ESG-literate investors gain an edge navigating this volatility.</p>`
+    }
+  },
+  {
+    title:{id:"Produk Investasi ESG di Indonesia", en:"ESG Investment Products in Indonesia"},
+    sub:{id:"Pelajaran 4 · Apa yang bisa dibeli dan di mana", en:"Lesson 4 · What you can buy and where"},
+    html:{
+      id:`<h4>1. Indeks Saham ESG</h4>
+<ul>
+  <li><span class="term">IDX ESG Leaders</span> — saham dengan skor ESG tertinggi</li>
+  <li><span class="term">KEHATI SRI Index</span> — indeks SRI tertua (sejak 2009), 25 saham</li>
+  <li><span class="term">ESG Sector Leaders KEHATI</span> — leader per sektor</li>
+  <li><span class="term">IDX Climate</span> — fokus iklim</li>
+</ul>
+<h4>2. Reksa Dana ESG</h4>
+<p>Tersedia di platform seperti <strong>Bibit</strong>, <strong>Bareksa</strong>, <strong>Tanamduit</strong>. Cek label "ESG" atau "Sustainable" di nama produknya. Verifikasi dengan baca <em>fact sheet</em> bulanan.</p>
+<h4>3. Green Sukuk Ritel</h4>
+<p>Sukuk negara untuk proyek hijau. Seri ST (Sukuk Tabungan) dan SR (Sukuk Ritel) khusus mendanai proyek lingkungan. Mulai <strong>Rp 1 juta</strong>, return ~5-7% tahunan, dijamin pemerintah.</p>
+<h4>4. Saham Individual</h4>
+<p>Beli langsung konstituen indeks ESG via broker. Contoh saham yang sering masuk: BCA, Astra International, Telkom Indonesia, Unilever Indonesia.</p>
+<h4>Platform untuk Eksekusi</h4>
+<ul>
+  <li><strong>Bibit</strong> — reksa dana, robo-advisor, mulai Rp 100k</li>
+  <li><strong>Bareksa / Tanamduit</strong> — marketplace reksa dana</li>
+  <li><strong>Ajaib</strong> — saham retail, fee 0.10%-0.18%</li>
+  <li><strong>Stockbit</strong> — saham + komunitas, fee 0.10%-0.29%</li>
+  <li><strong>IPOT</strong> — broker multi-asset, fee 0.19%-0.29%</li>
+</ul>
+<div class="callout">💡 <strong>Elemu Lestari tidak menjual saham.</strong> Kami menyarankan broker terdaftar OJK yang sesuai profil kamu. Kamu yang putuskan dan eksekusi sendiri di platform broker.</div>`,
+      en:`<h4>1. ESG Stock Indices</h4>
+<ul>
+  <li><span class="term">IDX ESG Leaders</span> — highest ESG-scored stocks</li>
+  <li><span class="term">KEHATI SRI Index</span> — oldest SRI index (since 2009), 25 stocks</li>
+  <li><span class="term">ESG Sector Leaders KEHATI</span> — leader per sector</li>
+  <li><span class="term">IDX Climate</span> — climate focus</li>
+</ul>
+<h4>2. ESG Mutual Funds</h4>
+<p>Available on platforms like <strong>Bibit</strong>, <strong>Bareksa</strong>, <strong>Tanamduit</strong>. Look for "ESG" or "Sustainable" labels. Verify by reading monthly <em>fact sheets</em>.</p>
+<h4>3. Retail Green Sukuk</h4>
+<p>Government sukuk for green projects. ST (Savings Sukuk) and SR (Retail Sukuk) series dedicated to environmental projects. Min <strong>IDR 1 million</strong>, ~5-7% annual returns, government-guaranteed.</p>
+<h4>4. Individual Stocks</h4>
+<p>Buy ESG index constituents directly via broker. Common names: BCA, Astra International, Telkom Indonesia, Unilever Indonesia.</p>
+<h4>Execution Platforms</h4>
+<ul>
+  <li><strong>Bibit</strong> — mutual funds, robo-advisor, min IDR 100k</li>
+  <li><strong>Bareksa / Tanamduit</strong> — fund marketplaces</li>
+  <li><strong>Ajaib</strong> — retail stocks, fees 0.10%-0.18%</li>
+  <li><strong>Stockbit</strong> — stocks + community, fees 0.10%-0.29%</li>
+  <li><strong>IPOT</strong> — multi-asset broker, fees 0.19%-0.29%</li>
+</ul>
+<div class="callout">💡 <strong>Elemu Lestari does not sell stocks.</strong> We suggest OJK-licensed brokers fitting your profile. You decide and execute on the broker platform yourself.</div>`
+    }
+  },
+  {
+    title:{id:"Greenwashing, Rating ESG, & Bias Perilaku", en:"Greenwashing, ESG Ratings, & Behavioral Biases"},
+    sub:{id:"Pelajaran 5 · Hal yang bikin investor salah langkah", en:"Lesson 5 · Pitfalls that derail investors"},
+    html:{
+      id:`<h4>🟢 Greenwashing — Si Hijau Palsu</h4>
+<p><strong>Greenwashing</strong> = perusahaan mengklaim ramah lingkungan tanpa bukti substansial. Tanda-tanda greenwashing:</p>
+<ul>
+  <li>Slogan hijau tanpa data (mis. "kami sustainable")</li>
+  <li>Target jauh di masa depan tanpa milestone (mis. "net zero 2060")</li>
+  <li>Logo daun tapi mayoritas bisnis di fossil fuel</li>
+  <li>Klaim "carbon neutral" hanya berbasis offset murah</li>
+</ul>
+<h4>📊 ESG Rating Divergence</h4>
+<p>Penelitian Berg, Kölbel &amp; Rigobon (2022, <em>Review of Finance</em>): rating ESG dari provider berbeda <strong>sangat berbeda</strong> untuk perusahaan yang sama. Korelasi antar rating ESG hanya <strong>~0.54</strong> — bandingkan dengan rating kredit yang biasanya <strong>~0.99</strong>.</p>
+<p>Artinya: rating MSCI ESG dan Sustainalytics bisa kasih nilai sangat beda untuk Bank Mandiri, misalnya. Jangan andalkan satu rating.</p>
+<h4>🧠 Bias Perilaku Investor Ritel</h4>
+<ul>
+  <li><strong>Herding</strong> — ikut-ikutan beli karena Twitter/TikTok rame</li>
+  <li><strong>FOMO</strong> — takut ketinggalan, beli di harga puncak</li>
+  <li><strong>Confirmation bias</strong> — hanya baca berita yang mendukung pilihan kita</li>
+  <li><strong>Loss aversion</strong> — pegang saham rugi terlalu lama, jual yang untung terlalu cepat</li>
+</ul>
+<h4>Bagaimana Hindari Jebakan?</h4>
+<ul>
+  <li>Cek minimal <strong>2 rating ESG</strong> (MSCI ESG + Sustainalytics + FTSE Russell)</li>
+  <li>Baca <em>integrated report</em> / <em>sustainability report</em> perusahaan</li>
+  <li>Pakai <strong>DCA</strong> (Dollar Cost Averaging) — investasi rutin bulanan</li>
+  <li>Horizon panjang (5+ tahun)</li>
+  <li>Jangan investasi karena <em>cuan</em> influencer — investasi karena pemahaman pribadi</li>
+</ul>
+<div class="alert-callout"><strong>⚠️ Aturan emas:</strong> Kalau kamu tidak bisa jelaskan dalam 1 kalimat <em>kenapa</em> kamu beli saham/reksa dana itu, jangan beli. Bukan investasi itu namanya — gambling.</div>`,
+      en:`<h4>🟢 Greenwashing — The Fake Green</h4>
+<p><strong>Greenwashing</strong> = a company claims eco-friendliness without substantive proof. Red flags:</p>
+<ul>
+  <li>Green slogans without data (e.g. "we\'re sustainable")</li>
+  <li>Distant targets with no milestones (e.g. "net zero 2060")</li>
+  <li>Leaf logo but most of the business is fossil fuels</li>
+  <li>"Carbon neutral" claims based purely on cheap offsets</li>
+</ul>
+<h4>📊 ESG Rating Divergence</h4>
+<p>Research by Berg, Kölbel &amp; Rigobon (2022, <em>Review of Finance</em>): ESG ratings from different providers <strong>diverge substantially</strong> for the same company. Inter-rating correlation only <strong>~0.54</strong> — compare to credit ratings at typically <strong>~0.99</strong>.</p>
+<p>Meaning: MSCI ESG and Sustainalytics can give very different scores to Bank Mandiri, for example. Don\'t rely on one rating.</p>
+<h4>🧠 Retail Investor Behavioral Biases</h4>
+<ul>
+  <li><strong>Herding</strong> — following the crowd because Twitter/TikTok is hyped</li>
+  <li><strong>FOMO</strong> — fear of missing out, buying at peak</li>
+  <li><strong>Confirmation bias</strong> — only reading news that supports your pick</li>
+  <li><strong>Loss aversion</strong> — holding losers too long, selling winners too early</li>
+</ul>
+<h4>How to avoid the traps</h4>
+<ul>
+  <li>Check at least <strong>2 ESG ratings</strong> (MSCI ESG + Sustainalytics + FTSE Russell)</li>
+  <li>Read the company\'s <em>integrated report</em> / <em>sustainability report</em></li>
+  <li>Use <strong>DCA</strong> (Dollar Cost Averaging) — monthly recurring investment</li>
+  <li>Long horizon (5+ years)</li>
+  <li>Don\'t invest because of an influencer\'s <em>cuan</em> claim — invest because YOU understand it</li>
+</ul>
+<div class="alert-callout"><strong>⚠️ Golden rule:</strong> If you can\'t explain in one sentence <em>why</em> you\'re buying that stock/fund, don\'t buy. That\'s not investing — that\'s gambling.</div>`
+    }
+  }
+];
+
+/* ===== EXPERT SYSTEM (bilingual) ===== */
+const ES_QUESTIONS = [
+  {
+    key:"goal", label_id:"Pertanyaan 1 dari 5", label_en:"Question 1 of 5",
+    q_id:"Apa tujuan utama investasi kamu?", q_en:"What is your main investment goal?",
+    options:[
+      {v:"wealth", t_id:"Tumbuh Wealth", t_en:"Grow Wealth", d_id:"Pertumbuhan kapital jangka panjang", d_en:"Long-term capital growth"},
+      {v:"income", t_id:"Income Rutin", t_en:"Regular Income", d_id:"Return hijau yang reguler", d_en:"Regular green returns"},
+      {v:"emergency", t_id:"Dana Darurat", t_en:"Emergency Fund", d_id:"Buffer likuiditas jangka pendek", d_en:"Short-term liquidity buffer"},
+      {v:"hajj", t_id:"Tabungan Haji/Umrah", t_en:"Hajj/Umrah Savings", d_id:"Persiapan ibadah", d_en:"Pilgrimage preparation"},
+      {v:"home", t_id:"Beli Rumah", t_en:"Buy a Home", d_id:"Tabungan DP rumah", d_en:"Home down-payment savings"}
+    ]
+  },
+  {
+    key:"risk", label_id:"Pertanyaan 2 dari 5", label_en:"Question 2 of 5",
+    q_id:"Bagaimana toleransi risiko kamu?", q_en:"What\'s your risk tolerance?",
+    options:[
+      {v:"low", t_id:"Rendah", t_en:"Low", d_id:"Prioritas jaga modal", d_en:"Capital preservation priority"},
+      {v:"med", t_id:"Sedang", t_en:"Medium", d_id:"Bisa terima volatilitas wajar", d_en:"Can accept moderate volatility"},
+      {v:"high", t_id:"Tinggi", t_en:"High", d_id:"Siap terima fluktuasi besar", d_en:"Ready for big swings"}
+    ]
+  },
+  {
+    key:"horizon", label_id:"Pertanyaan 3 dari 5", label_en:"Question 3 of 5",
+    q_id:"Berapa lama horizon investasi kamu?", q_en:"What\'s your investment horizon?",
+    options:[
+      {v:"short", t_id:"< 1 tahun", t_en:"< 1 year", d_id:"Butuh akses segera", d_en:"Need access soon"},
+      {v:"medium", t_id:"1-5 tahun", t_en:"1-5 years", d_id:"Tujuan menengah", d_en:"Medium-term goals"},
+      {v:"long", t_id:"5+ tahun", t_en:"5+ years", d_id:"Modal yang sabar", d_en:"Patient capital"}
+    ]
+  },
+  {
+    key:"amount", label_id:"Pertanyaan 4 dari 5", label_en:"Question 4 of 5",
+    q_id:"Berapa modal awal yang tersedia?", q_en:"How much initial capital?",
+    options:[
+      {v:"small", t_id:"< Rp 5 juta", t_en:"< IDR 5M", d_id:"Baru mulai", d_en:"Just starting"},
+      {v:"med", t_id:"Rp 5-50 juta", t_en:"IDR 5-50M", d_id:"Sudah punya base", d_en:"Has a base"},
+      {v:"large", t_id:"> Rp 50 juta", t_en:"> IDR 50M", d_id:"Investor mapan", d_en:"Established investor"}
+    ]
+  },
+  {
+    key:"pillar", label_id:"Pertanyaan 5 dari 5", label_en:"Question 5 of 5",
+    q_id:"Pilar ESG mana yang paling kamu prioritaskan?", q_en:"Which ESG pillar do you prioritize most?",
+    options:[
+      {v:"E", t_id:"Environment 🌱", t_en:"Environment 🌱", d_id:"Iklim, energi terbarukan", d_en:"Climate, renewables"},
+      {v:"S", t_id:"Social 🤝", t_en:"Social 🤝", d_id:"Hak buruh, dampak komunitas", d_en:"Labor rights, community impact"},
+      {v:"G", t_id:"Governance 🏛️", t_en:"Governance 🏛️", d_id:"Transparansi, tata kelola", d_en:"Transparency, governance"}
+    ]
+  }
+];
+
+/* ===== QUIZ (bilingual) ===== */
+const QUIZ = [
+  { q_id:"Apa kepanjangan ESG?", q_en:"What does ESG stand for?",
+    opts_id:["Equity, Stock, Growth","Environmental, Social, Governance","Economy, Society, Government","Energy, Sustainability, Green"],
+    opts_en:["Equity, Stock, Growth","Environmental, Social, Governance","Economy, Society, Government","Energy, Sustainability, Green"],
+    correct:1,
+    exp_id:"ESG = Environmental, Social, Governance. Di Indonesia, OJK memakai istilah LST (Lingkungan, Sosial, Tata Kelola).",
+    exp_en:"ESG = Environmental, Social, Governance. In Indonesia, OJK uses the term LST (Lingkungan, Sosial, Tata Kelola)." },
+  { q_id:"Pada tanggal berapa MSCI mengumumkan potensi penurunan status Indonesia?", q_en:"On what date did MSCI announce the potential downgrade of Indonesia?",
+    opts_id:["15 Desember 2025","28 Januari 2026","10 Februari 2026","1 Maret 2026"],
+    opts_en:["15 December 2025","28 January 2026","10 February 2026","1 March 2026"],
+    correct:1,
+    exp_id:"Pada 28 Januari 2026, MSCI membekukan perubahan positif untuk saham Indonesia dan mengumumkan konsultasi terkait potensi downgrade ke frontier market.",
+    exp_en:"On 28 January 2026, MSCI froze positive changes for Indonesian stocks and announced consultation on a potential frontier market downgrade." },
+  { q_id:"Pilar ESG mana yang menjadi isu utama dalam krisis MSCI Indonesia 2026?", q_en:"Which ESG pillar is the main issue in the 2026 MSCI Indonesia crisis?",
+    opts_id:["Environmental","Social","Governance","Semua sama"],
+    opts_en:["Environmental","Social","Governance","All equally"],
+    correct:2,
+    exp_id:"Governance — masalah transparansi kepemilikan, akurasi free-float, dan dugaan coordinated trading. Pilar G jadi kritis pasca MSCI 2026.",
+    exp_en:"Governance — issues with ownership transparency, free-float accuracy, and suspected coordinated trading. The G pillar became critical after MSCI 2026." },
+  { q_id:"Apa nama indeks SRI tertua di Indonesia?", q_en:"What is Indonesia\'s oldest SRI index?",
+    opts_id:["IDX ESG Leaders","KEHATI SRI Index","Jakarta Islamic Index","IDX Climate"],
+    opts_en:["IDX ESG Leaders","KEHATI SRI Index","Jakarta Islamic Index","IDX Climate"],
+    correct:1,
+    exp_id:"KEHATI SRI Index, diluncurkan 2009 oleh BEI bersama Yayasan KEHATI. Berisi 25 saham yang lulus skrining ESG ketat.",
+    exp_en:"KEHATI SRI Index, launched 2009 by IDX with the KEHATI Foundation. Contains 25 stocks passing strict ESG screening." },
+  { q_id:"Indonesia adalah penerbit Green Sukuk negara pertama di dunia pada tahun:", q_en:"Indonesia became the world\'s first sovereign Green Sukuk issuer in:",
+    opts_id:["2015","2018","2020","2022"], opts_en:["2015","2018","2020","2022"], correct:1,
+    exp_id:"2018 — Indonesia membuat sejarah sebagai negara pertama yang menerbitkan Green Sukuk berdaulat untuk mendanai proyek lingkungan.",
+    exp_en:"2018 — Indonesia made history as the first country to issue sovereign Green Sukuk to fund environmental projects." },
+  { q_id:"Berapa tingkat literasi pasar modal Indonesia menurut SNLIK 2025?", q_en:"What is Indonesia\'s capital markets literacy rate per SNLIK 2025?",
+    opts_id:["7.78%","17.78%","27.78%","37.78%"], opts_en:["7.78%","17.78%","27.78%","37.78%"], correct:1,
+    exp_id:"Hanya 17.78%, jauh di bawah perbankan (65.5%) dan asuransi (45.45%). Ini gap edukasi yang Elemu Lestari coba tutup.",
+    exp_en:"Only 17.78%, far below banking (65.5%) and insurance (45.45%). This is the education gap Elemu Lestari aims to close." },
+  { q_id:"Apa itu greenwashing?", q_en:"What is greenwashing?",
+    opts_id:["Mencuci kendaraan dengan air daur ulang","Klaim ramah lingkungan tanpa bukti substansial","Investasi dengan return tinggi","Reksa dana berkode hijau"],
+    opts_en:["Washing vehicles with recycled water","Claiming eco-friendliness without substantial evidence","High-return investing","Mutual funds with green codes"],
+    correct:1,
+    exp_id:"Greenwashing = perusahaan klaim 'hijau/sustainable' hanya untuk pemasaran tanpa praktek nyata. Contoh: bank klaim 'net zero' tapi tetap biayai PLTU batubara.",
+    exp_en:"Greenwashing = companies claim 'green/sustainable' purely for marketing without real practices. Example: banks claim 'net zero' while still funding coal plants." },
+  { q_id:"Penelitian Berg et al. (2022) menemukan korelasi antar rating ESG hanya sekitar:", q_en:"Berg et al. (2022) found inter-ESG-rating correlation of approximately:",
+    opts_id:["0.54","0.74","0.84","0.99"], opts_en:["0.54","0.74","0.84","0.99"], correct:0,
+    exp_id:"~0.54 — rating ESG dari berbagai provider sangat berbeda. Bandingkan dengan rating kredit (~0.99). Artinya: jangan andalkan satu rating saja.",
+    exp_en:"~0.54 — ESG ratings from different providers diverge significantly. Compare to credit ratings (~0.99). Lesson: don\'t rely on a single rating." },
+  { q_id:"Platform mana yang paling cocok untuk investor pemula dengan modal di bawah Rp 1 juta?", q_en:"Which platform suits beginner investors with under IDR 1M capital?",
+    opts_id:["IPOT","Stockbit","Bibit","Mirae Asset"], opts_en:["IPOT","Stockbit","Bibit","Mirae Asset"], correct:2,
+    exp_id:"Bibit — robo-advisor reksa dana, mulai Rp 100.000, auto-rebalancing, ada kategori ESG dan Syariah. Cocok pemula dengan modal kecil.",
+    exp_en:"Bibit — mutual fund robo-advisor, min IDR 100,000, auto-rebalancing, ESG and Syariah categories available. Best for beginners with small capital." },
+  { q_id:"POJK 13/2025 yang berlaku 11 Desember 2025 secara eksplisit mengizinkan:", q_en:"POJK 13/2025, effective 11 December 2025, explicitly permits:",
+    opts_id:["Crypto trading","Insider trading","Kerja sama Perusahaan Efek dengan influencer media sosial","Short selling tanpa batas"],
+    opts_en:["Crypto trading","Insider trading","Securities firms partnering with social media influencers","Unlimited short selling"],
+    correct:2,
+    exp_id:"POJK 13/2025 mengizinkan kerjasama Perusahaan Efek (sekuritas) dengan influencer/content creator media sosial — landasan hukum untuk model affiliate marketing fintech edukasi.",
+    exp_en:"POJK 13/2025 permits Securities Companies to partner with social media influencers/content creators — the legal basis for fintech education affiliate marketing." }
+];
+
+/* ===== Theme manager ===== */
+const THEME = {
+  apply(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('themeIcon').textContent = theme==='dark'?'☀':'🌙';
+    STORE.set('theme', theme);
+  },
+  toggle(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    this.apply(cur==='dark'?'light':'dark');
+  }
+};
+
+/* ===== Language manager ===== */
+const LANG = {
+  apply(L){
+    window.CURRENT_LANG = L;
+    document.documentElement.lang = L;
+    document.getElementById('langIcon').textContent = L==='id'?'EN':'ID';
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+    const map = {
+      'tagline':'tagline','metaDegree':'meta.degree','metaSchool':'meta.school',
+      'proverb':'proverb','footerCredit':'footer.credit'
+    };
+    for(const id in map){ const el=document.getElementById(id); if(el) el.textContent = t(map[id]); }
+    document.getElementById('bannerText').innerHTML = t('banner.msci');
+    document.getElementById('disclaimer').innerHTML = '<strong>'+(L==='en'?'Disclaimer:':'Disclaimer:')+'</strong>'+t('footer.disclaimer').replace(/<\/?strong>/g,'').replace('Disclaimer:','');
+    document.getElementById('disclaimer').innerHTML = t('footer.disclaimer');
+    document.getElementById('chatInput').placeholder = t('chat.placeholder');
+    document.getElementById('teachTitle').textContent = t('teach.title');
+    document.getElementById('teachDesc').textContent = t('teach.desc');
+    document.getElementById('teachQLabel').textContent = t('teach.qlabel');
+    document.getElementById('teachALabel').textContent = t('teach.alabel');
+    STORE.set('lang', L);
+    // Re-render dynamic content
+    renderMarketPanel();
+    renderChat();
+    renderLesson();
+    if(_esStep===0 && Object.keys(_esAnswers).length===0) renderExpertStep();
+    else if(STORE.get('expert',{}).completed) renderExpertResult();
+    else renderExpertStep();
+    renderSimulator();
+    renderNewsTab();
+    renderStocksTab();
+    if(!_quizActive) renderQuizIntro();
+  },
+  toggle(){ this.apply(window.CURRENT_LANG==='id'?'en':'id'); }
+};
+
+/* ===== Tab manager ===== */
+// Only enabled tabs are listed here; disabled tab panels are commented out in HTML
+// but their JS render functions are kept intact for re-enable. activateTab guards against
+// missing DOM elements so the app doesn't crash if a disabled tab's panel is missing.
+const ENABLED_TABS = ['chat','learn','advise'];
+function activateTab(mode){
+  if(!ENABLED_TABS.includes(mode)) mode = 'chat'; // restore safety
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  ['chat','learn','advise','simulate','data','quiz'].forEach(m=>{
+    const el = document.getElementById('mode-'+m);
+    if(el) el.classList.toggle('hide', m!==mode);
+  });
+  STORE.set('tab', mode);
+}
+function activateSubTab(sub){
+  const subtabs = document.querySelectorAll('.subtab');
+  if(!subtabs.length) return;
+  subtabs.forEach(b=>b.classList.toggle('active', b.dataset.sub===sub));
+  const n = document.getElementById('sub-news'); if(n) n.classList.toggle('hide', sub!=='news');
+  const s = document.getElementById('sub-stocks'); if(s) s.classList.toggle('hide', sub!=='stocks');
+  STORE.set('subtab', sub);
+}
+
+/* ===== Chatbot ===== */
+let _faqTokens = null;
+function getFAQTokens(){
+  if(_faqTokens) return _faqTokens;
+  // Merge core FAQ_DATA with user-extended knowledge.js entries
+  const extra = (window.KNOWLEDGE_DATA && Array.isArray(window.KNOWLEDGE_DATA.entries)) ? window.KNOWLEDGE_DATA.entries : [];
+  const allEntries = [...FAQ_DATA, ...extra];
+  _faqTokens = allEntries.map(f=>{
+    const allKw = [...(f.kw_id||[]),...(f.kw_en||[])];
+    const tokens = [];
+    allKw.forEach(k => tokenize(k).forEach(x=>tokens.push(x)));
+    return { ...f, tokens };
+  });
+  return _faqTokens;
+}
+function getLearned(){ return STORE.get('learned', []); }
+function buildLearnedTokens(){
+  return getLearned().map(L=>({ ...L, tokens: tokenize(L.q) }));
+}
+function findMatch(query){
+  const lcQuery = ' '+query.toLowerCase().replace(/[^a-z0-9À-ſ\s]/g,' ').replace(/\s+/g,' ')+' ';
+  const qt = tokenize(query);
+  const expanded = expandWithSynonyms(qt, SYNONYMS);
+  let best = { score:0, src:null };
+  const runners = [];
+  for(const L of buildLearnedTokens()){
+    let score = jaccard(expanded, L.tokens) * 1.1;
+    if(L.q && lcQuery.includes(' '+L.q.toLowerCase().trim()+' ')) score += 0.5;
+    if(score > best.score){ if(best.src) runners.push(best); best = { score, src:{type:'learned', entry:L} }; }
+    else if(score > 0.1){ runners.push({ score, src:{type:'learned', entry:L} }); }
+  }
+  for(const f of getFAQTokens()){
+    let score = jaccard(expanded, f.tokens);
+    // Substring boost: verbatim match of multi-word phrase OR specific single-word term (>=5 chars)
+    const allKw = [...(f.kw_id||[]),...(f.kw_en||[])];
+    for(const kw of allKw){
+      const klc = kw.toLowerCase().trim();
+      if(klc.includes(' ') && lcQuery.includes(' '+klc+' ')){ score += 0.5; break; }
+      if(!klc.includes(' ') && klc.length >= 5 && lcQuery.includes(' '+klc+' ')){ score += 0.4; break; }
+    }
+    if(score > best.score){ if(best.src) runners.push(best); best = { score, src:{type:'faq', entry:f} }; }
+    else if(score > 0.1){ runners.push({ score, src:{type:'faq', entry:f} }); }
+  }
+  runners.sort((a,b)=>b.score-a.score);
+  const seen = new Set();
+  const dedup = [];
+  for(const r of runners){
+    const k = (r.src.entry.id||r.src.entry.q||'')+r.src.type;
+    if(!seen.has(k)){ seen.add(k); dedup.push(r); }
+  }
+  return { best, runners: dedup.slice(0,3) };
+}
+
+function chatReply(query){
+  const m = findMatch(query);
+  // Only HIGH confidence shows an answer. Below threshold = unknown + suggestions.
+  // User clicks a suggestion if they want that answer — bot doesn't guess.
+  const HIGH = 0.15;
+  if(m.best.score >= HIGH){
+    const entry = m.best.src.entry;
+    const html = m.best.src.type==='learned' ?
+      (escapeHTML(entry.a) + '<div class="msg-meta">'+t('chat.learned')+'</div>') :
+      (entry['a_'+window.CURRENT_LANG] || entry.a_id);
+    return { html, runners: m.runners };
+  }
+  return { html:null, runners: m.runners };
+}
+
+function chatLabel(entry){
+  if(entry.q) return entry.q; // learned
+  const L = window.CURRENT_LANG;
+  return entry['kw_'+L]?.[0] || entry.kw_id?.[0] || '?';
+}
+
+function ensureDateSep(){
+  const msgs = document.getElementById('chatMessages');
+  if(!msgs || msgs.querySelector('.chat-date-sep')) return;
+  const sep = document.createElement('div');
+  sep.className = 'chat-date-sep';
+  sep.textContent = fmtChatDate();
+  msgs.insertBefore(sep, msgs.firstChild);
+}
+function addMessage(content, who, meta){
+  ensureDateSep();
+  const wrap = document.createElement('div');
+  wrap.className = 'msg '+who;
+  if(who === 'bot'){
+    const av = document.createElement('div');
+    av.className = 'msg-avatar';
+    wrap.appendChild(av);
+  }
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = content;
+  const time = document.createElement('span');
+  time.className = 'msg-time';
+  time.textContent = fmtChatTime();
+  bubble.appendChild(time);
+  wrap.appendChild(bubble);
+  document.getElementById('chatMessages').appendChild(wrap);
+  document.getElementById('chatBody').scrollTop = 9999;
+  if(meta && meta.runners && meta.runners.length){
+    const dym = document.createElement('div');
+    dym.className = 'dym';
+    dym.innerHTML = '<span>'+t('chat.didYouMean')+':</span> ';
+    meta.runners.forEach((r,i)=>{
+      const a = document.createElement('a');
+      a.textContent = chatLabel(r.src.entry);
+      a.onclick = ()=>{ document.getElementById('chatInput').value = a.textContent; sendMessage(); };
+      dym.appendChild(a);
+      if(i < meta.runners.length-1) dym.appendChild(document.createTextNode(' · '));
+    });
+    document.getElementById('chatMessages').appendChild(dym);
+  }
+}
+
+function addChips(){
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-chips';
+  (window.CURRENT_LANG==='en'?SUGGESTED_EN:SUGGESTED_ID).forEach(s=>{
+    const c = document.createElement('button');
+    c.className='chip'; c.textContent=s;
+    c.onclick = ()=>{ document.getElementById('chatInput').value = s; sendMessage(); };
+    wrap.appendChild(c);
+  });
+  document.getElementById('chatMessages').appendChild(wrap);
+}
+
+let _lastUnknown = '';
+let _awaitingName = false;
+function showTyping(){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot typing';
+  wrap.id = 'typingIndicator';
+  wrap.innerHTML = '<div class="msg-avatar"></div><div class="msg-bubble"><span class="typ-dot"></span><span class="typ-dot"></span><span class="typ-dot"></span></div>';
+  document.getElementById('chatMessages').appendChild(wrap);
+  document.getElementById('chatBody').scrollTop = 9999;
+}
+function hideTyping(){
+  const t = document.getElementById('typingIndicator');
+  if(t) t.remove();
+}
+function sendMessage(){
+  const input = document.getElementById('chatInput');
+  const v = input.value.trim();
+  if(!v) return;
+  addMessage(escapeHTML(v), 'user');
+  input.value = '';
+
+  const conv = matchConversational(v);
+  const name = STORE.get('user_name', null);
+
+  // Explicit name update outside onboarding ("my name is X" / "panggil saya X")
+  if(!_awaitingName){
+    const newName = detectNameUpdate(v);
+    if(newName){
+      const oldName = STORE.get('user_name', null);
+      STORE.set('user_name', newName);
+      showTyping();
+      const delay = 500 + Math.floor(Math.random()*300);
+      setTimeout(()=>{
+        hideTyping();
+        const L = window.CURRENT_LANG;
+        let reply;
+        if(!oldName){
+          reply = (L==='en' ? "Nice to meet you, " : "Senang berkenalan dengan ")+
+            '<strong>'+escapeHTML(newName)+'</strong>! 🌿 '+
+            (L==='en' ? "I\'ll remember your name." : "Saya simpan nama kamu.");
+        } else if(oldName.toLowerCase() === newName.toLowerCase()){
+          reply = (L==='en' ? "Yes, you\'re " : "Iya, kamu ")+
+            '<strong>'+escapeHTML(newName)+'</strong>! 🌿 '+
+            (L==='en' ? "Already remembered." : "Sudah saya ingat.");
+        } else {
+          reply = (L==='en' ? "Oh, I\'ll call you " : "Oh, panggil ")+
+            '<strong>'+escapeHTML(newName)+'</strong>'+
+            (L==='en' ? " now! 🌿 Sorry, I had \"" : " ya! 🌿 Maaf, sebelumnya saya catat \"")+
+            escapeHTML(oldName)+
+            (L==='en' ? "\" before. Updated." : "\". Sudah saya update.");
+        }
+        addMessage(reply, 'bot');
+      }, delay);
+      return;
+    }
+  }
+
+  // First-visit name capture flow
+  if(_awaitingName){
+    showTyping();
+    const delay = 500 + Math.floor(Math.random()*300);
+    setTimeout(()=>{
+      hideTyping();
+      // If they greeted instead of giving a name, greet back and re-ask
+      if(conv){
+        addMessage(conv.reply(null)+'<br><br>'+t('name.reask'), 'bot');
+        return; // still awaiting name
+      }
+      const cleaned = cleanName(v);
+      if(!cleaned){
+        addMessage(escapeHTML(t('name.invalid'))+'<br>'+t('name.reask'), 'bot');
+        return; // still awaiting name
+      }
+      STORE.set('user_name', cleaned);
+      _awaitingName = false;
+      addMessage(escapeHTML(t('name.welcome'))+' <strong>'+escapeHTML(cleaned)+'</strong>'+t('name.welcome_suffix'), 'bot');
+    }, delay);
+    return;
+  }
+
+  // Conversational reply (greetings/thanks/etc.) outside name capture
+  if(conv){
+    showTyping();
+    const delay = 400 + Math.floor(Math.random()*300);
+    setTimeout(()=>{
+      hideTyping();
+      addMessage(conv.reply(name), 'bot');
+    }, delay);
+    return;
+  }
+
+  // Normal FAQ flow
+  showTyping();
+  const delay = 500 + Math.floor(Math.random()*400);
+  setTimeout(()=>{
+    hideTyping();
+    const reply = chatReply(v);
+    if(reply.html === null){
+      _lastUnknown = v;
+      addMessage(getUnknownReply(v), 'bot', { runners: reply.runners });
+    } else {
+      let html = reply.html;
+      if(name && Math.random() < 0.25 && !/^<(strong|h\d|ul|ol|div)/i.test(html.trim())){
+        html = escapeHTML(name)+', '+html.charAt(0).toLowerCase()+html.slice(1);
+      }
+      addMessage(html, 'bot', { runners: reply.runners });
+    }
+  }, delay);
+}
+
+function renderChat(){
+  const msgs = document.getElementById('chatMessages');
+  if(!msgs) return;
+  msgs.innerHTML = '';
+  _awaitingName = false;
+  const name = STORE.get('user_name', null);
+  if(!name){
+    // First visit: onboarding requires explicit greeting + name ask
+    _awaitingName = true;
+    addMessage(escapeHTML(getGreeting())+'! 🌿 '+t('intro.first'), 'bot');
+  }
+  // Returning visit: chat stays fully blank. Sari speaks only when the user
+  // sends the first message. Chip suggestions are intentionally removed —
+  // see addChips() function (kept in code for potential re-enable).
+}
+
+/* ===== Teach modal ===== */
+function openTeachModal(question){
+  document.getElementById('teachQ').value = question;
+  document.getElementById('teachA').value = '';
+  document.getElementById('teachModal').classList.add('show');
+  setTimeout(()=>document.getElementById('teachA').focus(), 100);
+}
+function closeTeachModal(){ document.getElementById('teachModal').classList.remove('show'); }
+function saveTeach(){
+  const q = document.getElementById('teachQ').value.trim();
+  const a = document.getElementById('teachA').value.trim();
+  if(!q || !a){ closeTeachModal(); return; }
+  const learned = getLearned();
+  learned.push({ q, a, ts: Date.now() });
+  STORE.set('learned', learned);
+  closeTeachModal();
+  addMessage('🌿 '+escapeHTML(t('teach.thanks')), 'bot');
+}
+
+/* ===== Lessons ===== */
+let _currentLesson = STORE.get('lesson', 0);
+function renderLessonNav(){
+  const nav = document.getElementById('lessonNav');
+  nav.innerHTML = '';
+  const L = window.CURRENT_LANG;
+  LESSONS.forEach((l,i)=>{
+    const b = document.createElement('button');
+    b.className = 'lesson-pill'+(i===_currentLesson?' active':'');
+    b.innerHTML = `<span class="num">${i+1}</span>${escapeHTML(l.title[L]||l.title.id)}`;
+    b.onclick = ()=>{ _currentLesson=i; STORE.set('lesson',i); renderLesson(); };
+    nav.appendChild(b);
+  });
+}
+function renderLesson(){
+  if(_currentLesson >= LESSONS.length) _currentLesson = 0;
+  const l = LESSONS[_currentLesson];
+  const L = window.CURRENT_LANG;
+  document.getElementById('lessonContent').innerHTML = `
+    <h3>${escapeHTML(l.title[L]||l.title.id)}</h3>
+    <div class="subtitle">${escapeHTML(l.sub[L]||l.sub.id)}</div>
+    ${l.html[L] || l.html.id}
+  `;
+  renderLessonNav();
+  document.getElementById('prevLesson').disabled = _currentLesson===0;
+  document.getElementById('nextLesson').disabled = _currentLesson===LESSONS.length-1;
+  document.getElementById('prevLesson').textContent = t('btn.prev');
+  document.getElementById('nextLesson').textContent = t('btn.next');
+}
+
+/* ===== Expert system ===== */
+let _esStep = 0;
+let _esAnswers = {};
+
+function runExpertRules(a){
+  const L = window.CURRENT_LANG, en = L==='en';
+  const recs = [], fired = [];
+  const r = (rule, ttl_id, ttl_en, body_id, body_en, broker)=>{
+    fired.push(rule);
+    recs.push({ title: en?ttl_en:ttl_id, body: en?body_en:body_id, broker });
+  };
+  if(a.goal==="hajj"){
+    r("R1: goal=Hajj → emas digital + sukuk panjang",
+      "Tabungan emas digital","Digital gold savings",
+      "Buka akun di <strong>Tamasia</strong> atau <strong>Pegadaian Digital</strong>. Emas tahan inflasi biaya haji.",
+      "Open an account at <strong>Tamasia</strong> or <strong>Pegadaian Digital</strong>. Gold hedges hajj cost inflation.",
+      "Tamasia · Pegadaian");
+    r("R1b: goal=Hajj → Sukuk Ritel SR 5+ tahun",
+      "Green Sukuk Ritel tenor panjang","Long-tenor Retail Green Sukuk",
+      "Alokasi 40-60% ke Sukuk Ritel SR seri 5+ tahun. Return stabil, dijamin negara, sesuai Syariah.",
+      "Allocate 40-60% to Retail Sukuk SR series with 5+ year tenor. Stable yield, government-guaranteed, Syariah-compliant.",
+      "Bibit · Bareksa · Tanamduit");
+  }
+  if(a.goal==="emergency"){
+    r("R2: goal=Emergency → reksa dana pasar uang + tabungan",
+      "Reksa dana pasar uang ESG","ESG money market fund",
+      "Pilih reksa dana pasar uang berlabel ESG di Bibit/Bareksa. Likuid (cair 1-3 hari), risiko rendah.",
+      "Pick an ESG-labeled money market fund on Bibit/Bareksa. Liquid (1-3 day redemption), low risk.",
+      "Bibit · Bareksa");
+    r("R2b: emergency → tabungan bank 3-6 bulan",
+      "Tabungan syariah/konvensional","Bank savings (Syariah or conv.)",
+      "3-6 bulan pengeluaran di rekening bank biasa untuk likuiditas darurat penuh.",
+      "Keep 3-6 months of expenses in a regular bank account for full emergency liquidity.",
+      "Bank Mandiri · BCA · BSI");
+  }
+  if(a.goal==="home"){
+    r("R3: goal=Home → reksa dana campuran + sukuk",
+      "Reksa dana campuran ESG","ESG mixed fund",
+      "Untuk DP rumah 3-5 tahun lagi, alokasi 60% reksa dana campuran ESG + 40% sukuk.",
+      "For 3-5 year home down payment, allocate 60% ESG mixed fund + 40% sukuk.",
+      "Bibit · Bareksa");
+    r("R3b: home → KPR Syariah BSI",
+      "Rencana KPR Syariah","Syariah mortgage plan",
+      "Saat siap beli rumah, pertimbangkan KPR Syariah BSI / Bank Mandiri Syariah dengan akad murabaha (tanpa riba).",
+      "When ready, consider Syariah mortgages from BSI / Bank Mandiri Syariah with murabaha (no riba).",
+      "BSI · Bank Mandiri Syariah");
+  }
+  if(a.goal==="wealth"){
+    if(a.risk==="high"){
+      r("R4a: goal=Wealth & risk=High → equity-heavy ESG portfolio",
+        "Saham IDX ESG Leaders (80%)","IDX ESG Leaders stocks (80%)",
+        "Beli langsung 5-10 saham dari IDX ESG Leaders / KEHATI Index. Diversifikasi sektoral.",
+        "Buy 5-10 stocks directly from IDX ESG Leaders / KEHATI Index. Sector-diversified.",
+        "Ajaib · Stockbit · IPOT");
+      r("R4a2: balancing dengan sukuk 20%",
+        "Sukuk untuk balancing (20%)","Sukuk for balance (20%)",
+        "20% di Green Sukuk Ritel untuk meredam volatility equity.",
+        "20% in Retail Green Sukuk to dampen equity volatility.",
+        "Bibit · Bareksa");
+    } else if(a.risk==="med"){
+      r("R4b: goal=Wealth & risk=Medium → balanced halal-ESG",
+        "Portfolio seimbang (60/40)","Balanced portfolio (60/40)",
+        "Buka Bibit, pilih portfolio Moderate dengan filter ESG. 60% saham ESG / 40% sukuk + reksa dana pendapatan tetap.",
+        "Open Bibit, choose Moderate with ESG filter. 60% ESG equities / 40% sukuk + fixed-income funds.",
+        "Bibit · StashAway");
+    } else {
+      r("R4c: goal=Wealth & risk=Low → konservatif sukuk-heavy",
+        "Portofolio konservatif","Conservative portfolio",
+        "70% Green Sukuk Ritel + 20% reksa dana pendapatan tetap + 10% reksa dana indeks ESG.",
+        "70% Retail Green Sukuk + 20% fixed-income funds + 10% ESG index funds.",
+        "Bibit · Bareksa");
+    }
+  }
+  if(a.goal==="income"){
+    r("R5: goal=Income → sukuk + dividen ESG",
+      "Green Sukuk Ritel rutin","Regular Retail Green Sukuk",
+      "Sukuk Ritel SR membayar kupon bulanan/3-bulanan. Pendapatan stabil dan halal.",
+      "Retail Sukuk SR pays monthly/quarterly coupons. Stable, halal income.",
+      "Bibit · Bareksa · Tanamduit");
+    r("R5b: income → saham dividen tinggi yang ESG",
+      "Saham dividen tinggi ESG","High-dividend ESG stocks",
+      "Cari konstituen IDX ESG Leaders dengan dividend yield 3%+. Contoh: BBCA, ASII, TLKM.",
+      "Look for IDX ESG Leaders constituents with 3%+ dividend yield. E.g.: BBCA, ASII, TLKM.",
+      "Ajaib · Stockbit · IPOT");
+  }
+  if(a.amount==="small"){
+    r("R6: amount=Small → robo-advisor reksa dana",
+      "Mulai dengan robo-advisor","Start with robo-advisor",
+      "Modal di bawah Rp 5 juta paling efisien di <strong>Bibit</strong> (mulai Rp 100k). Auto-rebalancing, biaya rendah, kategori ESG tersedia.",
+      "Capital under IDR 5M is most efficient on <strong>Bibit</strong> (min IDR 100k). Auto-rebalancing, low fees, ESG categories.",
+      "Bibit");
+  }
+  if(a.amount==="large" && a.goal==="wealth"){
+    r("R7: amount=Large & wealth → diversifikasi multi-asset",
+      "Diversifikasi multi-asset","Multi-asset diversification",
+      "Modal besar baiknya disebar: saham ESG individual (IPOT/Stockbit), Green Sukuk, dan reksa dana ESG. Pertimbangkan juga ETF Syariah Wahed.",
+      "Large capital should spread: individual ESG stocks (IPOT/Stockbit), Green Sukuk, ESG funds. Also consider Wahed Syariah ETF.",
+      "IPOT · Bibit · Wahed");
+  }
+  if(a.horizon==="long" && (a.risk==="med" || a.risk==="high")){
+    r("R8: horizon=Long & risk≥Medium → DCA bulanan",
+      "Dollar Cost Averaging bulanan","Monthly Dollar Cost Averaging",
+      "Set auto-debit bulanan ke portfolio ESG kamu. Konsistensi + horizon panjang = compounding maksimal.",
+      "Set up auto-debit monthly to your ESG portfolio. Consistency + long horizon = maximum compounding.",
+      "Bibit (auto-invest) · Ajaib");
+  }
+  if(a.horizon==="short"){
+    r("R9: horizon=Short → hindari equity, prioritas likuiditas",
+      "Prioritas likuiditas","Liquidity priority",
+      "Untuk horizon <1 tahun, hindari saham. Stick ke reksa dana pasar uang dan Sukuk Ritel tenor pendek.",
+      "For <1 year horizon, avoid stocks. Stick to money market funds and short-tenor Retail Sukuk.",
+      "Bibit · Bareksa");
+  }
+  if(a.pillar==="G"){
+    r("R10G: pillar=G → filter governance pasca MSCI",
+      "Filter Governance pasca-MSCI","Governance-first filter (post-MSCI)",
+      "Prioritaskan saham KEHATI Index dengan free-float transparan dan beneficial ownership jelas. Hindari saham dengan riwayat <em>coordinated trading</em>.",
+      "Prioritize KEHATI Index stocks with transparent free-float and clear beneficial ownership. Avoid stocks with coordinated-trading history.",
+      "Stockbit · IPOT");
+  }
+  if(a.pillar==="E"){
+    r("R10E: pillar=E → fokus renewables & climate",
+      "Tema energi terbarukan","Renewables theme",
+      "Cari saham &amp; reksa dana yang fokus energi terbarukan, kendaraan listrik (EV), dan efisiensi energi. Green Sukuk Ritel cocok di sini.",
+      "Look for stocks &amp; funds focused on renewables, EVs, energy efficiency. Retail Green Sukuk fits perfectly.",
+      "Bibit · Stockbit");
+  }
+  if(a.pillar==="S"){
+    r("R10S: pillar=S → fokus dampak sosial",
+      "Tema dampak sosial","Social impact theme",
+      "Cari perusahaan dengan rating S tinggi: praktek tenaga kerja baik, supply chain bersih, kontribusi komunitas signifikan. KEHATI Index banyak pilihan.",
+      "Look for companies with high S ratings: good labor practices, clean supply chains, significant community contribution. KEHATI Index has many.",
+      "Stockbit · IPOT");
+  }
+  let pid="Investor ESG Seimbang", pen="Balanced ESG Investor";
+  if(a.risk==="high" && a.horizon==="long"){ pid="Pembangun Kekayaan ESG Agresif"; pen="Aggressive ESG Wealth Builder"; }
+  else if(a.risk==="low" || a.horizon==="short"){ pid="Penabung ESG Konservatif"; pen="Conservative ESG Saver"; }
+  else if(a.goal==="hajj"){ pid="Penabung Haji Lestari"; pen="Sustainable Hajj Saver"; }
+  else if(a.goal==="income"){ pid="Pencari Income ESG"; pen="ESG Income Seeker"; }
+  else if(a.pillar==="G" && a.goal==="wealth"){ pid="Investor Governance-First (Pasca-MSCI)"; pen="Governance-First Investor (Post-MSCI)"; }
+  return { profile: en?pen:pid, recs, fired };
+}
+
+function renderExpertStep(){
+  if(_esStep >= ES_QUESTIONS.length){ renderExpertResult(); return; }
+  const q = ES_QUESTIONS[_esStep];
+  const L = window.CURRENT_LANG;
+  document.getElementById('progressFill').style.width = (_esStep/ES_QUESTIONS.length*100)+'%';
+  document.getElementById('expertContent').innerHTML = `
+    <div class="expert-step">
+      <div class="step-label">${escapeHTML(q['label_'+L]||q.label_id)}</div>
+      <h3>${escapeHTML(q['q_'+L]||q.q_id)}</h3>
+      <div class="opt-grid">
+        ${q.options.map(o=>`
+          <button class="opt-card" data-v="${o.v}">
+            <div class="opt-title">${escapeHTML(o['t_'+L]||o.t_id)}</div>
+            <div class="opt-desc">${escapeHTML(o['d_'+L]||o.d_id)}</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.querySelectorAll('#expertContent .opt-card').forEach(c=>{
+    c.onclick = ()=>{
+      _esAnswers[q.key] = c.dataset.v;
+      STORE.set('expert', { step:_esStep+1, answers:_esAnswers });
+      _esStep++; renderExpertStep();
+    };
+  });
+}
+
+function renderExpertResult(){
+  document.getElementById('progressFill').style.width = '100%';
+  const r = runExpertRules(_esAnswers);
+  const tags = b => b ? b.split('·').map(x=>`<span class="broker-tag">${escapeHTML(x.trim())}</span>`).join('') : '';
+  document.getElementById('expertContent').innerHTML = `
+    <div class="result-card" id="resultCard">
+      <span class="badge">${escapeHTML(t('expert.profile_label'))}</span>
+      <h3>${escapeHTML(r.profile)}</h3>
+      <p>${escapeHTML(t('expert.intro'))}</p>
+      <div class="rec-list">
+        ${r.recs.map(rec=>`
+          <div class="rec-item">
+            <strong>${escapeHTML(rec.title)}</strong><br>${rec.body}
+            ${rec.broker ? '<div style="margin-top:6px">📍 '+tags(rec.broker)+'</div>' : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="rules-fired">
+        <span class="rt">${escapeHTML(t('expert.fired'))}</span>
+        ${r.fired.map(f=>'• '+escapeHTML(f)).join('<br>')}
+      </div>
+      <div class="export-row">
+        <button class="export-btn" id="expPdf">${t('btn.exportPdf')}</button>
+        <button class="export-btn" id="expPng">${t('btn.exportPng')}</button>
+        <button class="restart-btn" id="restartES">${t('btn.restart')}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('restartES').onclick = ()=>{
+    _esStep=0; _esAnswers={}; STORE.del('expert'); renderExpertStep();
+  };
+  document.getElementById('expPdf').onclick = exportPDF;
+  document.getElementById('expPng').onclick = exportPNG;
+  STORE.set('expert', { step:_esStep, answers:_esAnswers, completed:true });
+}
+
+function exportPDF(){ window.print(); }
+async function exportPNG(){
+  if(typeof html2canvas === 'undefined'){ alert('html2canvas not loaded'); return; }
+  const card = document.getElementById('resultCard');
+  try{
+    const canvas = await html2canvas(card, { backgroundColor:null, scale:2, logging:false });
+    const link = document.createElement('a');
+    link.download = 'elemu-lestari-saran-'+new Date().toISOString().slice(0,10)+'.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e){ console.error(e); alert('Export failed: '+e.message); }
+}
+
+/* ===== Simulator ===== */
+const SIM_DEFAULTS = { initial:1000000, monthly:500000, horizon:5, returnEsg:9 };
+
+function calcProjection(initial, monthly, horizon, annualRate){
+  const months = horizon * 12;
+  const r = Math.pow(1 + annualRate/100, 1/12) - 1;
+  const data = [{ m:0, v:initial }];
+  let val = initial;
+  for(let m=1; m<=months; m++){
+    val = (val + monthly) * (1 + r);
+    data.push({ m, v:val });
+  }
+  return data;
+}
+
+function renderSimulator(){
+  const cfg = STORE.get('sim', SIM_DEFAULTS);
+  const body = document.getElementById('simulateBody');
+  if(!body) return;
+  body.innerHTML = `
+    <div class="sim-grid">
+      <div class="sim-field">
+        <label>${escapeHTML(t('sim.initial'))}</label>
+        <input type="number" id="simInitial" value="${cfg.initial}" step="100000" min="0">
+        <div class="hint">${escapeHTML(t('sim.initial_hint'))}</div>
+      </div>
+      <div class="sim-field">
+        <label>${escapeHTML(t('sim.monthly'))}</label>
+        <input type="number" id="simMonthly" value="${cfg.monthly}" step="100000" min="0">
+        <div class="hint">${escapeHTML(t('sim.monthly_hint'))}</div>
+      </div>
+      <div class="sim-field">
+        <label>${escapeHTML(t('sim.horizon'))}</label>
+        <input type="number" id="simHorizon" value="${cfg.horizon}" step="1" min="1" max="30">
+        <div class="hint">${escapeHTML(t('sim.horizon_hint'))}</div>
+      </div>
+      <div class="sim-field">
+        <label>${escapeHTML(t('sim.return'))}</label>
+        <input type="number" id="simReturn" value="${cfg.returnEsg}" step="0.5" min="0" max="30">
+        <div class="hint">${escapeHTML(t('sim.return_hint'))}</div>
+      </div>
+    </div>
+    <div id="simResult"></div>
+  `;
+  ['simInitial','simMonthly','simHorizon','simReturn'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', drawSim);
+  });
+  drawSim();
+}
+
+function drawSim(){
+  const initial = +document.getElementById('simInitial').value || 0;
+  const monthly = +document.getElementById('simMonthly').value || 0;
+  const horizon = Math.max(1, Math.min(30, +document.getElementById('simHorizon').value || 1));
+  const rEsg = +document.getElementById('simReturn').value || 0;
+  STORE.set('sim', { initial, monthly, horizon, returnEsg:rEsg });
+  const ESG = calcProjection(initial, monthly, horizon, rEsg);
+  const JCI = calcProjection(initial, monthly, horizon, 7);
+  const SUK = calcProjection(initial, monthly, horizon, 5.5);
+  const contrib = initial + monthly * horizon * 12;
+  const fEsg = ESG[ESG.length-1].v, fJci = JCI[JCI.length-1].v, fSuk = SUK[SUK.length-1].v;
+  const en = window.CURRENT_LANG==='en';
+  document.getElementById('simResult').innerHTML = `
+    <div class="sim-summary">
+      <div class="sim-card scenario esg">
+        <div class="sim-label">${escapeHTML(t('sim.final_esg'))}</div>
+        <div class="sim-value">${fmtRp(fEsg)}</div>
+        <div class="sim-sub">+${fmtRp(fEsg-contrib)} ${escapeHTML(t('sim.profit').toLowerCase())}</div>
+      </div>
+      <div class="sim-card scenario jci">
+        <div class="sim-label">${escapeHTML(t('sim.final_jci'))}</div>
+        <div class="sim-value">${fmtRp(fJci)}</div>
+        <div class="sim-sub">~7% / ${en?'year':'tahun'}</div>
+      </div>
+      <div class="sim-card scenario sukuk">
+        <div class="sim-label">${escapeHTML(t('sim.final_sukuk'))}</div>
+        <div class="sim-value">${fmtRp(fSuk)}</div>
+        <div class="sim-sub">~5.5% / ${en?'year':'tahun'}</div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-label">${escapeHTML(t('sim.contributions'))}</div>
+        <div class="sim-value">${fmtRp(contrib)}</div>
+        <div class="sim-sub">${horizon}y × 12 + ${fmtRp(initial)}</div>
+      </div>
+    </div>
+    <div class="sim-chart-wrap">
+      <h4>${escapeHTML(t('sim.chart_title'))}</h4>
+      ${drawSVGChart([
+        { name:'ESG '+rEsg+'%', color:'#2D8659', data:ESG },
+        { name:'JCI 7%', color:'#9CADA5', data:JCI },
+        { name:'Sukuk 5.5%', color:'#B8860B', data:SUK }
+      ], horizon, initial, monthly)}
+      <div class="sim-legend">
+        <span><i style="background:#2D8659"></i>ESG ${rEsg}%/y</span>
+        <span><i style="background:#9CADA5"></i>JCI ~7%/y</span>
+        <span><i style="background:#B8860B"></i>Sukuk ~5.5%/y</span>
+        <span><i style="background:repeating-linear-gradient(90deg,#888 0 3px,transparent 3px 6px)"></i>${en?'Contributions':'Total Setoran'}</span>
+      </div>
+      <div class="sim-note">${escapeHTML(t('sim.note'))}</div>
+    </div>
+  `;
+}
+
+function drawSVGChart(series, horizon, initial, monthly){
+  const W = 760, H = 280, P = { l:60, r:20, t:10, b:30 };
+  let maxV = 0;
+  series.forEach(s => s.data.forEach(p => { if(p.v>maxV) maxV=p.v; }));
+  maxV = maxV * 1.05;
+  const months = horizon * 12;
+  const x = m => P.l + (m/months) * (W - P.l - P.r);
+  const y = v => P.t + (1 - v/maxV) * (H - P.t - P.b);
+  let ticks = '';
+  for(let i=0; i<=4; i++){
+    const yv = maxV * i / 4;
+    const py = y(yv);
+    ticks += `<line x1="${P.l}" y1="${py}" x2="${W-P.r}" y2="${py}" stroke="rgba(120,120,120,0.15)" stroke-width="0.5"/>`;
+    ticks += `<text x="${P.l-6}" y="${py+4}" text-anchor="end" font-size="10" fill="rgba(120,120,120,0.9)">${fmtRp(yv).replace('Rp ','')}</text>`;
+  }
+  let xticks = '';
+  for(let yr=0; yr<=horizon; yr++){
+    const px = x(yr*12);
+    xticks += `<line x1="${px}" y1="${H-P.b}" x2="${px}" y2="${H-P.b+4}" stroke="rgba(120,120,120,0.9)" stroke-width="0.8"/>`;
+    xticks += `<text x="${px}" y="${H-P.b+18}" text-anchor="middle" font-size="10" fill="rgba(120,120,120,0.9)">${yr}y</text>`;
+  }
+  // contribution line (dashed)
+  const contribData = [];
+  let cv = initial;
+  for(let m=0; m<=months; m++){
+    contribData.push({m, v:cv});
+    cv += monthly;
+  }
+  const contribPath = contribData.map((p,i)=> (i===0?'M':'L') + x(p.m) + ' ' + y(Math.min(p.v, maxV))).join(' ');
+  let lines = `<path d="${contribPath}" stroke="#888" stroke-width="1.5" stroke-dasharray="4 3" fill="none" opacity="0.6"/>`;
+  series.forEach(s=>{
+    const d = s.data.map((p,i)=> (i===0?'M':'L') + x(p.m) + ' ' + y(p.v)).join(' ');
+    lines += `<path d="${d}" stroke="${s.color}" stroke-width="2" fill="none"/>`;
+  });
+  return `<svg class="sim-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${ticks}${xticks}${lines}</svg>`;
+}
+
+/* ===== News tab ===== */
+function renderNewsTab(){
+  const el = document.getElementById('sub-news');
+  if(!el) return;
+  const data = window.NEWS_DATA || { sources:[], articles:[] };
+  const en = window.CURRENT_LANG==='en';
+  el.innerHTML = `
+    <div class="data-meta">
+      <span><span class="pill">${escapeHTML(t('data.updated'))} ${escapeHTML(data.updated||'—')}</span></span>
+      <span>${escapeHTML(t('data.refresh'))}</span>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--emerald);margin-bottom:6px;font-weight:600">${escapeHTML(t('news.dir_title'))}</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">${escapeHTML(t('news.dir_desc'))}</p>
+    <div class="news-grid">
+      ${(data.sources||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(s=>`
+        <a class="news-card" href="${escapeHTML(s.url)}" target="_blank" rel="noopener">
+          <div class="nc-head">
+            <div class="nc-logo" style="background:${escapeHTML(s.color||'#0F4C3A')}">${escapeHTML(s.letter||'?')}</div>
+            <div>
+              <div class="nc-name">${escapeHTML(s.name)}</div>
+              <div class="nc-tag">${escapeHTML(s.tag||'')}</div>
+            </div>
+          </div>
+          <div class="nc-action">${en?'Open source ↗':'Buka sumber ↗'}</div>
+        </a>
+      `).join('')}
+    </div>
+    <div class="news-articles">
+      <h3>${escapeHTML(t('news.articles_title'))}</h3>
+      ${(data.articles||[]).length===0 ?
+        `<div class="news-empty">${t('news.empty')}</div>` :
+        `<div class="news-list">${data.articles.map(a=>`
+          <a class="news-article" href="${escapeHTML(a.url)}" target="_blank" rel="noopener">
+            <div class="na-source">${escapeHTML(a.source)}</div>
+            <div class="na-title">${escapeHTML(a.title)}</div>
+            <div class="na-date">${escapeHTML(a.published||'')}</div>
+          </a>
+        `).join('')}</div>`
+      }
+    </div>
+  `;
+}
+
+/* ===== Stocks tab ===== */
+let _stockFilter = 'all';
+let _stockSort = { col:'market_cap_t', dir:-1 };
+
+function renderStocksTab(){
+  const el = document.getElementById('sub-stocks');
+  if(!el) return;
+  const data = window.STOCKS_DATA || { stocks:[], benchmark:{} };
+  const isSample = data.is_sample;
+  const bm = data.benchmark || {};
+  el.innerHTML = `
+    <div class="data-meta">
+      <span><span class="pill">${escapeHTML(t('data.updated'))} ${escapeHTML(data.updated||'—')}</span></span>
+      ${isSample ? `<span>${t('data.sample_warn')}</span>` : ''}
+    </div>
+    ${bm.jci_value ? `
+      <div class="benchmark-card">
+        <div>
+          <div class="bc-label">${escapeHTML(t('stocks.benchmark'))}</div>
+          <div class="bc-value">${escapeHTML(String(bm.jci_value))}</div>
+        </div>
+        <div>
+          <div class="bc-label">${escapeHTML(t('stocks.bench_ytd'))}</div>
+          <div class="bc-value"><span class="bc-change ${bm.jci_ytd<0?'neg':'pos'}" style="color:${bm.jci_ytd<0?'var(--red)':'var(--green-good)'}">${fmtPct(bm.jci_ytd)}</span></div>
+        </div>
+        <div>
+          <div class="bc-label">${escapeHTML(t('stocks.bench_1y'))}</div>
+          <div class="bc-value"><span class="bc-change ${bm.jci_1y<0?'neg':'pos'}" style="color:${bm.jci_1y<0?'var(--red)':'var(--green-good)'}">${fmtPct(bm.jci_1y)}</span></div>
+        </div>
+      </div>
+    ` : ''}
+    <div class="stocks-tools">
+      <button class="stocks-filter ${_stockFilter==='all'?'active':''}" data-f="all">${escapeHTML(t('stocks.filter_all'))}</button>
+      <button class="stocks-filter ${_stockFilter==='kehati'?'active':''}" data-f="kehati">${escapeHTML(t('stocks.filter_kehati'))}</button>
+      <button class="stocks-filter ${_stockFilter==='esg'?'active':''}" data-f="esg">${escapeHTML(t('stocks.filter_esg'))}</button>
+      <button class="stocks-filter ${_stockFilter==='syariah'?'active':''}" data-f="syariah">${escapeHTML(t('stocks.filter_syariah'))}</button>
+      <button class="stocks-filter ${_stockFilter==='dividend'?'active':''}" data-f="dividend">${escapeHTML(t('stocks.filter_dividend'))}</button>
+    </div>
+    <div class="stocks-table-wrap">
+      <table class="stocks-table">
+        <thead><tr>
+          <th data-c="ticker">${escapeHTML(t('stocks.col_ticker'))}</th>
+          <th data-c="name">${escapeHTML(t('stocks.col_name'))}</th>
+          <th data-c="price">${escapeHTML(t('stocks.col_price'))}</th>
+          <th data-c="change_1y">${escapeHTML(t('stocks.col_1y'))}</th>
+          <th data-c="change_ytd">${escapeHTML(t('stocks.col_ytd'))}</th>
+          <th data-c="dividend_yield">${escapeHTML(t('stocks.col_div'))}</th>
+          <th data-c="pe_ratio">${escapeHTML(t('stocks.col_pe'))}</th>
+          <th data-c="market_cap_t">${escapeHTML(t('stocks.col_mcap'))}</th>
+          <th data-c="flags">${escapeHTML(t('stocks.col_flags'))}</th>
+          <th data-c="esg">${escapeHTML(t('stocks.col_esg'))}</th>
+        </tr></thead>
+        <tbody id="stocksTbody"></tbody>
+      </table>
+    </div>
+  `;
+  document.querySelectorAll('#sub-stocks .stocks-filter').forEach(b=>{
+    b.onclick = ()=>{ _stockFilter = b.dataset.f; renderStocksRows(); document.querySelectorAll('#sub-stocks .stocks-filter').forEach(x=>x.classList.toggle('active', x.dataset.f===_stockFilter)); };
+  });
+  document.querySelectorAll('#sub-stocks th[data-c]').forEach(h=>{
+    h.onclick = ()=>{
+      const c = h.dataset.c;
+      if(c==='flags' || c==='esg' || c==='name') return;
+      if(_stockSort.col===c) _stockSort.dir *= -1;
+      else { _stockSort.col=c; _stockSort.dir=-1; }
+      renderStocksRows();
+    };
+  });
+  renderStocksRows();
+}
+
+function renderStocksRows(){
+  const data = window.STOCKS_DATA || { stocks:[] };
+  let rows = (data.stocks||[]).slice();
+  if(_stockFilter==='kehati') rows = rows.filter(r=>r.kehati);
+  else if(_stockFilter==='esg') rows = rows.filter(r=>r.esg_leaders);
+  else if(_stockFilter==='syariah') rows = rows.filter(r=>r.syariah);
+  else if(_stockFilter==='dividend') rows = rows.filter(r=>(r.dividend_yield||0)>=5);
+  rows.sort((a,b)=>{
+    const av=a[_stockSort.col], bv=b[_stockSort.col];
+    if(av==null) return 1; if(bv==null) return -1;
+    return (av<bv?-1:av>bv?1:0) * _stockSort.dir;
+  });
+  const esgColor = score => {
+    if(score==null) return '#9CADA5';
+    if(score>=7.5) return '#2D8659';
+    if(score>=6) return '#B8860B';
+    return '#C44536';
+  };
+  const tbody = document.getElementById('stocksTbody');
+  if(!tbody) return;
+  tbody.innerHTML = rows.map(r=>{
+    const flags = [];
+    if(r.kehati) flags.push('<span class="flag flag-k">KEHATI</span>');
+    if(r.esg_leaders) flags.push('<span class="flag flag-e">ESG</span>');
+    if(r.syariah) flags.push('<span class="flag flag-s">Syariah</span>');
+    const esg = r.esg ? `<div class="esg-bars">
+      <span class="esg-bar" style="background:${esgColor(r.esg.e)}" title="Environment ${r.esg.e}">${r.esg.e?.toFixed(1)}</span>
+      <span class="esg-bar" style="background:${esgColor(r.esg.s)}" title="Social ${r.esg.s}">${r.esg.s?.toFixed(1)}</span>
+      <span class="esg-bar" style="background:${esgColor(r.esg.g)}" title="Governance ${r.esg.g}">${r.esg.g?.toFixed(1)}</span>
+    </div>` : '<span style="color:var(--muted);font-size:10px">—</span>';
+    return `<tr>
+      <td class="ticker-cell">${escapeHTML(r.ticker||'?')}</td>
+      <td><div class="stock-name">${escapeHTML(r.name||'')}</div><div class="stock-sector">${escapeHTML(r.sector||'')}</div></td>
+      <td>${r.price!=null?fmtRp(r.price).replace('Rp ',''):'—'}</td>
+      <td class="${(r.change_1y||0)>=0?'pos':'neg'}">${fmtPct(r.change_1y)}</td>
+      <td class="${(r.change_ytd||0)>=0?'pos':'neg'}">${fmtPct(r.change_ytd)}</td>
+      <td>${r.dividend_yield!=null?r.dividend_yield.toFixed(1)+'%':'—'}</td>
+      <td>${r.pe_ratio!=null?r.pe_ratio.toFixed(1):'—'}</td>
+      <td>${r.market_cap_t!=null?(r.market_cap_t>=1?r.market_cap_t.toFixed(1)+'T':'—'):'—'}</td>
+      <td>${flags.join('')||'<span style="color:var(--muted);font-size:10px">—</span>'}</td>
+      <td>${esg}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">${window.CURRENT_LANG==='en'?'No matching stocks':'Tidak ada saham yang cocok'}</td></tr>`;
+}
+
+/* ===== Quiz ===== */
+let _quizIdx = 0;
+let _quizScore = 0;
+let _quizActive = false;
+
+function renderQuizIntro(){
+  _quizActive = false;
+  const el = document.getElementById('quizContent');
+  if(!el) return; // tab disabled — skip render
+  const best = STORE.get('quizBest', null);
+  el.innerHTML = `
+    <div class="quiz-intro">
+      <h3>${escapeHTML(t('quiz.ready'))}</h3>
+      <p>${escapeHTML(t('quiz.desc'))}</p>
+      ${best!=null ? `<p style="color:var(--gold);font-weight:700">${window.CURRENT_LANG==='en'?'Your best score:':'Skor terbaik kamu:'} ${best}/${QUIZ.length}</p>` : ''}
+      <button class="quiz-start-btn" id="startQuiz">${escapeHTML(t('quiz.start'))}</button>
+    </div>
+  `;
+  document.getElementById('startQuiz').onclick = ()=>{ _quizIdx=0; _quizScore=0; _quizActive=true; renderQuestion(); };
+}
+
+function renderQuestion(){
+  if(_quizIdx >= QUIZ.length){ renderQuizResult(); return; }
+  const q = QUIZ[_quizIdx];
+  const L = window.CURRENT_LANG;
+  const letters = ['A','B','C','D'];
+  const opts = q['opts_'+L] || q.opts_id;
+  document.getElementById('quizContent').innerHTML = `
+    <div class="quiz-question">
+      <div class="quiz-meta">
+        <span class="qnum">${escapeHTML(t('quiz.qnum'))} ${_quizIdx+1} ${escapeHTML(t('quiz.of'))} ${QUIZ.length}</span>
+        <span>${escapeHTML(t('quiz.score'))} ${_quizScore}</span>
+      </div>
+      <h3>${escapeHTML(q['q_'+L]||q.q_id)}</h3>
+      <div class="quiz-options">
+        ${opts.map((o,i)=>`
+          <button class="quiz-opt" data-i="${i}">
+            <span class="letter">${letters[i]}</span>${escapeHTML(o)}
+          </button>
+        `).join('')}
+      </div>
+      <div id="qFeedback"></div>
+    </div>
+  `;
+  document.querySelectorAll('#quizContent .quiz-opt').forEach(b=>{
+    b.onclick = ()=>{
+      const chosen = parseInt(b.dataset.i);
+      const correct = q.correct;
+      document.querySelectorAll('#quizContent .quiz-opt').forEach((bb,i)=>{
+        bb.style.pointerEvents='none';
+        if(i===correct) bb.classList.add('correct');
+        else if(i===chosen) bb.classList.add('wrong');
+      });
+      if(chosen===correct) _quizScore++;
+      document.getElementById('qFeedback').innerHTML = `
+        <div class="quiz-feedback">
+          <strong>${chosen===correct?escapeHTML(t('quiz.correct')):escapeHTML(t('quiz.wrong'))}</strong> ${escapeHTML(q['exp_'+L]||q.exp_id)}
+          <br><button class="quiz-next-btn" id="nextQ">${_quizIdx===QUIZ.length-1?escapeHTML(t('quiz.last')):escapeHTML(t('quiz.next'))}</button>
+        </div>
+      `;
+      document.getElementById('nextQ').onclick = ()=>{ _quizIdx++; renderQuestion(); };
+    };
+  });
+}
+
+function renderQuizResult(){
+  _quizActive = false;
+  const pct = Math.round(_quizScore/QUIZ.length*100);
+  const best = STORE.get('quizBest', 0);
+  if(_quizScore > best) STORE.set('quizBest', _quizScore);
+  STORE.set('quizLast', { score:_quizScore, ts:Date.now() });
+  const msg = pct>=80 ? t('quiz.msg_high') : pct>=60 ? t('quiz.msg_mid') : t('quiz.msg_low');
+  const headline = pct>=80 ? t('quiz.win') : pct>=60 ? t('quiz.ok') : t('quiz.try');
+  document.getElementById('quizContent').innerHTML = `
+    <div class="quiz-result">
+      <div class="score-circle">
+        <div>
+          <div class="score-num">${_quizScore}/${QUIZ.length}</div>
+          <div class="score-label">${pct}% ${escapeHTML(t('quiz.pct'))}</div>
+        </div>
+      </div>
+      <h3>${escapeHTML(headline)}</h3>
+      <p>${escapeHTML(msg)}</p>
+      <button class="quiz-start-btn" id="restartQuiz">${escapeHTML(t('quiz.retry'))}</button>
+    </div>
+  `;
+  document.getElementById('restartQuiz').onclick = renderQuizIntro;
+}
+
+/* ===== App init ===== */
+function initApp(){
+  // Restore preferences
+  window.CURRENT_LANG = STORE.get('lang', 'id');
+  const theme = STORE.get('theme', 'light');
+  THEME.apply(theme);
+  LANG.apply(window.CURRENT_LANG);
+
+  // Restore expert system state
+  const esState = STORE.get('expert', null);
+  if(esState && esState.completed){
+    _esAnswers = esState.answers || {};
+    _esStep = ES_QUESTIONS.length;
+  } else if(esState){
+    _esAnswers = esState.answers || {};
+    _esStep = esState.step || 0;
+  }
+  renderExpertStep();
+
+  // Tabs
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const btn = e.target.closest('.tab');
+    if(!btn) return;
+    activateTab(btn.dataset.mode);
+  });
+  // Sub-tabs (only if Data tab is enabled)
+  const subtabsEl = document.getElementById('subtabs');
+  if(subtabsEl){
+    subtabsEl.addEventListener('click', e=>{
+      const btn = e.target.closest('.subtab');
+      if(!btn) return;
+      activateSubTab(btn.dataset.sub);
+    });
+  }
+
+  // Header buttons
+  document.getElementById('langToggle').onclick = ()=>LANG.toggle();
+  document.getElementById('themeToggle').onclick = ()=>THEME.toggle();
+
+  // Chat input
+  document.getElementById('sendBtn').onclick = sendMessage;
+  document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(); });
+
+  // Lesson nav
+  document.getElementById('prevLesson').onclick = ()=>{ if(_currentLesson>0){ _currentLesson--; STORE.set('lesson',_currentLesson); renderLesson(); } };
+  document.getElementById('nextLesson').onclick = ()=>{ if(_currentLesson<LESSONS.length-1){ _currentLesson++; STORE.set('lesson',_currentLesson); renderLesson(); } };
+
+  // Teach modal
+  document.getElementById('teachCancel').onclick = closeTeachModal;
+  document.getElementById('teachSave').onclick = saveTeach;
+
+  // Reset name link
+  const rn = document.getElementById('resetName');
+  if(rn) rn.onclick = (e)=>{
+    e.preventDefault();
+    if(confirm(t('reset.confirm'))){
+      STORE.del('user_name');
+      _awaitingName = false;
+      activateTab('chat');
+      renderChat();
+    }
+  };
+  document.getElementById('teachModal').addEventListener('click', e=>{
+    if(e.target.id==='teachModal') closeTeachModal();
+  });
+
+  // Today's market panel (live data via fetch_data.py daily refresh)
+  renderMarketPanel();
+
+  // Restore last tab (falls back to 'chat' for any disabled tabs)
+  const lastTab = STORE.get('tab', 'chat');
+  activateTab(lastTab);
+  if(document.getElementById('subtabs')){
+    const lastSub = STORE.get('subtab', 'news');
+    activateSubTab(lastSub);
+  }
+
+  console.log('🌿 Elemu Lestari ready · '+FAQ_DATA.length+' Q&A · '+LESSONS.length+' lessons · '+QUIZ.length+' quiz · '+(getLearned().length)+' learned · theme='+theme+' · lang='+window.CURRENT_LANG);
+}
+
+// Run init when DOM ready
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+</script>
+</body>
+</html>
