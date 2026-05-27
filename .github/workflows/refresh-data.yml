@@ -1,14 +1,22 @@
+# ============================================================
 # Elmu · daily ESG data refresh
-# Runs after IDX market close (5 PM WIB / 10 AM UTC), pulls fresh
-# stock prices + JCI benchmark + RSS news, commits any changes.
-# Netlify then auto-redeploys from the new commit.
+# ------------------------------------------------------------
+# Runs every day after IDX close (5 PM WIB / 10 AM UTC), pulls
+# fresh stock prices + JCI benchmark + RSS news, commits any
+# changes to stocks.js and news.js. Netlify then auto-redeploys
+# the site from the new commit, so the live URL stays current.
+#
+# Manual trigger: Actions tab → "Refresh ESG market data" → Run workflow
+# ============================================================
 name: Refresh ESG market data
 
 on:
   schedule:
-    - cron: '0 10 * * 1-5'   # Mon–Fri at 10:00 UTC (17:00 WIB)
-  workflow_dispatch: {}
+    # 10:00 UTC daily = 17:00 WIB (after IDX market close at 16:00 WIB)
+    - cron: '0 10 * * 1-5'   # Monday-Friday only (no weekends)
+  workflow_dispatch: {}      # manual trigger from Actions tab
 
+# GITHUB_TOKEN needs write access to push the data update commit
 permissions:
   contents: write
 
@@ -33,6 +41,7 @@ jobs:
           pip install yfinance feedparser
 
       - name: Run data refresher
+        working-directory: ${{ github.workspace }}
         run: python fetch_data.py
 
       - name: Check for changes
