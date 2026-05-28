@@ -29,10 +29,10 @@
 // Allowed origins — add your Netlify deploy URL + any custom domain here.
 // `null` and `file://` are blocked. localhost is allowed for `netlify dev`.
 const ALLOWED_ORIGINS = new Set([
-  'https://elmu-ai.netlify.app',   // typical Netlify URL — adjust if yours differs
-  'https://elmu.ai',                // custom domain (if set)
+  'https://elemu-lestari.netlify.app',   // production deploy URL (Netlify-assigned)
+  'https://elmu.ai',                      // custom domain (if set)
   'https://www.elmu.ai',
-  'http://localhost:8888',          // netlify dev default
+  'http://localhost:8888',                // netlify dev default
   'http://localhost:3000',
   'http://127.0.0.1:8888',
 ]);
