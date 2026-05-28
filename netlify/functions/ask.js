@@ -42,6 +42,13 @@ const RATE_BUCKETS = new Map(); // ip -> { count, windowStart }
 const RATE_WINDOW_MS = 10 * 60 * 1000;  // 10 minutes
 const RATE_MAX = 30;                    // 30 requests / window / IP
 
+// Module-level cache of the working Gemini model. The first time any
+// request succeeds with a model, we remember it for the rest of this
+// function instance's lifetime. This means subsequent requests only
+// make 1 Gemini API call (not 4) — critical for staying under the
+// free-tier 15 RPM quota.
+let CACHED_WORKING_MODEL = null;
+
 function rateLimit(ip) {
   const now = Date.now();
   const b = RATE_BUCKETS.get(ip);
@@ -218,14 +225,25 @@ exports.handler = async (event, context) => {
     ],
   };
 
-  // Try each model in the fallback chain. Stop as soon as one returns 2xx.
-  // For 404 (model not found), advance to the next. For other errors, return.
+  // Build the actual attempt list. If we've already discovered a working
+  // model in this function instance, ONLY try that one — saves 75% of
+  // quota usage vs. retrying the whole chain on every request.
+  const modelsToTry = CACHED_WORKING_MODEL
+    ? [CACHED_WORKING_MODEL]
+    : GEMINI_MODELS.slice();
+
+  // Try each model in order. Stop as soon as one returns 2xx.
+  // For 404 (model not available), advance to the next. For any other
+  // error including 429 (rate limit), stop and surface the error —
+  // retrying other models won't help when the project quota is exhausted.
   let resp;
-  let usedModel = GEMINI_MODELS[0];
+  let usedModel = modelsToTry[0];
   let lastErrText = '';
   let lastStatus = 0;
-  for (const model of GEMINI_MODELS) {
+  const triedModels = [];
+  for (const model of modelsToTry) {
     usedModel = model;
+    triedModels.push(model);
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
     try {
       const ctl = new AbortController();
@@ -238,7 +256,6 @@ exports.handler = async (event, context) => {
       });
       clearTimeout(timeoutId);
     } catch (e) {
-      // Network/timeout failure — return immediately (don't retry models on network errors)
       return {
         statusCode: 502,
         headers,
@@ -251,17 +268,23 @@ exports.handler = async (event, context) => {
       };
     }
     if (resp.ok) {
-      break; // success — exit the fallback chain
+      // Remember this working model so future requests skip the fallback chain.
+      if (CACHED_WORKING_MODEL !== model) {
+        console.log('[ask] Caching working model:', model);
+        CACHED_WORKING_MODEL = model;
+      }
+      break;
     }
-    // Capture detail before potentially trying next model
     lastErrText = await resp.text().catch(() => '');
     lastStatus = resp.status;
     if (resp.status === 404) {
       // Model not available on this account/project — try the next one.
       console.warn('[ask] Model not found, trying next:', model);
+      // Also clear cache if the cached model started returning 404 —
+      // happens when Google retires a model mid-stream.
+      if (CACHED_WORKING_MODEL === model) CACHED_WORKING_MODEL = null;
       continue;
     }
-    // Other errors (401/403/429/500) → don't retry, return.
     break;
   }
 
@@ -272,10 +295,28 @@ exports.handler = async (event, context) => {
       const parsed = JSON.parse(lastErrText);
       upstreamDetail = (parsed && parsed.error && parsed.error.message) || '';
     } catch (e) {
-      upstreamDetail = lastErrText.slice(0, 200);
+      upstreamDetail = lastErrText.slice(0, 500);
     }
-    // Redact anything that looks like an API key (AIza... is the Google AI key prefix)
     upstreamDetail = upstreamDetail.replace(/AIza[A-Za-z0-9_-]{20,}/g, '[REDACTED-KEY]');
+
+    // 429 RESOURCE_EXHAUSTED → return a friendly "rate limit" message
+    // so the client can display a helpful "wait 60s" hint instead of
+    // a generic 502.
+    if (lastStatus === 429) {
+      return {
+        statusCode: 200, // Important: 200 so the client treats this as a normal answer-with-warning
+        headers,
+        body: JSON.stringify({
+          answer: lang === 'id'
+            ? "<em>⏳ Kuota AI Gemini gratis sudah penuh untuk saat ini (max 15 pertanyaan per menit / 1500 per hari di paket free). Tunggu ~60 detik lalu coba lagi, atau pakai pertanyaan yang sudah ada di basis pengetahuan saya untuk sementara.</em>"
+            : "<em>⏳ Free-tier Gemini quota is full right now (15 questions/min, 1500/day cap). Wait ~60 seconds and try again, or stick to questions in my local knowledge base for now.</em>",
+          source: 'rate_limit',
+          upstream_status: 429,
+          upstream_detail: upstreamDetail || 'Quota exceeded',
+        }),
+      };
+    }
+
     return {
       statusCode: 502,
       headers,
@@ -285,7 +326,7 @@ exports.handler = async (event, context) => {
           : 'AI service is having issues (code ' + lastStatus + ').'),
         upstream_status: lastStatus,
         upstream_detail: upstreamDetail || '(no detail provided)',
-        models_tried: GEMINI_MODELS,
+        models_tried: triedModels,
       }),
     };
   }
