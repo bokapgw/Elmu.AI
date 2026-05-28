@@ -18,3 +18,13 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# Secrets — NEVER commit. Use .env.example as a template instead.
+# Production secrets live in the Netlify dashboard's Environment Variables.
+.env
+.env.*
+!.env.example
+
+# Netlify CLI local cache
+.netlify/
+node_modules/

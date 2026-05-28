@@ -1933,6 +1933,62 @@ function detectHighSpecificity(query){
   );
 }
 
+/* ===== Gemini-backed AI fallback ===================================
+   When the local FAQ matcher returns no confident match, we forward the
+   query to /api/ask — a Netlify Function that proxies Google Gemini.
+   The Gemini API key lives ONLY in the Netlify environment (never in
+   client code, never in git). The Function applies a system prompt
+   that locks Gemini to Indonesian ESG / sustainable finance topics
+   so it can't drift off-topic.
+
+   Architecture (Layer 5 — Backend & Integration):
+     Browser  ->  /api/ask  ->  Netlify Function  ->  Gemini API
+                       |              |
+                       |              `- key from process.env.GEMINI_API_KEY
+                       `- HTTPS, JSON, includes lang + last 3 turns of history
+
+   Returns: { answer: string, source: 'gemini', blocked?: boolean } on
+   success, or null on any failure (so caller falls back to the curated
+   unknown-reply with did-you-mean chips). Never throws.
+=================================================================== */
+async function askGeminiFallback(query){
+  try {
+    const lang = window.CURRENT_LANG || 'id';
+    // Send last 3 turns of conversation history so Gemini has context for
+    // follow-ups like "elaborate" / "what does that mean" / pronouns.
+    const turns = (window.CONVERSATION_STATE && Array.isArray(window.CONVERSATION_STATE.turns))
+      ? window.CONVERSATION_STATE.turns.slice(-3).map(t => ({
+          role: t.role === 'bot' ? 'model' : 'user',
+          text: String(t.text || '').replace(/<[^>]+>/g, '').slice(0, 500),
+        }))
+      : [];
+    const ctl = new AbortController();
+    const timeoutId = setTimeout(()=>ctl.abort(), 28000); // hair past function max
+    const resp = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, lang, history: turns }),
+      signal: ctl.signal,
+    });
+    clearTimeout(timeoutId);
+    if(!resp.ok){
+      // 503 = key not configured. Silently fall back to curated unknown.
+      // 429 = rate limited. Show the message so user knows to wait.
+      if(resp.status === 429){
+        const data = await resp.json().catch(()=>({}));
+        return { answer: '<em>⏳ '+(data.error || 'Rate limit. Coba lagi nanti.')+'</em>', source: 'gemini' };
+      }
+      return null;
+    }
+    const data = await resp.json();
+    if(!data || typeof data.answer !== 'string' || !data.answer.trim()) return null;
+    return data;
+  } catch(e){
+    if(window.console && console.warn) console.warn('[askGeminiFallback] failed:', e && e.message);
+    return null;
+  }
+}
+
 /* ===== Live data query handler ====================================
    Recognizes data-driven questions like "saham terbaik", "top gainer",
    "dividen tertinggi", "esg score tertinggi", "harga BBCA", and reads
@@ -2712,17 +2768,18 @@ const FAQ_DATA = [
   // SECTION 2 · ESG BASICS — definitions of ESG, LST, pillars
   // ============================================================
   { id:'esg', category:'esg-basics', intent:'definitional', kw_id:['esg','apa itu esg','definisi esg','environmental social governance','jelaskan esg','tentang esg','konsep esg'], kw_en:['esg','what is esg','definition esg','environmental social governance','explain esg','about esg','esg concept'],
-    a_id:"<strong>ESG</strong> = <span class='accent'>Environmental, Social, Governance</span> — kerangka untuk menilai perusahaan <em>di luar</em> laporan keuangan.<br><br>" +
-         "<strong>🌳 E — Environment (Lingkungan)</strong><br>" +
-         "Emisi karbon (Scope 1/2/3), pemakaian energi &amp; air, pengelolaan limbah, deforestasi.<br>" +
-         "<em>Contoh nyata:</em> Bank Mandiri turunkan emisi 32% dari baseline 2019; Telkom transisi ke 100% green energy data center.<br><br>" +
-         "<strong>👥 S — Social (Sosial)</strong><br>" +
-         "Hak buruh, kesetaraan gender, komunitas lokal, privasi data konsumen, K3.<br>" +
-         "<em>Contoh nyata:</em> Bank Mandiri salurkan KUR ke 963 ribu debitur UMKM; Unilever Indonesia program akses air bersih.<br><br>" +
-         "<strong>⚖️ G — Governance (Tata Kelola)</strong><br>" +
-         "Transparansi pemegang saham, anti-korupsi, hak minoritas, struktur direksi independen.<br>" +
-         "<em>Krisis MSCI Jan 2026</em> — pilar G inilah yang gagal di banyak emiten IDX → ratusan triliun rupiah hilang.<br><br>" +
-         "<strong>Di Indonesia:</strong> OJK memakai istilah <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola), diatur lewat <em>POJK 51/2017</em> dan <em>Sustainable Finance Roadmap Phase II</em>. 11 kategori KKUB jadi acuan sektor mana yang \"hijau\".",
+    a_id:"<strong>ESG</strong> itu cara menilai sebuah perusahaan <em>bukan cuma</em> dari untung-ruginya, tapi juga dari 3 hal penting:<br><br>" +
+         "<strong>🌳 E — Lingkungan</strong><br>" +
+         "Apakah perusahaan ramah ke alam? Berapa banyak asap (emisi karbon) yang dibuang? Apakah hemat air dan listrik? Apakah pernah membuang limbah sembarangan?<br>" +
+         "<em>Contohnya:</em> Bank Mandiri sudah mengurangi asap emisinya 32% sejak 2019. Telkom pakai listrik dari sumber bersih di pusat datanya.<br><br>" +
+         "<strong>👥 S — Sosial</strong><br>" +
+         "Apakah perusahaan baik ke karyawan dan masyarakat sekitar? Apakah pekerja digaji layak? Apakah perempuan punya kesempatan yang sama? Apakah data pelanggan dijaga?<br>" +
+         "<em>Contohnya:</em> Bank Mandiri menyalurkan pinjaman ke 963 ribu pelaku usaha kecil. Unilever Indonesia bantu desa-desa dapat akses air bersih.<br><br>" +
+         "<strong>⚖️ G — Tata Kelola</strong><br>" +
+         "Apakah perusahaan dipimpin secara jujur dan terbuka? Siapa pemilik sebenarnya? Apakah pemegang saham kecil dilindungi? Adakah direksi independen yang berani bilang \"tidak\" kalau ada keputusan salah?<br>" +
+         "<em>Pelajaran dari krisis MSCI Januari 2026:</em> Justru pilar G inilah yang gagal di banyak perusahaan Indonesia — ratusan triliun rupiah hilang dari pasar saham gara-gara masalah tata kelola.<br><br>" +
+         "<strong>Cara mudah memahami ESG:</strong> Bayangin kamu mau beli kue. Selain rasanya enak (= laba perusahaan), kamu juga peduli: bahan kuenya tidak merusak alam (E), pekerja pabrik kuenya digaji adil (S), dan pemilik pabriknya jujur ke pelanggan (G). Itulah inti ESG.<br><br>" +
+         "<strong>Di Indonesia,</strong> OJK pakai singkatan <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola) — artinya sama persis dengan ESG. Diatur lewat aturan OJK nomor <em>POJK 51 Tahun 2017</em>.",
     a_en:"<strong>ESG</strong> = <span class='accent'>Environmental, Social, Governance</span> — a framework to evaluate companies <em>beyond</em> the financial statements.<br><br>" +
          "<strong>🌳 E — Environment</strong><br>" +
          "Carbon emissions (Scope 1/2/3), energy &amp; water use, waste, deforestation.<br>" +
@@ -2736,18 +2793,19 @@ const FAQ_DATA = [
          "<strong>In Indonesia:</strong> OJK uses the term <strong>LST</strong> (Lingkungan, Sosial, Tata Kelola), regulated by <em>POJK 51/2017</em> and <em>Sustainable Finance Roadmap Phase II</em>. 11 KKUB categories define which sectors count as \"green\"." },
 
   { id:'lst', category:'esg-basics', intent:'definitional', kw_id:['lst','apa itu lst','definisi lst','lingkungan sosial tata kelola','istilah lst','lst indonesia','lst ojk'], kw_en:['lst','what is lst','define lst','lingkungan sosial tata kelola','indonesian esg term'],
-    a_id:"<strong>LST</strong> (Lingkungan, Sosial, Tata Kelola) adalah <strong>istilah resmi Indonesia</strong> untuk konsep <span class='accent'>ESG</span>. Dipakai oleh OJK, Bappenas, BKPM, dan dokumen pemerintah lainnya.<br><br>" +
-         "<strong>Padanan:</strong><br>" +
-         "• <strong>L</strong>ingkungan = <strong>E</strong>nvironmental<br>" +
-         "• <strong>S</strong>osial = <strong>S</strong>ocial<br>" +
-         "• <strong>T</strong>ata <strong>K</strong>elola = <strong>G</strong>overnance<br><br>" +
-         "<strong>Mengapa beda istilah?</strong> Indonesia ingin agenda berkelanjutan punya \"rasa lokal\" — supaya UMKM &amp; pelaku usaha lokal lebih mudah mengadopsi, tidak terdengar seperti standar asing.<br><br>" +
-         "<strong>Dokumen resmi yang pakai \"LST\":</strong><br>" +
-         "• <em>POJK 51/POJK.03/2017</em> tentang Penerapan Keuangan Berkelanjutan<br>" +
-         "• <em>Sustainable Finance Roadmap Phase II (2021-2025)</em><br>" +
-         "• <em>Panduan Investasi Lestari</em> (BKPM, 2022)<br>" +
-         "• <em>Taksonomi Keuangan Berkelanjutan Indonesia (TKBI)</em><br><br>" +
-         "<strong>Konteks praktis:</strong> Saat baca Laporan Keberlanjutan emiten Indonesia, kamu akan lihat kata <em>aspek LST</em> atau <em>risiko LST</em> alih-alih ESG. Artinya identik dengan ESG.",
+    a_id:"<strong>LST</strong> itu singkatan dari <strong>Lingkungan, Sosial, Tata Kelola</strong> — versi bahasa Indonesia dari ESG. Artinya sama persis.<br><br>" +
+         "<strong>Hubungan dengan ESG:</strong><br>" +
+         "• <strong>L</strong>ingkungan = E (Environment)<br>" +
+         "• <strong>S</strong>osial = S (Social)<br>" +
+         "• <strong>T</strong>ata <strong>K</strong>elola = G (Governance)<br><br>" +
+         "<strong>Kenapa pakai istilah Indonesia?</strong> Supaya pengusaha kecil dan masyarakat umum lebih mudah paham — tidak terdengar seperti istilah asing yang ribet. Tujuannya supaya konsep ini benar-benar bisa dipakai di lapangan, bukan cuma di kantor pusat perusahaan besar.<br><br>" +
+         "<strong>Siapa yang pakai istilah LST?</strong><br>" +
+         "• OJK (Otoritas Jasa Keuangan) — pengawas keuangan Indonesia<br>" +
+         "• Bappenas — lembaga perencanaan negara<br>" +
+         "• BKPM — lembaga koordinasi penanaman modal<br>" +
+         "• Aturan resmi: <em>POJK 51 Tahun 2017</em> tentang Penerapan Keuangan Berkelanjutan<br>" +
+         "• Dokumen: <em>Peta Jalan Keuangan Berkelanjutan Tahap II (2021-2025)</em>, <em>Panduan Investasi Lestari</em> (BKPM, 2022), dan <em>Taksonomi Keuangan Berkelanjutan Indonesia (TKBI)</em><br><br>" +
+         "<strong>Tips baca laporan perusahaan:</strong> Kalau kamu buka Laporan Keberlanjutan (<em>Sustainability Report</em>) sebuah perusahaan Indonesia, kamu akan sering lihat kata-kata seperti \"aspek LST\" atau \"risiko LST\". Itu sama saja artinya dengan ESG — jangan bingung.",
     a_en:"<strong>LST</strong> (Lingkungan, Sosial, Tata Kelola) is the <strong>official Indonesian term</strong> for the <span class='accent'>ESG</span> concept. Used by OJK, Bappenas, BKPM, and other government documents.<br><br>" +
          "<strong>Mapping:</strong><br>" +
          "• <strong>L</strong>ingkungan = <strong>E</strong>nvironmental<br>" +
@@ -2770,13 +2828,17 @@ const FAQ_DATA = [
   // separate entry (`msci_indonesia_crisis`) so case/news queries don't
   // hijack definitional ones.
   { id:'msci', category:'indices', intent:'definitional', kw_id:['msci','apa itu msci','msci adalah','definisi msci','pengertian msci','tentang msci','apa msci','arti msci','morgan stanley capital'], kw_en:['msci','what is msci','define msci','explain msci','about msci','meaning msci','morgan stanley capital international','msci definition'],
-    a_id:"<strong>MSCI</strong> = <span class='accent'>Morgan Stanley Capital International</span> — penyedia indeks &amp; data investasi global yang berkantor pusat di New York (didirikan 1969, dipisah dari Morgan Stanley 2007). MSCI bukan bursa; mereka membuat indeks acuan yang dipakai trilyunan dolar dana global.<br><br>" +
-         "<strong>Fungsi utama untuk Indonesia:</strong><br>" +
-         "1. <strong>Klasifikasi negara</strong> — MSCI membagi pasar jadi <em>developed</em> (AS, Jepang), <em>emerging</em> (Indonesia, India, Brazil), dan <em>frontier</em> (Vietnam, Kenya). Indonesia saat ini di <em>emerging market</em>.<br>" +
-         "2. <strong>MSCI Indonesia Index</strong> — kumpulan saham Indonesia berkapitalisasi besar yang diikuti reksa dana internasional.<br>" +
-         "3. <strong>MSCI ESG Ratings</strong> — peringkat ESG (AAA sampai CCC) untuk ribuan perusahaan termasuk Indonesia.<br><br>" +
-         "<strong>Kenapa penting buat investor Indonesia?</strong><br>" +
-         "Jika MSCI naikkan/turunkan klasifikasi atau bobot Indonesia, dana global ikut masuk/keluar — bisa menggerakkan IHSG signifikan. Lihat juga: krisis MSCI Indonesia Januari 2026.",
+    a_id:"<strong>MSCI</strong> adalah perusahaan asing dari Amerika yang tugasnya membuat <em>daftar peringkat</em> dan <em>data</em> tentang pasar saham di seluruh dunia. Kantornya di New York, berdiri sejak 1969.<br><br>" +
+         "<strong>Anggap saja MSCI itu seperti \"Forbes\" atau \"FIFA Ranking\":</strong> Mereka tidak punya bursa saham sendiri, tapi peringkat yang mereka buat dipakai oleh ribuan pengelola dana besar di luar negeri untuk memutuskan akan investasi ke mana.<br><br>" +
+         "<strong>3 Hal Penting MSCI untuk Indonesia:</strong><br>" +
+         "1. <strong>Mengelompokkan Negara</strong> — MSCI membagi negara jadi 3 kelompok berdasarkan seberapa maju pasar sahamnya:<br>" +
+         "  • <em>Pasar Maju</em> (Amerika, Jepang, Eropa) — pasar saham besar dan stabil<br>" +
+         "  • <em>Pasar Berkembang</em> (Indonesia, India, Brasil) — pasar lumayan besar tapi masih sedang tumbuh — <strong>Indonesia ada di sini</strong><br>" +
+         "  • <em>Pasar Pemula</em> (Vietnam, Kenya) — pasar masih kecil dan berisiko tinggi<br>" +
+         "2. <strong>Daftar Saham Indonesia</strong> — MSCI bikin daftar saham besar Indonesia yang dibeli oleh dana asing.<br>" +
+         "3. <strong>Peringkat ESG</strong> — MSCI kasih nilai (AAA paling bagus, CCC paling jelek) untuk seberapa ramah perusahaan ke lingkungan, sosial, dan tata kelolanya.<br><br>" +
+         "<strong>Kenapa MSCI penting buat investor Indonesia?</strong><br>" +
+         "Kalau MSCI menaikkan atau menurunkan posisi Indonesia di peringkat mereka, ratusan triliun rupiah dana asing bisa masuk atau keluar dari pasar saham kita. Itu bisa membuat IHSG (indeks saham Indonesia) naik atau turun banyak — seperti yang terjadi di Januari 2026.",
     a_en:"<strong>MSCI</strong> = <span class='accent'>Morgan Stanley Capital International</span> — a global index &amp; investment data provider headquartered in New York (founded 1969, spun off from Morgan Stanley in 2007). MSCI is not an exchange; they build benchmark indices tracked by trillions of dollars in global funds.<br><br>" +
          "<strong>Main functions for Indonesia:</strong><br>" +
          "1. <strong>Country classification</strong> — MSCI splits markets into <em>developed</em> (US, Japan), <em>emerging</em> (Indonesia, India, Brazil), and <em>frontier</em> (Vietnam, Kenya). Indonesia is currently in <em>emerging market</em>.<br>" +
@@ -2793,7 +2855,11 @@ const FAQ_DATA = [
     a_en:"<strong>MSCI Indonesia Crisis · January 2026</strong> 🚨<br>On 28 January 2026, MSCI froze positive changes to Indonesian stocks and considered downgrading from <em>emerging market</em> to <em>frontier market</em>. Reasons:<br>• Unclear ownership transparency<br>• Doubtful <em>free-float</em> data accuracy<br>• Suspected <em>coordinated trading</em><br>Impact: ~<strong>USD 80 billion</strong> in market cap lost in 2 days. IDX CEO &amp; OJK Chairman resigned. Goldman Sachs downgraded to <em>underweight</em>." },
 
   { id:'transparency', category:'governance', kw_id:['indonesia kenapa','kenapa indonesia downgrade','transparansi indonesia','tata kelola indonesia downgrade','3 masalah governance','msci downgrade alasan','indonesia risiko downgrade','alasan msci'], kw_en:['why indonesia','why indonesia at risk','indonesia downgrade reasons','transparency indonesia','3 governance issues indonesia','indonesia downgrade why','reasons msci downgrade'],
-    a_id:"<strong>Indonesia berisiko downgrade</strong> karena tiga masalah <span class='accent'>tata kelola</span> (governance):<br>1. <strong>Free-float palsu</strong> — banyak saham dilaporkan beredar bebas, tapi nyatanya dikontrol pihak terkait<br>2. <strong>Coordinated trading</strong> — dugaan saham digerakkan beberapa pihak terkoordinasi<br>3. <strong>Beneficial ownership</strong> — siapa pemilik akhirnya sering tersembunyi di balik holding<br>Inilah kenapa pilar <strong>G (Governance)</strong> dalam ESG sekarang paling penting di Indonesia.",
+    a_id:"<strong>Kenapa Indonesia berisiko turun peringkat di mata MSCI?</strong> Ada 3 masalah utama soal <em>tata kelola</em> (cara perusahaan dipimpin secara jujur dan terbuka):<br><br>" +
+         "1. <strong>Saham \"beredar bebas\" yang sebenarnya tidak bebas</strong> — Banyak saham yang dilaporkan bisa dibeli/dijual siapa saja di pasar, padahal aslinya tetap dipegang orang dalam atau kerabat pemilik perusahaan. Ini menipu investor.<br><br>" +
+         "2. <strong>Saham digerakkan berbarengan oleh kelompok tertentu</strong> — Diduga ada beberapa pihak yang sengaja \"mengoper\" saham di antara mereka supaya harga naik atau turun sesuai yang diinginkan. Bukan harga jujur dari pasar.<br><br>" +
+         "3. <strong>Pemilik sebenarnya disembunyikan</strong> — Siapa orang yang sebenarnya untung dari sebuah perusahaan? Sering tersembunyi di balik perusahaan-perusahaan lain yang berlapis-lapis, sehingga sulit dilacak.<br><br>" +
+         "<strong>Inilah sebabnya</strong> pilar <strong>T (Tata Kelola)</strong> di ESG sekarang jadi yang paling penting di Indonesia — bukan cuma soal hijau dan sosial, tapi juga soal kejujuran cara perusahaan dijalankan.",
     a_en:"<strong>Indonesia is at downgrade risk</strong> due to three <span class='accent'>governance</span> issues:<br>1. <strong>Fake free-float</strong> — many shares reported as freely circulating but actually controlled by related parties<br>2. <strong>Coordinated trading</strong> — suspected coordinated movement by linked actors<br>3. <strong>Beneficial ownership</strong> — ultimate owners often hidden behind holding structures<br>This is why <strong>G (Governance)</strong> in ESG is now most critical in Indonesia." },
 
 
@@ -2801,20 +2867,21 @@ const FAQ_DATA = [
   // SECTION 4 · REGULATIONS — OJK + POJKs (most POJK detail in knowledge.js)
   // ============================================================
   { id:'ojk', category:'regulations', intent:'definitional', kw_id:['ojk','otoritas jasa keuangan','regulator','siapa ojk','apa itu ojk','tentang ojk','fungsi ojk'], kw_en:['ojk','otoritas','indonesian financial services authority','what is ojk','who is ojk','indonesia regulator','about ojk'],
-    a_id:"<strong>OJK</strong> = <span class='accent'>Otoritas Jasa Keuangan</span> — regulator independen sektor jasa keuangan Indonesia (didirikan via UU 21/2011, beroperasi penuh 2013). Bukan sekadar pengawas pasar modal, tapi juga perbankan, asuransi, dana pensiun, fintech, dan IKNB.<br><br>" +
-         "<strong>3 Mandat Utama:</strong><br>" +
-         "1. <strong>Mengatur</strong> — menerbitkan POJK (Peraturan OJK) &amp; SEOJK (Surat Edaran)<br>" +
-         "2. <strong>Mengawasi</strong> — supervisi LJK, emiten, perusahaan publik<br>" +
-         "3. <strong>Melindungi konsumen</strong> — perlindungan investor &amp; nasabah<br><br>" +
-         "<strong>Peran di ESG/Keuangan Berkelanjutan:</strong><br>" +
-         "• Penerbit <em>Sustainable Finance Roadmap Phase I (2015-2019)</em> &amp; <em>Phase II (2021-2025)</em><br>" +
-         "• Penerbit <strong>POJK 51/2017</strong> (sustainable finance), <strong>POJK 60/2017</strong> (green bond), <strong>POJK 14/2023</strong> (carbon trading), <strong>POJK 17/2023</strong> (CRMS bank), <strong>POJK 18/2023</strong> (sustainability bond)<br>" +
-         "• Indonesia diakui SBFN di tahap \"Maturing\" — tertinggi di antara <em>Emerging Markets &amp; Developing Economies</em><br><br>" +
-         "<strong>Pasca Krisis MSCI Januari 2026:</strong><br>" +
-         "• Turunkan ambang wajib lapor kepemilikan dari <strong>5% → 1%</strong><br>" +
-         "• Percepat aturan <em>finfluencer</em> (regulasi influencer keuangan)<br>" +
-         "• Perkuat <strong>POJK 13/2025</strong> tentang internal control Perusahaan Efek (PEE/PPE)<br>" +
-         "• Ketua &amp; anggota Dewan Komisioner mundur Februari 2026",
+    a_id:"<strong>OJK</strong> singkatan dari <strong>Otoritas Jasa Keuangan</strong> — lembaga negara yang mengawasi <em>semua hal yang berhubungan dengan uang</em> di Indonesia. Didirikan tahun 2011, mulai jalan penuh 2013.<br><br>" +
+         "<strong>Anggap OJK seperti \"polisi\" untuk dunia keuangan</strong> — tugasnya menjaga supaya bank, asuransi, perusahaan saham, perusahaan fintech, dan layanan pinjaman online tidak merugikan masyarakat.<br><br>" +
+         "<strong>3 Tugas Utama OJK:</strong><br>" +
+         "1. <strong>Membuat aturan</strong> — OJK menerbitkan peraturan yang disebut <em>POJK</em> dan <em>SEOJK</em> (semacam Undang-Undang khusus keuangan)<br>" +
+         "2. <strong>Mengawasi</strong> — memantau bank, perusahaan saham, dan perusahaan keuangan lain supaya tidak melanggar aturan<br>" +
+         "3. <strong>Melindungi konsumen</strong> — kalau kamu ditipu investasi bodong atau dirugikan bank, OJK yang membantu<br><br>" +
+         "<strong>Peran OJK di Bidang Investasi Hijau (ESG):</strong><br>" +
+         "• Membuat <em>Peta Jalan Keuangan Berkelanjutan Tahap I</em> (2015-2019) dan <em>Tahap II</em> (2021-2025) — semacam rencana jangka panjang supaya keuangan Indonesia makin ramah lingkungan<br>" +
+         "• Menerbitkan aturan-aturan penting: <strong>POJK 51/2017</strong> (laporan keberlanjutan), <strong>POJK 60/2017</strong> (obligasi hijau), <strong>POJK 14/2023</strong> (perdagangan karbon), dan lain-lain<br>" +
+         "• Indonesia dinilai di tahap \"Maturing\" (sedang matang) oleh badan dunia SBFN — peringkat tertinggi di antara negara berkembang<br><br>" +
+         "<strong>Apa yang OJK lakukan setelah Krisis MSCI Januari 2026?</strong><br>" +
+         "• Mempercepat aturan untuk para <em>finfluencer</em> (orang yang bicara soal keuangan di media sosial) supaya tidak menyesatkan publik<br>" +
+         "• Menurunkan batas wajib lapor kepemilikan saham dari 5% jadi 1% — supaya pemilik tersembunyi lebih sulit menyamar<br>" +
+         "• Memperkuat aturan POJK 13 Tahun 2025 untuk pengawasan internal perusahaan saham<br>" +
+         "• Ketua OJK lama mundur pada Februari 2026 — tanda OJK mau berubah dan memperbaiki diri",
     a_en:"<strong>OJK</strong> = <span class='accent'>Otoritas Jasa Keuangan</span> (Indonesian Financial Services Authority) — Indonesia's independent financial services sector regulator (established under Law 21/2011, fully operational 2013). Not just capital markets oversight — also covers banking, insurance, pensions, fintech, and NBFI.<br><br>" +
          "<strong>3 Main Mandates:</strong><br>" +
          "1. <strong>Regulate</strong> — issue POJK (OJK regulations) &amp; SEOJK (circular letters)<br>" +
@@ -2834,11 +2901,21 @@ const FAQ_DATA = [
   // Indices: IDX/BEI and KEHATI (definitional). Constituent lists are served
   // by the live-data ranker (matchLiveDataQuery) from STOCKS_DATA, not these.
   { id:'idx', category:'indices', intent:'definitional', kw_id:['idx','bei','bursa efek','indeks esg'], kw_en:['idx','indonesia stock exchange','esg index'],
-    a_id:"<strong>IDX</strong> (Indonesia Stock Exchange / Bursa Efek Indonesia) menerbitkan beberapa indeks ESG:<br>• <strong>IDX ESG Leaders</strong> — saham dengan skor ESG tertinggi<br>• <strong>IDX KEHATI SRI</strong> — indeks SRI tertua (sejak 2009)<br>• <strong>ESG Sector Leaders KEHATI</strong> — leader per sektor<br>• <strong>IDX Climate</strong> — fokus iklim<br>Total ~25-30 saham tersebar dalam berbagai indeks ESG ini.",
+    a_id:"<strong>IDX</strong> singkatan dari <em>Indonesia Stock Exchange</em> — dalam bahasa Indonesia disebut <strong>Bursa Efek Indonesia (BEI)</strong>. Ini adalah <em>tempat resmi</em> jual-beli saham di Indonesia.<br><br>" +
+         "<strong>Anggap IDX seperti \"pasar besar\" untuk saham</strong> — semua perusahaan yang ingin sahamnya bisa dibeli masyarakat harus terdaftar di sini.<br><br>" +
+         "<strong>IDX juga membuat beberapa daftar saham hijau:</strong><br>" +
+         "• <strong>IDX ESG Leaders</strong> — daftar saham yang nilai ESG-nya paling bagus<br>" +
+         "• <strong>IDX KEHATI SRI</strong> — daftar saham hijau tertua di Indonesia (sejak 2009)<br>" +
+         "• <strong>ESG Sector Leaders KEHATI</strong> — saham terbaik di tiap sektor industri<br>" +
+         "• <strong>IDX Climate</strong> — daftar khusus untuk saham yang peduli iklim<br>" +
+         "<br>Total ada sekitar 25-30 saham yang masuk ke berbagai daftar ESG ini.",
     a_en:"<strong>IDX</strong> (Indonesia Stock Exchange) publishes several ESG indices:<br>• <strong>IDX ESG Leaders</strong> — highest ESG-scored stocks<br>• <strong>IDX KEHATI SRI</strong> — oldest SRI index (since 2009)<br>• <strong>ESG Sector Leaders KEHATI</strong> — leader per sector<br>• <strong>IDX Climate</strong> — climate focus<br>~25-30 stocks across these indices total." },
 
   { id:'kehati', category:'indices', intent:'definitional', kw_id:['kehati','sri','yayasan'], kw_en:['kehati','sri index','yayasan'],
-    a_id:"<strong>KEHATI SRI Index</strong> adalah indeks SRI tertua di Indonesia, diluncurkan 2009 oleh Bursa Efek Indonesia bekerja sama dengan <em>Yayasan Keanekaragaman Hayati Indonesia (KEHATI)</em>. Indeks ini berisi 25 saham yang lulus skrining ESG ketat. Contoh: BCA, Astra International, Unilever Indonesia, Telkom Indonesia.",
+    a_id:"<strong>Indeks SRI-KEHATI</strong> adalah daftar saham hijau tertua di Indonesia, dibuat sejak tahun 2009. <em>SRI</em> singkatan dari <em>Sustainable and Responsible Investment</em> — artinya investasi yang bertanggung jawab dan ramah lingkungan.<br><br>" +
+         "<strong>Siapa yang membuat?</strong> Bursa Efek Indonesia (BEI/IDX) bekerja sama dengan <strong>Yayasan KEHATI</strong> — yayasan yang peduli pada keanekaragaman hayati Indonesia (kehidupan alam: hewan, tumbuhan, hutan, laut).<br><br>" +
+         "<strong>Isinya apa?</strong> Daftar ini berisi <strong>25 saham terpilih</strong> dari perusahaan-perusahaan yang sudah lulus penilaian ESG yang ketat. Beberapa nama yang masuk: BCA, Astra International, Unilever Indonesia, Telkom Indonesia.<br><br>" +
+         "<strong>Kenapa berguna untuk investor pemula?</strong> Daripada kamu harus meneliti satu per satu apakah sebuah perusahaan ramah lingkungan, kamu bisa langsung pakai daftar ini sebagai \"contekan\" — saham-saham di sini sudah disaring untuk kamu.",
     a_en:"<strong>KEHATI SRI Index</strong> is Indonesia\'s oldest SRI index, launched in 2009 by IDX in partnership with the <em>Indonesian Biodiversity Foundation (KEHATI)</em>. Contains 25 stocks that pass strict ESG screening. Examples: BCA, Astra International, Unilever Indonesia, Telkom Indonesia." },
 
 
@@ -2850,7 +2927,16 @@ const FAQ_DATA = [
     a_en:"<strong>Indonesia Green Sukuk</strong> 🌱<br>Indonesia is the world\'s first sovereign <em>Green Sukuk</em> issuer (2018). The government issues <strong>Retail Green Sukuk</strong> in ST (Savings Sukuk) and SR (Retail Sukuk) series, dedicated to green projects: renewables, low-carbon transport, water management. Min <strong>IDR 1 million</strong>, yields competitive with deposits." },
 
   { id:'greenwashing', category:'frameworks', intent:'definitional', kw_id:['greenwashing','green washing','klaim palsu'], kw_en:['greenwashing','fake green','fake sustainability'],
-    a_id:"<strong>Greenwashing</strong> adalah praktik perusahaan yang <em>mengklaim ramah lingkungan</em> tanpa bukti substansial — hanya untuk pemasaran. Contoh:<br>• Perusahaan sawit pasang logo hijau tapi masih deforestasi<br>• Bank klaim 'net zero' tapi tetap biayai PLTU batubara<br>• Mutual fund 'ESG' yang isinya saham fossil fuel<br><strong>Cara hindari:</strong> cek rating dari pihak ketiga (FTSE Russell, MSCI ESG, Sustainalytics) dan baca <em>integrated report</em> perusahaannya.",
+    a_id:"<strong>Greenwashing</strong> itu istilah untuk perusahaan yang <em>pura-pura ramah lingkungan</em> padahal sebenarnya tidak — hanya untuk gimmick iklan.<br><br>" +
+         "<strong>Anggap saja seperti orang pakai topeng hijau:</strong> Dari luar terlihat peduli alam, tapi kalau topengnya dibuka — masih merusak.<br><br>" +
+         "<strong>Contoh nyata yang sering terjadi:</strong><br>" +
+         "• Perusahaan sawit pasang logo hijau di kemasannya, tapi masih menebang hutan secara liar<br>" +
+         "• Bank mengaku akan \"netral karbon\" di 2050, tapi sekarang masih meminjamkan uang ke pembangkit listrik batubara<br>" +
+         "• Reksa dana \"ramah lingkungan\" yang dijual ke nasabah, ternyata isinya saham perusahaan minyak dan batubara<br><br>" +
+         "<strong>Cara melindungi diri kamu:</strong><br>" +
+         "1. Jangan langsung percaya iklan — cek peringkat ESG dari pihak luar yang independen (MSCI ESG, Sustainalytics, FTSE Russell)<br>" +
+         "2. Baca Laporan Keberlanjutan perusahaannya — apakah ada angka konkret atau cuma janji-janji indah?<br>" +
+         "3. Cek apakah laporan tersebut sudah diverifikasi (di-audit) oleh pihak ketiga yang terpercaya — kalau belum, hati-hati",
     a_en:"<strong>Greenwashing</strong> is when companies <em>claim eco-friendliness</em> without substantial evidence — purely for marketing. Examples:<br>• Palm oil firms display green logos while still deforesting<br>• Banks claim 'net zero' while still financing coal plants<br>• 'ESG' mutual funds full of fossil fuel stocks<br><strong>Avoid by:</strong> checking third-party ratings (FTSE Russell, MSCI ESG, Sustainalytics) and reading the company\'s <em>integrated report</em>." },
 
   { id:'rating', category:'frameworks', kw_id:['rating','divergence','perbedaan rating','skor esg'], kw_en:['rating','divergence','esg score','disagreement'],
@@ -2915,7 +3001,22 @@ const FAQ_DATA = [
   // SECTION 7 · RETAIL EDUCATION — beginner guide, literacy, risk
   // ============================================================
   { id:'start', category:'retail-literacy', intent:'how-to', kw_id:['mulai','pemula','baru','cara mulai','newbie'], kw_en:['start','begin','beginner','how to start','new investor'],
-    a_id:"<strong>Cara mulai investasi ESG di Indonesia</strong> 🌱<br>1. Buka rekening di broker OJK-terdaftar (Bibit untuk reksa dana, Ajaib/Stockbit/IPOT untuk saham)<br>2. Mulai dari Green Sukuk Ritel kalau mau aman (mulai Rp 1 juta)<br>3. Untuk saham: beli konstituen IDX ESG Leaders / KEHATI<br>4. Untuk reksa dana: pilih reksa dana berlabel ESG/SRI di Bibit<br>5. Pakai <strong>DCA</strong> (dollar-cost averaging) — investasi rutin bulanan<br>6. Diversifikasi: jangan all-in di 1 saham",
+    a_id:"<strong>Cara mulai investasi yang ramah lingkungan di Indonesia</strong> 🌱<br><br>" +
+         "Tenang, kamu tidak perlu jadi ahli untuk mulai. Ikuti langkah-langkah ini:<br><br>" +
+         "<strong>1. Buat akun di aplikasi investasi resmi</strong><br>" +
+         "Pilih aplikasi yang sudah terdaftar di OJK supaya aman. Untuk pemula:<br>" +
+         "• <strong>Bibit</strong> — paling mudah, cocok untuk beli reksa dana (semacam tabungan investasi)<br>" +
+         "• <strong>Ajaib</strong> atau <strong>Stockbit</strong> — kalau kamu mau beli saham perusahaan langsung<br><br>" +
+         "<strong>2. Mulai dengan jumlah kecil yang aman</strong><br>" +
+         "Pemula sebaiknya coba <strong>Sukuk Hijau Ritel</strong> dulu (modal mulai Rp 1 juta). Ini surat utang negara untuk proyek hijau — paling aman karena dijamin pemerintah.<br><br>" +
+         "<strong>3. Pilih saham atau reksa dana yang \"hijau\"</strong><br>" +
+         "• Kalau beli saham: pilih perusahaan yang masuk daftar <strong>IDX ESG Leaders</strong> atau <strong>SRI-KEHATI</strong> — sudah disaring oleh BEI<br>" +
+         "• Kalau beli reksa dana: di Bibit ada filter \"ESG\" atau \"Syariah\" — gampang dicari<br><br>" +
+         "<strong>4. Investasi rutin tiap bulan</strong><br>" +
+         "Sisihkan jumlah tetap setiap bulan (misal Rp 200 ribu/bulan) — cara ini dalam dunia investasi disebut \"<em>Dollar-Cost Averaging</em>\" alias rata-rata harga. Lebih aman daripada beli sekaligus banyak.<br><br>" +
+         "<strong>5. Jangan taruh semua uang di satu tempat</strong><br>" +
+         "Sebar uangmu ke beberapa saham/reksa dana yang berbeda — kalau satu jelek, yang lain bisa menyelamatkan.<br><br>" +
+         "<strong>⚠ Catatan penting:</strong> Ini bukan saran beli/jual saham. Untuk keputusan investasi yang besar, konsultasi dengan penasihat investasi berlisensi OJK.",
     a_en:"<strong>How to start ESG investing in Indonesia</strong> 🌱<br>1. Open an account at an OJK-licensed broker (Bibit for mutual funds, Ajaib/Stockbit/IPOT for stocks)<br>2. Start with Retail Green Sukuk if you want safety (min IDR 1M)<br>3. For stocks: buy IDX ESG Leaders / KEHATI constituents<br>4. For mutual funds: pick ESG/SRI-labeled funds on Bibit<br>5. Use <strong>DCA</strong> (dollar-cost averaging) — invest monthly<br>6. Diversify: don\'t go all-in on one stock" },
 
   { id:'profit', kw_id:['cuan','untung','profit','return','keuntungan'], kw_en:['profit','return','gain','income'],
@@ -2927,11 +3028,34 @@ const FAQ_DATA = [
     a_en:"<strong>ESG vs Syariah</strong> 🕌<br>ESG and Syariah share many features (exclusion of haram industries, ethics focus) but are not identical:<br>• Syariah excludes: alcohol, gambling, pork, riba (conventional interest)<br>• ESG excludes: weapons, tobacco, heavy fossil fuels<br>Many companies qualify for both. Indonesia has <strong>Jakarta Islamic Index (JII)</strong> and <strong>Indonesian Sharia Stock Index (ISSI)</strong>. Bibit and Wahed offer Syariah portfolios." },
 
   { id:'risk', kw_id:['risiko','bahaya','volatilitas'], kw_en:['risk','danger','volatility'],
-    a_id:"<strong>Risiko investasi ESG di Indonesia</strong> ⚠️<br>1. <strong>Greenwashing</strong> — klaim hijau palsu<br>2. <strong>Rating divergence</strong> — beda provider beda penilaian<br>3. <strong>Likuiditas terbatas</strong> — saham ESG kadang kurang likuid<br>4. <strong>Volatilitas MSCI</strong> — krisis 2026 menunjukkan emerging market masih bisa shock<br>5. <strong>Regulasi berubah</strong> — POJK terus berevolusi<br>Mitigasi: diversifikasi, horizon panjang (5+ tahun), pakai DCA.",
+    a_id:"<strong>Risiko investasi hijau di Indonesia</strong> ⚠️<br><br>" +
+         "Penting kamu tahu — investasi <strong>tidak pernah</strong> 100% aman. Ini risiko yang khusus untuk investasi hijau (ESG) di Indonesia:<br><br>" +
+         "<strong>1. Perusahaan pura-pura hijau (<em>Greenwashing</em>)</strong><br>" +
+         "Ada perusahaan yang menyatakan dirinya ramah lingkungan padahal aslinya tidak. Kamu bisa salah pilih kalau cuma percaya iklan.<br><br>" +
+         "<strong>2. Peringkat ESG bisa beda-beda</strong><br>" +
+         "Satu perusahaan bisa dapat nilai bagus dari MSCI, tapi nilai jelek dari Sustainalytics. Jadi peringkat ESG itu belum seragam — perlu pengecekan dari banyak sumber.<br><br>" +
+         "<strong>3. Sulit dijual cepat (<em>Likuiditas Rendah</em>)</strong><br>" +
+         "Beberapa saham ESG di Indonesia jarang diperdagangkan. Artinya, kalau kamu butuh uang mendadak, mungkin susah jual sahamnya dengan harga wajar.<br><br>" +
+         "<strong>4. Harga bisa anjlok tiba-tiba</strong><br>" +
+         "Pelajaran dari krisis MSCI Januari 2026: pasar saham Indonesia bisa mengalami goncangan besar dalam hitungan hari. Siapkan mental dan rencana untuk situasi seperti ini.<br><br>" +
+         "<strong>5. Aturan bisa berubah</strong><br>" +
+         "OJK terus mengeluarkan aturan baru (POJK) untuk investasi hijau. Aturan baru bisa memengaruhi kinerja saham/reksa dana yang sudah kamu beli.<br><br>" +
+         "<strong>Cara mengurangi risiko:</strong><br>" +
+         "• <strong>Sebar uangmu</strong> ke beberapa saham/reksa dana berbeda — jangan all-in di satu tempat<br>" +
+         "• <strong>Investasi jangka panjang</strong> — minimal 5 tahun, jangan berharap untung besar dalam hitungan minggu<br>" +
+         "• <strong>Investasi rutin tiap bulan</strong> — jumlah tetap, supaya kamu beli saat harga murah maupun mahal (rata-ratanya jadi wajar)<br>" +
+         "• <strong>Hanya pakai uang \"dingin\"</strong> — uang yang kamu tidak butuhkan dalam 5 tahun ke depan, bukan uang darurat",
     a_en:"<strong>ESG investing risks in Indonesia</strong> ⚠️<br>1. <strong>Greenwashing</strong> — fake green claims<br>2. <strong>Rating divergence</strong> — providers disagree<br>3. <strong>Limited liquidity</strong> — ESG stocks can be illiquid<br>4. <strong>MSCI volatility</strong> — the 2026 crisis shows EM can shock<br>5. <strong>Regulatory churn</strong> — POJK keeps evolving<br>Mitigation: diversify, long horizon (5+ years), use DCA." },
 
   { id:'snlik', kw_id:['snlik','literasi','17.78','rendah','kurang paham'], kw_en:['snlik','literacy','17.78','low literacy'],
-    a_id:"<strong>Literasi Pasar Modal Indonesia Masih Rendah</strong> 📉<br>Menurut <strong>SNLIK 2025</strong> (Survei Nasional Literasi dan Inklusi Keuangan), literasi pasar modal Indonesia hanya <strong>17.78%</strong> — jauh di bawah perbankan (65.5%) dan asuransi (45.45%). Inilah kenapa Elemu Lestari dibangun: untuk menutup gap edukasi ini, khususnya pasca krisis MSCI 2026.",
+    a_id:"<strong>Pemahaman Masyarakat Indonesia tentang Saham Masih Sangat Rendah</strong> 📉<br><br>" +
+         "Menurut survei resmi <strong>SNLIK 2025</strong> (Survei Nasional Literasi dan Inklusi Keuangan oleh OJK), hanya <strong>17,78% orang Indonesia</strong> yang benar-benar paham cara kerja pasar saham.<br><br>" +
+         "<strong>Bandingkan dengan bidang lain:</strong><br>" +
+         "• Pemahaman tentang bank: <strong>65,5%</strong> (lebih dari setengah masyarakat)<br>" +
+         "• Pemahaman tentang asuransi: <strong>45,45%</strong> (hampir separuh)<br>" +
+         "• Pemahaman tentang saham: <strong>hanya 17,78%</strong> (kurang dari 1 dari 5 orang!)<br><br>" +
+         "<strong>Apa artinya?</strong> Banyak orang Indonesia berinvestasi di saham tanpa benar-benar paham apa yang mereka beli — itu bahaya karena mudah tertipu, mudah panik kalau harga turun, dan mudah jadi korban investasi bodong.<br><br>" +
+         "<strong>Inilah kenapa Elemu Lestari (saya, Sari) dibuat:</strong> Untuk membantu masyarakat Indonesia memahami investasi — khususnya investasi hijau yang ramah lingkungan — dengan bahasa yang mudah dimengerti. Terutama setelah krisis MSCI Januari 2026 yang menunjukkan betapa pentingnya investor paham apa yang mereka lakukan.",
     a_en:"<strong>Indonesian Capital Markets Literacy is Low</strong> 📉<br>Per <strong>SNLIK 2025</strong> (National Survey on Financial Literacy and Inclusion), capital markets literacy in Indonesia is only <strong>17.78%</strong> — far below banking (65.5%) and insurance (45.45%). This is why Elemu Lestari exists: to close this education gap, especially after the 2026 MSCI crisis." },
 
   { id:'retail', kw_id:['ritel','retail','sid','21 juta','gen z','milenial'], kw_en:['retail','sid','21 million','gen z','millennial'],
@@ -5647,8 +5771,28 @@ function _processMessage(v, input){
     hideTyping();
     const reply = chatReply(vMatch);
     if(reply.html === null){
+      // No confident local FAQ match — try the Gemini-backed fallback.
+      // /api/ask is a Netlify Function proxy that keeps the API key
+      // server-side. If the proxy is unreachable or unconfigured, we
+      // gracefully fall back to the existing "I don't know" reply.
       _lastUnknown = v;
-      addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
+      askGeminiFallback(v).then(aiReply => {
+        if(aiReply && aiReply.answer){
+          // Tag the bubble so users see this came from the AI fallback,
+          // not the curated knowledge base.
+          const L3 = window.CURRENT_LANG || 'id';
+          const tag = (L3 === 'en')
+            ? '<div class="msg-meta">✨ Generated via Gemini · not from the curated knowledge base. Always verify with the source.</div>'
+            : '<div class="msg-meta">✨ Dibuat dengan AI Gemini · bukan dari basis pengetahuan kurasi. Selalu verifikasi ke sumber.</div>';
+          addMessage(aiReply.answer + tag, 'bot');
+        } else {
+          // Proxy not configured, blocked, or failed — fall back to the
+          // existing curated "I don't know" with did-you-mean chips.
+          addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
+        }
+      }).catch(()=>{
+        addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
+      });
     } else {
       let html = reply.html;
       // Prepend a varied natural opener (so identical queries feel less templated)

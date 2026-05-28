@@ -1,0 +1,37 @@
+# ============================================================
+# Elemu Lestari · Netlify build & runtime configuration
+# ============================================================
+
+[build]
+  publish    = "."                     # the site is a single static folder
+  functions  = "netlify/functions"     # serverless functions live here
+
+# Pretty URL: /api/ask  ->  /.netlify/functions/ask
+# (keeps the public path short and lets us swap providers later
+#  without touching client code)
+[[redirects]]
+  from   = "/api/ask"
+  to     = "/.netlify/functions/ask"
+  status = 200
+  force  = true
+
+# Security headers for the static site. These do NOT apply to the
+# function response (functions set their own headers in code).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options          = "DENY"
+    X-Content-Type-Options   = "nosniff"
+    Referrer-Policy          = "strict-origin-when-cross-origin"
+    Permissions-Policy       = "geolocation=(), microphone=(), camera=()"
+
+# ENVIRONMENT VARIABLES (DO NOT COMMIT VALUES HERE!)
+# ------------------------------------------------------------
+# Set GEMINI_API_KEY in the Netlify dashboard:
+#   Site → Site configuration → Environment variables → Add a variable
+#   Key:    GEMINI_API_KEY
+#   Value:  <your-google-ai-studio-api-key>
+#   Scope:  Functions (production)
+# Get a free key at: https://aistudio.google.com/apikey
+# The key is read at runtime by netlify/functions/ask.js — it is NEVER
+# bundled into the public static site.
