@@ -193,8 +193,12 @@ exports.handler = async (event, context) => {
   }
   contents.push({ role: 'user', parts: [{ text: query }] });
 
-  // Gemini 2.0 Flash (free tier on Google AI Studio API)
-  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + encodeURIComponent(apiKey);
+  // Gemini 1.5 Flash — most stable + most generous free tier
+  // (15 RPM / 1500 RPD on the free tier as of early 2026).
+  // If you have access, you can swap to 'gemini-2.0-flash' or
+  // 'gemini-2.5-flash' for newer models.
+  const GEMINI_MODEL = 'gemini-1.5-flash';
+  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + encodeURIComponent(apiKey);
 
   const geminiBody = {
     systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -240,14 +244,29 @@ exports.handler = async (event, context) => {
 
   if (!resp.ok) {
     const errText = await resp.text().catch(() => '');
-    // Don't leak detailed error text to the client (might contain key fragments)
+    // Log to Netlify function logs (developer-only, server-side).
+    console.error('[ask] Gemini returned non-OK:', resp.status, errText.slice(0, 800));
+    // Parse the upstream error to surface a SAFE detail to the client.
+    // Strip anything that looks like a key fragment defensively.
+    let upstreamDetail = '';
+    try {
+      const parsed = JSON.parse(errText);
+      upstreamDetail = (parsed && parsed.error && parsed.error.message) || '';
+    } catch (e) {
+      upstreamDetail = errText.slice(0, 200);
+    }
+    // Redact anything that looks like an API key (AIza... is the Google AI key prefix)
+    upstreamDetail = upstreamDetail.replace(/AIza[A-Za-z0-9_-]{20,}/g, '[REDACTED-KEY]');
     return {
       statusCode: 502,
       headers,
       body: JSON.stringify({
-        error: lang === 'id'
-          ? 'Layanan AI sedang bermasalah (kode ' + resp.status + '). Coba lagi nanti.'
-          : 'AI service is having issues (code ' + resp.status + '). Please try later.',
+        error: (lang === 'id'
+          ? 'Layanan AI sedang bermasalah (kode ' + resp.status + ').'
+          : 'AI service is having issues (code ' + resp.status + ').'),
+        upstream_status: resp.status,
+        upstream_detail: upstreamDetail || '(no detail provided)',
+        model: GEMINI_MODEL,
       }),
     };
   }
