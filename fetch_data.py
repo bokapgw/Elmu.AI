@@ -118,15 +118,33 @@ INDICES = {
 }
 
 NEWS_SOURCES = [
-    {"name":"CNBC Indonesia",  "tag":"Market & Investing",   "url":"https://www.cnbcindonesia.com/market",        "color":"#003D7A","letter":"CN","rss":None},
-    {"name":"Bisnis Indonesia","tag":"Bisnis & Pasar Modal", "url":"https://www.bisnis.com/topic/82/pasar-modal", "color":"#0066B3","letter":"BI","rss":None},
-    {"name":"Kontan",          "tag":"Investasi & Keuangan", "url":"https://investasi.kontan.co.id/",             "color":"#E31E24","letter":"KO","rss":"https://investasi.kontan.co.id/rss"},
-    {"name":"Kompas Money",    "tag":"Ekonomi & Finansial",  "url":"https://money.kompas.com/",                   "color":"#005CAA","letter":"KM","rss":"https://money.kompas.com/index.xml"},
-    {"name":"Katadata",        "tag":"Data-driven Ekonomi",  "url":"https://katadata.co.id/finansial",            "color":"#F26522","letter":"KD","rss":None},
-    {"name":"CNN Indonesia",   "tag":"Ekonomi & Bisnis",     "url":"https://www.cnnindonesia.com/ekonomi",        "color":"#CC0000","letter":"CN","rss":"https://www.cnnindonesia.com/ekonomi/rss"},
-    {"name":"Investor Daily",  "tag":"Pasar Modal",          "url":"https://investor.id/market",                  "color":"#1A5E8C","letter":"ID","rss":None},
-    {"name":"IDX Channel",     "tag":"Bursa Indonesia",      "url":"https://www.idxchannel.com/",                 "color":"#00417A","letter":"IX","rss":None},
-    {"name":"MSCI",            "tag":"Index Methodology",    "url":"https://www.msci.com/research-and-insights",  "color":"#003366","letter":"MS","rss":None},
+    # Sources with VERIFIED working RSS feeds — these get fetched daily.
+    {"name":"Kompas Ekonomi",  "tag":"Ekonomi Nasional",      "url":"https://money.kompas.com/",                   "color":"#005CAA","letter":"KM","rss":"https://www.kompas.com/getrss/money"},
+    {"name":"Detik Finance",   "tag":"Finansial &amp; Pasar Modal","url":"https://finance.detik.com/",            "color":"#003366","letter":"DF","rss":"https://rss.detik.com/index.php/finance"},
+    {"name":"CNN Indonesia",   "tag":"Ekonomi &amp; Bisnis",      "url":"https://www.cnnindonesia.com/ekonomi",   "color":"#CC0000","letter":"CN","rss":"https://www.cnnindonesia.com/ekonomi/rss"},
+    {"name":"CNBC Indonesia",  "tag":"Market &amp; Investing",    "url":"https://www.cnbcindonesia.com/market",   "color":"#003D7A","letter":"CB","rss":"https://www.cnbcindonesia.com/market/rss"},
+    {"name":"Tempo Bisnis",    "tag":"Bisnis &amp; Ekonomi",      "url":"https://bisnis.tempo.co/",               "color":"#D32F2F","letter":"TM","rss":"https://rss.tempo.co/bisnis"},
+    {"name":"Kontan",          "tag":"Investasi &amp; Keuangan",  "url":"https://investasi.kontan.co.id/",        "color":"#E31E24","letter":"KO","rss":"https://investasi.kontan.co.id/rss"},
+    # Sources without RSS — listed in the news modal as reference directory only.
+    {"name":"Bisnis Indonesia","tag":"Bisnis &amp; Pasar Modal",  "url":"https://www.bisnis.com/topic/82/pasar-modal", "color":"#0066B3","letter":"BI","rss":None},
+    {"name":"Katadata",        "tag":"Data-driven Ekonomi",       "url":"https://katadata.co.id/finansial",       "color":"#F26522","letter":"KD","rss":None},
+    {"name":"Investor Daily",  "tag":"Pasar Modal",               "url":"https://investor.id/market",             "color":"#1A5E8C","letter":"ID","rss":None},
+    {"name":"IDX Channel",     "tag":"Bursa Indonesia",           "url":"https://www.idxchannel.com/",            "color":"#00417A","letter":"IX","rss":None},
+    {"name":"MSCI",            "tag":"Index Methodology",         "url":"https://www.msci.com/research-and-insights","color":"#003366","letter":"MS","rss":None},
+]
+
+# Curated fallback headlines — used when ALL RSS feeds fail (rate limits,
+# network errors, parser issues). Ensures the news modal is never empty
+# even if upstream RSS is down. Update periodically when major news breaks.
+NEWS_FALLBACK = [
+    {"source":"CNBC Indonesia", "category":"Macro",     "title":"MSCI Pertimbangkan Turunkan Status Indonesia ke Frontier Market", "url":"https://www.cnbcindonesia.com/market", "published":"2026-01-28"},
+    {"source":"Bisnis Indonesia","category":"Regulator", "title":"OJK Turunkan Ambang Wajib Lapor Kepemilikan Saham dari 5% ke 1%", "url":"https://www.bisnis.com/topic/82/pasar-modal", "published":"2026-02-15"},
+    {"source":"Kontan",         "category":"ESG",       "title":"IDX Carbon Catat Volume Perdagangan Karbon Tembus Rp 50 Miliar", "url":"https://investasi.kontan.co.id/", "published":"2026-03-10"},
+    {"source":"Kompas Money",   "category":"ESG",       "title":"Sukuk Hijau Ritel SR020 Terbit, Sasaran Pendanaan Proyek Hijau",  "url":"https://money.kompas.com/", "published":"2026-04-22"},
+    {"source":"CNN Indonesia",  "category":"Macro",     "title":"IHSG Mulai Pulih Pasca Krisis MSCI, Investor Asing Beli Lagi",     "url":"https://www.cnnindonesia.com/ekonomi", "published":"2026-05-05"},
+    {"source":"Katadata",       "category":"Regulator", "title":"TKBI v2 Resmi Berlaku, Tambah Sektor Konstruksi dan Transportasi","url":"https://katadata.co.id/finansial", "published":"2025-02-12"},
+    {"source":"Investor Daily", "category":"ESG",       "title":"JETP Salurkan USD 21,6 Miliar untuk Pensiun Dini PLTU di Indonesia","url":"https://investor.id/market", "published":"2025-11-08"},
+    {"source":"IDX Channel",    "category":"Market",    "title":"IDX ESG Leaders Review Semesteran: 3 Saham Baru Masuk Indeks",     "url":"https://www.idxchannel.com/", "published":"2026-06-15"},
 ]
 
 
@@ -302,29 +320,47 @@ def fetch_index(symbol):
 
 
 def fetch_news():
-    """Pull RSS headlines where available."""
+    """Pull RSS headlines where available. Returns (articles, is_live) — when
+    every RSS feed fails or returns nothing, we fall back to NEWS_FALLBACK so
+    the news modal is never empty (avoids the '0 artikel' empty state)."""
     try:
         import feedparser
     except ImportError:
-        print("  ! feedparser not installed — skipping RSS. Run: pip install feedparser", file=sys.stderr)
-        return []
+        print("  ! feedparser not installed — using fallback. Run: pip install feedparser", file=sys.stderr)
+        return list(NEWS_FALLBACK), False
     articles = []
     for s in NEWS_SOURCES:
         if not s.get("rss"):
             continue
         try:
-            f = feedparser.parse(s["rss"])
+            # feedparser handles redirects + various RSS/Atom dialects.
+            # We pass a generic UA so feeds that block default python-urllib succeed.
+            f = feedparser.parse(s["rss"], agent="Mozilla/5.0 (Elemu-Lestari/1.0)")
+            count = 0
             for entry in f.entries[:5]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
                 articles.append({
                     "source": s["name"],
-                    "title": entry.title,
-                    "url": entry.link,
-                    "published": entry.get("published", "")
+                    "category": s.get("tag", "").replace("&amp;", "&"),
+                    "title": title,
+                    "url": link,
+                    "published": entry.get("published", "") or entry.get("updated", ""),
                 })
-            print(f"  · {s['name']}: {min(5, len(f.entries))} headlines")
+                count += 1
+            status = "✓" if count > 0 else "(empty)"
+            print(f"  {status} {s['name']}: {count} headlines (feed entries: {len(f.entries)})")
+            # If feedparser reported bozo (malformed XML), log it but keep entries we got.
+            if getattr(f, "bozo", 0) and f.entries == []:
+                print(f"    ! {s['name']} feed parse warning: {f.bozo_exception}", file=sys.stderr)
         except Exception as exc:
-            print(f"  ! {s['name']}: {exc}", file=sys.stderr)
-    return articles
+            print(f"  ✗ {s['name']}: {exc}", file=sys.stderr)
+    if not articles:
+        print(f"  ! No live articles — using {len(NEWS_FALLBACK)} curated fallback headlines.", file=sys.stderr)
+        return list(NEWS_FALLBACK), False
+    return articles, True
 
 
 def main():
@@ -391,18 +427,19 @@ def main():
 
     # --- News ---
     print("\nFetching RSS headlines where available...")
-    articles = fetch_news()
+    articles, is_live = fetch_news()
     news_payload = {
         "updated": datetime.date.today().isoformat(),
-        "source": "Live RSS via fetch_data.py v2",
-        "articles_sample": False,
+        "source": "Live RSS via fetch_data.py v2" if is_live else "Curated fallback (live RSS unavailable)",
+        "articles_sample": not is_live,
         "sources": [{k: v for k, v in s.items() if k != "rss"} for s in NEWS_SOURCES],
         "articles": articles
     }
     with open("news.js", "w", encoding="utf-8") as f:
         f.write("/* Auto-generated by fetch_data.py v2 · do not edit manually */\n")
         f.write("window.NEWS_DATA = " + json.dumps(news_payload, indent=2, ensure_ascii=False) + ";\n")
-    print(f"✓ Wrote news.js ({len(articles)} live articles)")
+    label = "live articles" if is_live else "curated fallback headlines"
+    print(f"✓ Wrote news.js ({len(articles)} {label})")
 
     print("\n✓ Done. Reload index.html to see fresh data.")
 

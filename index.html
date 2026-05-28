@@ -5770,50 +5770,72 @@ function _processMessage(v, input){
   setTimeout(()=>{
     hideTyping();
     const reply = chatReply(vMatch);
-    if(reply.html === null){
-      // No confident local FAQ match — try the Gemini-backed fallback.
-      // /api/ask is a Netlify Function proxy that keeps the API key
-      // server-side. If the proxy is unreachable or unconfigured, we
-      // gracefully fall back to the existing "I don't know" reply.
+    // Build the AI-source tag once — reused by both no-match and weak-match
+    // Gemini handoffs below.
+    const L3 = window.CURRENT_LANG || 'id';
+    const aiTag = (L3 === 'en')
+      ? '<div class="msg-meta">✨ Generated via Gemini · not from the curated knowledge base. Always verify with the source.</div>'
+      : '<div class="msg-meta">✨ Dibuat dengan AI Gemini · bukan dari basis pengetahuan kurasi. Selalu verifikasi ke sumber.</div>';
+    // ROUTING decision tree:
+    //   A) reply.html === null         → no local match → try Gemini
+    //   B) high-specificity + score<0.6 → weak match on a specific question
+    //                                     (e.g. "Sharpe ratio for ESG?") →
+    //                                     try Gemini; on failure, fall back
+    //                                     to local-with-disclaimer.
+    //   C) otherwise                    → confident local match → use it
+    const isHighSpec = detectHighSpecificity(v);
+    const tryGemini = (reply.html === null) || (isHighSpec && reply.score < 0.6);
+    if(tryGemini){
+      // Show "thinking" indicator while Gemini works (2-5s typical).
+      showTyping();
       _lastUnknown = v;
       askGeminiFallback(v).then(aiReply => {
+        hideTyping();
         if(aiReply && aiReply.answer){
-          // Tag the bubble so users see this came from the AI fallback,
-          // not the curated knowledge base.
-          const L3 = window.CURRENT_LANG || 'id';
-          const tag = (L3 === 'en')
-            ? '<div class="msg-meta">✨ Generated via Gemini · not from the curated knowledge base. Always verify with the source.</div>'
-            : '<div class="msg-meta">✨ Dibuat dengan AI Gemini · bukan dari basis pengetahuan kurasi. Selalu verifikasi ke sumber.</div>';
-          addMessage(aiReply.answer + tag, 'bot');
+          // Got an AI answer — tag and display.
+          addMessage(aiReply.answer + aiTag, 'bot');
+        } else if(reply.html !== null){
+          // Gemini unavailable BUT we had a (weak) local match. Show it
+          // with the high-specificity honesty disclaimer prepended so the
+          // user knows we don't have the exact figure they asked for.
+          let html = reply.html;
+          const opener = pickOpener(detectIntent(v));
+          if(opener) html = opener + ' ' + html;
+          if(isHighSpec){
+            const disclaimer = (L3 === 'en')
+              ? "<em>⚠ Heads up: I don\'t have the exact figure/year/category you asked for in my knowledge base. Below is the general framework — for the specific number, consult the source document referenced at the end.</em><br><br>"
+              : "<em>⚠ Catatan: angka/tahun/kategori spesifik yang kamu minta belum ada di basis pengetahuan saya. Berikut kerangka umumnya — untuk angka spesifik, lihat dokumen sumber di akhir jawaban.</em><br><br>";
+            html = disclaimer + html;
+          }
+          html = html + buildCuriosityHook(reply.entryId);
+          _lastEntryId = reply.entryId;
+          _lastQuery = v;
+          addMessage(html, 'bot', { runners: reply.runners });
         } else {
-          // Proxy not configured, blocked, or failed — fall back to the
-          // existing curated "I don't know" with did-you-mean chips.
+          // No local match AND Gemini unavailable — curated "I don't know".
           addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
         }
       }).catch(()=>{
+        hideTyping();
         addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
       });
+      return; // bail out — async handler will add the message
+    }
+    // Confident local match path (the original `else` branch follows below)
+    if(reply.html === null){
+      // Defensive: shouldn't reach here given tryGemini logic, but keep
+      // a safety net so we never silently fail to reply.
+      _lastUnknown = v;
+      addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
     } else {
       let html = reply.html;
       // Prepend a varied natural opener (so identical queries feel less templated)
       const opener = pickOpener(detectIntent(v));
       if(opener) html = opener + ' ' + html;
-      // HIGH-SPECIFICITY HONESTY DISCLAIMER:
-      // If the user asked for a very specific number/year/category and our
-      // matched entry is generic, prepend an honesty disclaimer so they
-      // don't mistake the general framework for the specific answer.
-      // This guards against false education on policy/data queries like:
-      //   "Maximum operational cutoff year for TKBI transition coal?"
-      //   "Average Scope 1 carbon intensity of consumer goods on IDX?"
-      // The threshold reply.score < 0.6 catches generic-entry-on-specific
-      // queries; very strong matches (≥0.6) likely have the specific info.
-      if(detectHighSpecificity(v) && reply.score < 0.6){
-        const L2 = window.CURRENT_LANG || 'id';
-        const disclaimer = (L2 === 'en')
-          ? "<em>⚠ Heads up: I don\'t have the exact figure/year/category you asked for in my knowledge base. Below is the general framework — for the specific number, consult the source document referenced at the end.</em><br><br>"
-          : "<em>⚠ Catatan: angka/tahun/kategori spesifik yang kamu minta belum ada di basis pengetahuan saya. Berikut kerangka umumnya — untuk angka spesifik, lihat dokumen sumber di akhir jawaban.</em><br><br>";
-        html = disclaimer + html;
-      }
+      // (High-specificity queries with score<0.6 are handled in the tryGemini
+      // branch above — they only land here when Gemini failed AND we want a
+      // safe fallback to the local entry with the disclaimer. The disclaimer
+      // logic now lives inside the Gemini-fallback-handler.)
       // Append curiosity hook (related-topic chips) to lead user to deeper learning
       html = html + buildCuriosityHook(reply.entryId);
       // Save the last entry so follow-ups can route to related deeper topics
