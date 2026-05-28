@@ -193,12 +193,12 @@ exports.handler = async (event, context) => {
   }
   contents.push({ role: 'user', parts: [{ text: query }] });
 
-  // Gemini 1.5 Flash — most stable + most generous free tier
-  // (15 RPM / 1500 RPD on the free tier as of early 2026).
-  // If you have access, you can swap to 'gemini-2.0-flash' or
-  // 'gemini-2.5-flash' for newer models.
-  const GEMINI_MODEL = 'gemini-1.5-flash';
-  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + encodeURIComponent(apiKey);
+  // Self-healing model fallback chain. We try the first model; if it
+  // returns 404 (account doesn't have access), we automatically try the
+  // next one in the list. This makes the function survive Google's
+  // periodic model rotations and per-account roster differences.
+  // Order: most widely-available first, newer models as upgrades.
+  const GEMINI_MODELS = ['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-2.0-flash', 'gemini-2.5-flash'];
 
   const geminiBody = {
     systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -218,42 +218,61 @@ exports.handler = async (event, context) => {
     ],
   };
 
+  // Try each model in the fallback chain. Stop as soon as one returns 2xx.
+  // For 404 (model not found), advance to the next. For other errors, return.
   let resp;
-  try {
-    // 25-second timeout (Netlify functions max out at 26s on free tier)
-    const ctl = new AbortController();
-    const timeoutId = setTimeout(() => ctl.abort(), 25000);
-    resp = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiBody),
-      signal: ctl.signal,
-    });
-    clearTimeout(timeoutId);
-  } catch (e) {
-    return {
-      statusCode: 502,
-      headers,
-      body: JSON.stringify({
-        error: lang === 'id'
-          ? 'Gagal terhubung ke layanan AI. Coba lagi sebentar.'
-          : 'Failed to reach AI service. Please try again shortly.',
-      }),
-    };
+  let usedModel = GEMINI_MODELS[0];
+  let lastErrText = '';
+  let lastStatus = 0;
+  for (const model of GEMINI_MODELS) {
+    usedModel = model;
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
+    try {
+      const ctl = new AbortController();
+      const timeoutId = setTimeout(() => ctl.abort(), 25000);
+      resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geminiBody),
+        signal: ctl.signal,
+      });
+      clearTimeout(timeoutId);
+    } catch (e) {
+      // Network/timeout failure — return immediately (don't retry models on network errors)
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({
+          error: lang === 'id'
+            ? 'Gagal terhubung ke layanan AI. Coba lagi sebentar.'
+            : 'Failed to reach AI service. Please try again shortly.',
+          model_attempted: model,
+        }),
+      };
+    }
+    if (resp.ok) {
+      break; // success — exit the fallback chain
+    }
+    // Capture detail before potentially trying next model
+    lastErrText = await resp.text().catch(() => '');
+    lastStatus = resp.status;
+    if (resp.status === 404) {
+      // Model not available on this account/project — try the next one.
+      console.warn('[ask] Model not found, trying next:', model);
+      continue;
+    }
+    // Other errors (401/403/429/500) → don't retry, return.
+    break;
   }
 
-  if (!resp.ok) {
-    const errText = await resp.text().catch(() => '');
-    // Log to Netlify function logs (developer-only, server-side).
-    console.error('[ask] Gemini returned non-OK:', resp.status, errText.slice(0, 800));
-    // Parse the upstream error to surface a SAFE detail to the client.
-    // Strip anything that looks like a key fragment defensively.
+  if (!resp || !resp.ok) {
+    console.error('[ask] All model attempts failed. Last status:', lastStatus, 'Last error:', lastErrText.slice(0, 800));
     let upstreamDetail = '';
     try {
-      const parsed = JSON.parse(errText);
+      const parsed = JSON.parse(lastErrText);
       upstreamDetail = (parsed && parsed.error && parsed.error.message) || '';
     } catch (e) {
-      upstreamDetail = errText.slice(0, 200);
+      upstreamDetail = lastErrText.slice(0, 200);
     }
     // Redact anything that looks like an API key (AIza... is the Google AI key prefix)
     upstreamDetail = upstreamDetail.replace(/AIza[A-Za-z0-9_-]{20,}/g, '[REDACTED-KEY]');
@@ -262,11 +281,11 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         error: (lang === 'id'
-          ? 'Layanan AI sedang bermasalah (kode ' + resp.status + ').'
-          : 'AI service is having issues (code ' + resp.status + ').'),
-        upstream_status: resp.status,
+          ? 'Layanan AI sedang bermasalah (kode ' + lastStatus + ').'
+          : 'AI service is having issues (code ' + lastStatus + ').'),
+        upstream_status: lastStatus,
         upstream_detail: upstreamDetail || '(no detail provided)',
-        model: GEMINI_MODEL,
+        models_tried: GEMINI_MODELS,
       }),
     };
   }
@@ -310,7 +329,7 @@ exports.handler = async (event, context) => {
     body: JSON.stringify({
       answer: sanitized,
       source: 'gemini',
-      model: 'gemini-2.0-flash',
+      model: usedModel,
     }),
   };
 };
