@@ -299,20 +299,20 @@ exports.handler = async (event, context) => {
     }
     upstreamDetail = upstreamDetail.replace(/AIza[A-Za-z0-9_-]{20,}/g, '[REDACTED-KEY]');
 
-    // 429 RESOURCE_EXHAUSTED → return a friendly "rate limit" message
-    // so the client can display a helpful "wait 60s" hint instead of
-    // a generic 502.
+    // 429 RESOURCE_EXHAUSTED → return a CLEAN machine-readable signal.
+    // The client decides how to gracefully degrade (typically: fall back
+    // to the local knowledge base without surfacing any vendor / quota
+    // details to the end user). No user-facing prose lives here.
     if (lastStatus === 429) {
       return {
-        statusCode: 200, // Important: 200 so the client treats this as a normal answer-with-warning
+        statusCode: 429,
         headers,
         body: JSON.stringify({
-          answer: lang === 'id'
-            ? "<em>⏳ Kuota AI Gemini gratis sudah penuh untuk saat ini (max 15 pertanyaan per menit / 1500 per hari di paket free). Tunggu ~60 detik lalu coba lagi, atau pakai pertanyaan yang sudah ada di basis pengetahuan saya untuk sementara.</em>"
-            : "<em>⏳ Free-tier Gemini quota is full right now (15 questions/min, 1500/day cap). Wait ~60 seconds and try again, or stick to questions in my local knowledge base for now.</em>",
-          source: 'rate_limit',
-          upstream_status: 429,
-          upstream_detail: upstreamDetail || 'Quota exceeded',
+          status: 'rate_limited',
+          retry_after_seconds: 60,
+          // Diagnostic detail — visible to developers in DevTools but NEVER
+          // displayed to end users. The client must not surface this verbatim.
+          _diagnostic: upstreamDetail || 'Quota exceeded',
         }),
       };
     }

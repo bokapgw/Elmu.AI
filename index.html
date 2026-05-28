@@ -1954,7 +1954,7 @@ function detectHighSpecificity(query){
 async function askGeminiFallback(query){
   try {
     const lang = window.CURRENT_LANG || 'id';
-    // Send last 3 turns of conversation history so Gemini has context for
+    // Send last 3 turns of conversation history so the AI has context for
     // follow-ups like "elaborate" / "what does that mean" / pronouns.
     const turns = (window.CONVERSATION_STATE && Array.isArray(window.CONVERSATION_STATE.turns))
       ? window.CONVERSATION_STATE.turns.slice(-3).map(t => ({
@@ -1971,13 +1971,13 @@ async function askGeminiFallback(query){
       signal: ctl.signal,
     });
     clearTimeout(timeoutId);
+    // 429 rate-limited → return a clean signal so the caller can silently
+    // fall back to the local knowledge base. NEVER surface quota details
+    // to the end user — that's a leaky abstraction.
+    if(resp.status === 429){
+      return { rateLimited: true };
+    }
     if(!resp.ok){
-      // 503 = key not configured. Silently fall back to curated unknown.
-      // 429 = rate limited. Show the message so user knows to wait.
-      if(resp.status === 429){
-        const data = await resp.json().catch(()=>({}));
-        return { answer: '<em>⏳ '+(data.error || 'Rate limit. Coba lagi nanti.')+'</em>', source: 'gemini' };
-      }
       return null;
     }
     const data = await resp.json();
@@ -5771,11 +5771,12 @@ function _processMessage(v, input){
     hideTyping();
     const reply = chatReply(vMatch);
     // Build the AI-source tag once — reused by both no-match and weak-match
-    // Gemini handoffs below.
+    // AI handoffs below. Generic "AI" wording (no vendor name) keeps the
+    // UI clean and lets us swap providers without changing the message.
     const L3 = window.CURRENT_LANG || 'id';
     const aiTag = (L3 === 'en')
-      ? '<div class="msg-meta">✨ Generated via Gemini · not from the curated knowledge base. Always verify with the source.</div>'
-      : '<div class="msg-meta">✨ Dibuat dengan AI Gemini · bukan dari basis pengetahuan kurasi. Selalu verifikasi ke sumber.</div>';
+      ? '<div class="msg-meta">✨ AI-generated answer · always verify with the official source.</div>'
+      : '<div class="msg-meta">✨ Jawaban hasil AI · selalu verifikasi ke sumber resmi.</div>';
     // ROUTING decision tree:
     //   A) reply.html === null         → no local match → try Gemini
     //   B) high-specificity + score<0.6 → weak match on a specific question
@@ -5786,7 +5787,7 @@ function _processMessage(v, input){
     const isHighSpec = detectHighSpecificity(v);
     const tryGemini = (reply.html === null) || (isHighSpec && reply.score < 0.6);
     if(tryGemini){
-      // Show "thinking" indicator while Gemini works (2-5s typical).
+      // Show "thinking" indicator while the AI service works (2-5s typical).
       showTyping();
       _lastUnknown = v;
       askGeminiFallback(v).then(aiReply => {
@@ -5794,10 +5795,18 @@ function _processMessage(v, input){
         if(aiReply && aiReply.answer){
           // Got an AI answer — tag and display.
           addMessage(aiReply.answer + aiTag, 'bot');
-        } else if(reply.html !== null){
-          // Gemini unavailable BUT we had a (weak) local match. Show it
-          // with the high-specificity honesty disclaimer prepended so the
-          // user knows we don't have the exact figure they asked for.
+          return;
+        }
+        // AI unavailable (rate-limited, network error, key issue, etc.).
+        // We do NOT mention any of this to the user — no vendor names,
+        // no quota numbers, no "wait 60s" prompts. Instead we silently
+        // degrade to the local knowledge base:
+        //   - If a (weak) local match exists, present it as the answer.
+        //   - If high-specificity AND we have only a generic match, add
+        //     the honesty disclaimer about specific figures.
+        //   - If no local match at all, the curated "I don't know" reply
+        //     with did-you-mean chips already handles that case gracefully.
+        if(reply.html !== null){
           let html = reply.html;
           const opener = pickOpener(detectIntent(v));
           if(opener) html = opener + ' ' + html;
@@ -5812,7 +5821,6 @@ function _processMessage(v, input){
           _lastQuery = v;
           addMessage(html, 'bot', { runners: reply.runners });
         } else {
-          // No local match AND Gemini unavailable — curated "I don't know".
           addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
         }
       }).catch(()=>{
