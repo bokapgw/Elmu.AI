@@ -1793,6 +1793,38 @@ function pickOpener(intent){
       to the matched answer when our match wasn't on-target.
 ================================================================== */
 
+// ===== IDENTITY INTENT ROUTER =====
+// When the user asks the chatbot about ITSELF ("who are you", "who made
+// you", "what is your purpose"), the Jaccard matcher fails because:
+//   1. After STOP-word removal, "siapa kamu" becomes empty (both are stops).
+//   2. The chatbot's own name "Sari" wasn't a keyword in any entry.
+//   3. The pronoun resolver hijacks "siapa itu sari?" by replacing "itu"
+//      with the last-mentioned entity (e.g. Bibit from earlier turn).
+// This function pre-routes identity questions to the right FAQ entry by
+// direct ID lookup — fast, deterministic, no Jaccard noise.
+//
+// Returns one of: 'about' | 'creator' | 'purpose' | null
+// (which map to FAQ entry IDs of the same name).
+function detectIdentityIntent(query){
+  if(!query) return null;
+  const q = ' ' + query.toLowerCase().replace(/[?.,!]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  // CREATOR — who made / built / authored / developed this chatbot?
+  if(/\b(who\s+(made|created|built|designed|developed|coded|programmed|wrote|authored)\s+(you|sari|elemu|this(\s+chat)?bot)|who('?s| is)\s+your\s+(creator|developer|maker|author|programmer|designer)|who\s+is\s+joves|about\s+joves|joves\s+(is|siapa)|siapa\s+(yang\s+)?(membuat|membikin|bikin|menciptakan|menciptakn|menyusun|mengembangkan|mengkode|mengoding|mengkoding|mendevelop|memprogram|membangun|merancang|menulis|merilis|membentuk|bikin)\s+(kamu|sari|elemu|chatbot|bot)|(pembuat|pencipta|pengembang|developer|penulis|programmer|programer|author|coder|kreator)\s+(kamu|sari|elemu|saya|chatbot)|kamu\s+dibuat\s+(oleh\s+)?siapa|sari\s+dibuat\s+(oleh\s+)?siapa|dibuat\s+(oleh\s+)?siapa|by\s+who)\b/i.test(q)){
+    return 'creator';
+  }
+  // PURPOSE — why do you exist / what's your goal / what are you for?
+  if(/\b(what(\s+is)?\s+your\s+(purpose|goal|mission|role|function|aim|objective)|why\s+(do\s+you\s+(exist|live)|were\s+you\s+(made|created|built)|are\s+you\s+(here|made|created|built))|what\s+(do\s+you\s+do|are\s+you\s+for|is\s+the\s+(point|purpose)\s+of\s+you)|what\s+is\s+elemu(\s+lestari)?\s+for|your\s+(mission|goal|aim|objective|role)|(apa\s+)?(tujuan|misi|fungsi|kegunaan|manfaat|peran|visi|goal)\s+(kamu|sari|elemu|mu)|untuk\s+apa\s+(kamu|sari|elemu|chatbot)|kenapa\s+(kamu|sari|elemu)\s+(ada|dibuat|diciptakan|dibangun)|mengapa\s+(kamu|sari|elemu)\s+(ada|dibuat|diciptakan|dibangun)|fungsi\s+(kamu|sari|elemu))\b/i.test(q)){
+    return 'purpose';
+  }
+  // ABOUT — who are you / what is this chatbot / introduce yourself.
+  // This is the BROADEST identity check — must come last so creator/purpose
+  // can match first when more specific.
+  if(/\b(who\s+(are|r)\s+you|who\s+(is|are)\s+sari|what\s+(is|are)\s+you|what\s+is\s+(sari|elemu|elmu|this\s+chatbot|this\s+bot|this\s+app)|tell\s+me\s+about\s+(you|yourself|sari|elemu)|introduce\s+yourself|your\s+(name|identity)|are\s+you\s+(human|a\s+person|real|ai|llm|chatgpt|gpt|gemini|claude)|sari\s+(itu\s+)?siapa|siapa\s+(itu\s+)?sari|kamu\s+(itu\s+)?siapa|siapa\s+kamu|kenalan|perkenalan|tentang\s+(kamu|sari|elemu|dirimu)|apa\s+itu\s+(sari|elemu|elmu|chatbot\s+ini|bot\s+ini)|(sari|elemu|elmu)\s+(adalah|itu\s+apa)|asisten\s+(apa|siapa)|chatbot\s+(apa|siapa)|kamu\s+(itu\s+)?apa|kamu\s+manusia|kamu\s+ai|kamu\s+chatgpt|kamu\s+gemini|nama\s+(kamu|mu)|identitas\s+(kamu|mu))\b/i.test(q)){
+    return 'about';
+  }
+  return null;
+}
+
 // Off-topic detection. Returns a category string (eg 'culinary') or null.
 // Tuned for clear off-topic intent — e.g. recipes, sports scores, jokes —
 // while still allowing legitimate ESG queries that mention food companies
@@ -2755,13 +2787,100 @@ const FAQ_DATA = [
     a_id:"Halo! 🌿 Saya <strong>Sari</strong>, asisten investasi ESG dari <strong>Elemu Lestari</strong>. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau. Mau saya bantu apa?",
     a_en:"Hi! 🌿 I\'m <strong>Sari</strong>, the ESG investment assistant from <strong>Elemu Lestari</strong>. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products. What can I help you with?" },
 
-  { id:'about', kw_id:['siapa kamu','tentang kamu','elemu lestari','elemu','elmu','siapa','nama','apa itu elemu','apa itu elmu'], kw_en:['who are you','about you','what are you','your name','what is elemu','what is elmu'],
-    a_id:"Saya <strong>Sari</strong> — persona dan asisten dari <strong>Elemu Lestari</strong>, sebuah chatbot edukasi investasi ESG (bukan AI seperti ChatGPT/Claude, melainkan chatbot berbasis aturan).<br><br>" +
-         "<strong>Elemu Lestari</strong> = gabungan <span class='accent'>Elemu</span> (kebijaksanaan, Bahasa Nias) + <span class='accent'>Lestari</span> (berkelanjutan, Bahasa Indonesia). Dibangun sebagai proyek Master of Finance (FinTech) di Asia Pacific University untuk membantu investor ritel Indonesia memahami ESG — khususnya pasca krisis MSCI Januari 2026.<br><br>" +
-         "Anggap saja: Elemu Lestari = produk/platform, Sari = wajah yang ngobrol sama kamu. 🌿",
-    a_en:"I\'m <strong>Sari</strong> — the persona and assistant of <strong>Elemu Lestari</strong>, an ESG investing education chatbot (not an AI like ChatGPT/Claude — I\'m a rule-based chatbot).<br><br>" +
-         "<strong>Elemu Lestari</strong> = <span class='accent'>Elemu</span> (wisdom, in Nias) + <span class='accent'>Lestari</span> (sustainable, in Indonesian). Built as a Master of Finance (FinTech) project at Asia Pacific University to help Indonesian retail investors understand ESG — especially after the January 2026 MSCI crisis.<br><br>" +
-         "Think of it as: Elemu Lestari = the product, Sari = the friendly face you talk to. 🌿" },
+  // ABOUT — chatbot self-identity. Massively expanded keyword set so any
+  // phrasing of "who/what is Sari/this chatbot/Elemu" routes here. Critical
+  // keyword: 'sari' itself was missing before — that caused queries like
+  // "Sari, kamu itu siapa?" to score 0 against this entry and accidentally
+  // hit unrelated FAQs via pronoun resolution.
+  { id:'about', category:'conversational', intent:'definitional',
+    kw_id:['sari','siapa sari','sari siapa','sari itu siapa','siapa itu sari','apa itu sari','tentang sari','kenalan dengan sari','siapa kamu','kamu siapa','kamu itu siapa','tentang kamu','kenalan','perkenalan','kenalan dong','elemu lestari','elemu','elmu','nama kamu','identitas kamu','asisten siapa','chatbot siapa','apa itu elemu','apa itu elmu','apa itu chatbot ini','chatbot ini apa','sari adalah'],
+    kw_en:['sari','who is sari','what is sari','about sari','tell me about yourself','introduce yourself','who are you','who are you sari','about you','what are you','what is this chatbot','your name','your identity','what is elemu','what is elmu','about elemu lestari','identity'],
+    a_id:"Saya <strong>Sari</strong> — asisten investasi ESG dari <strong>Elemu Lestari</strong>. Saya bukan AI seperti ChatGPT atau Claude; saya chatbot berbasis aturan dengan basis pengetahuan khusus tentang investasi hijau di Indonesia.<br><br>" +
+         "<strong>Apa itu Elemu Lestari?</strong><br>" +
+         "Nama saya gabungan dari 2 bahasa:<br>" +
+         "• <strong>Elemu</strong> = kebijaksanaan (Bahasa Nias)<br>" +
+         "• <strong>Lestari</strong> = berkelanjutan (Bahasa Indonesia)<br>" +
+         "Jadi <em>Elemu Lestari</em> ≈ \"pengetahuan yang lestari/berkelanjutan\".<br><br>" +
+         "<strong>Apa yang bisa saya bantu?</strong><br>" +
+         "• Konsep ESG &amp; LST untuk pemula<br>" +
+         "• Regulasi OJK (POJK 51, POJK 13/2025, TKBI, dll)<br>" +
+         "• Indeks saham hijau Indonesia (IDX ESG Leaders, SRI-KEHATI)<br>" +
+         "• Krisis MSCI Januari 2026 &amp; pelajarannya<br>" +
+         "• Produk investasi hijau (Sukuk Hijau, JETP, IDXCarbon)<br>" +
+         "• Cara mulai investasi hijau untuk pemula<br><br>" +
+         "Mau tahu siapa yang membuat saya, atau apa tujuan saya dibangun? Tanya saja: <em>\"siapa pembuat kamu?\"</em> atau <em>\"apa tujuan kamu?\"</em>",
+    a_en:"I\'m <strong>Sari</strong> — the ESG investment assistant of <strong>Elemu Lestari</strong>. I\'m not a general AI like ChatGPT or Claude; I\'m a rule-based chatbot with a curated knowledge base specifically on green investing in Indonesia.<br><br>" +
+         "<strong>What is Elemu Lestari?</strong><br>" +
+         "My name combines 2 languages:<br>" +
+         "• <strong>Elemu</strong> = wisdom (in Nias)<br>" +
+         "• <strong>Lestari</strong> = sustainable (in Indonesian)<br>" +
+         "So <em>Elemu Lestari</em> ≈ \"sustainable wisdom\".<br><br>" +
+         "<strong>What can I help with?</strong><br>" +
+         "• ESG &amp; LST concepts for beginners<br>" +
+         "• OJK regulations (POJK 51, POJK 13/2025, TKBI, etc.)<br>" +
+         "• Indonesian green stock indices (IDX ESG Leaders, SRI-KEHATI)<br>" +
+         "• The January 2026 MSCI crisis &amp; its lessons<br>" +
+         "• Green investment products (Green Sukuk, JETP, IDXCarbon)<br>" +
+         "• How to start green investing as a beginner<br><br>" +
+         "Want to know who built me, or what my purpose is? Just ask: <em>\"who made you?\"</em> or <em>\"what is your purpose?\"</em>" },
+
+  // CREATOR — answers "who made you" / "siapa pembuat" / "siapa Joves".
+  // Joves is the author; this is part of a Master of Finance (FinTech)
+  // individual assignment at Asia Pacific University.
+  { id:'creator', category:'conversational', intent:'definitional',
+    kw_id:['siapa pembuat','siapa yang membuat','siapa yang buat','pembuat kamu','pembuat sari','pembuat saya','pencipta kamu','pencipta sari','pengembang kamu','developer kamu','siapa joves','tentang joves','joves siapa','siapa author','penulis kamu','siapa yang bikin','siapa yg bikin','siapa pengembang','siapa developernya','siapa yang membangun','dibuat siapa','siapa programernya','programmer kamu'],
+    kw_en:['who made you','who created you','who built you','your creator','your developer','your author','who is joves','about joves','your maker','who programmed you','who is your author','who is your developer','who designed you','who developed you'],
+    a_id:"Saya dibuat oleh <strong>Joves</strong> 👨‍💻<br><br>" +
+         "<strong>Konteks:</strong><br>" +
+         "Saya adalah bagian dari <strong>tugas individu Master of Finance (FinTech)</strong> di <em>Asia Pacific University</em> — bukan produk komersial dan bukan proyek tim, tapi karya solo Joves untuk demonstrasi bagaimana chatbot edukasi keuangan bisa dibangun.<br><br>" +
+         "<strong>Bagaimana saya dibangun?</strong><br>" +
+         "• Saya adalah <em>chatbot berbasis aturan</em> (rule-based) — bukan LLM seperti ChatGPT<br>" +
+         "• Basis pengetahuan saya dikurasi dari dokumen-dokumen resmi: POJK, SEOJK, peta jalan OJK, TKBI, paper akademis, dan riset Bank Dunia/IFC<br>" +
+         "• Untuk pertanyaan yang di luar basis pengetahuan, saya bisa pakai layanan AI (sebagai fitur tambahan)<br>" +
+         "• Kode saya tersedia di GitHub — kalau kamu mau lihat cara kerjanya<br><br>" +
+         "Tanya saya tentang ESG, regulasi OJK, atau krisis MSCI 2026 untuk mulai belajar! 🌿",
+    a_en:"I was made by <strong>Joves</strong> 👨‍💻<br><br>" +
+         "<strong>Context:</strong><br>" +
+         "I\'m part of an <strong>individual Master of Finance (FinTech) assignment</strong> at <em>Asia Pacific University</em> — not a commercial product and not a team project, but a solo work by Joves demonstrating how an educational financial chatbot can be built.<br><br>" +
+         "<strong>How was I built?</strong><br>" +
+         "• I\'m a <em>rule-based chatbot</em> — not an LLM like ChatGPT<br>" +
+         "• My knowledge base is curated from official documents: POJK, SEOJK, OJK roadmaps, TKBI, academic papers, and World Bank/IFC research<br>" +
+         "• For questions outside my curated base, I can use an AI service (as a supplementary feature)<br>" +
+         "• My source code is on GitHub — if you want to see how I work<br><br>" +
+         "Ask me about ESG, OJK regulations, or the 2026 MSCI crisis to start learning! 🌿" },
+
+  // PURPOSE — answers "what is your purpose" / "tujuan kamu" / "kenapa dibuat".
+  { id:'purpose', category:'conversational', intent:'definitional',
+    kw_id:['tujuan kamu','tujuan sari','tujuan elemu','apa tujuan','tujuan dibuat','kenapa dibuat','kenapa kamu dibuat','kenapa kamu ada','kenapa sari dibuat','untuk apa kamu','untuk apa sari','misi kamu','misi sari','misi elemu','fungsi kamu','fungsi sari','kegunaan kamu','manfaat kamu','peran kamu','peran sari','goal kamu','visi kamu'],
+    kw_en:['what is your purpose','your purpose','what is your goal','your goal','your mission','what is your mission','why do you exist','why were you made','why were you created','what do you do','your role','your function','what are you for','what is the point of you','what is elemu lestari for'],
+    a_id:"<strong>Tujuan saya:</strong> menutup gap edukasi investasi hijau di Indonesia 🌿<br><br>" +
+         "<strong>Konteks: Kenapa ini penting?</strong><br>" +
+         "Menurut <strong>SNLIK 2025</strong> (Survei OJK), tingkat pemahaman masyarakat Indonesia tentang pasar saham cuma <strong>17,78%</strong> — kurang dari 1 dari 5 orang. Padahal ada 21 juta investor ritel di pasar modal.<br><br>" +
+         "<strong>Pelajaran dari Krisis MSCI Januari 2026:</strong><br>" +
+         "Saat MSCI mempertimbangkan menurunkan status Indonesia ke <em>frontier market</em>, USD 80 miliar kapitalisasi pasar hilang dalam 2 hari. Banyak investor pemula panik karena tidak paham apa yang sebenarnya terjadi.<br><br>" +
+         "<strong>Yang saya tawarkan:</strong><br>" +
+         "1. <strong>Penjelasan dalam bahasa awam</strong> — bukan jargon keuangan yang ribet<br>" +
+         "2. <strong>Konteks Indonesia</strong> — fokus pada OJK, IDX, BUMN, bukan pasar luar negeri<br>" +
+         "3. <strong>Edukasi ESG &amp; investasi hijau</strong> — supaya kamu bisa berinvestasi yang baik buat planet dan dompetmu<br>" +
+         "4. <strong>Jujur tentang batasan</strong> — saya bilang \"saya tidak tahu\" kalau memang tidak tahu, bukan mengarang<br><br>" +
+         "<strong>Yang BUKAN tujuan saya:</strong><br>" +
+         "• Bukan kasih saran beli/jual saham — itu kerjaan penasihat investasi berlisensi OJK<br>" +
+         "• Bukan jual produk investasi — saya cuma edukasi, gratis<br>" +
+         "• Bukan menggantikan ahli — saya komplementer untuk literasi awal",
+    a_en:"<strong>My purpose:</strong> to close the green investment education gap in Indonesia 🌿<br><br>" +
+         "<strong>Context: Why does this matter?</strong><br>" +
+         "Per <strong>SNLIK 2025</strong> (OJK national survey), only <strong>17.78%</strong> of Indonesians genuinely understand the stock market — fewer than 1 in 5. Meanwhile there are 21 million retail investors in the capital market.<br><br>" +
+         "<strong>Lesson from the January 2026 MSCI Crisis:</strong><br>" +
+         "When MSCI considered downgrading Indonesia to <em>frontier market</em>, USD 80 billion in market cap was wiped out in 2 days. Many beginner investors panicked because they didn\'t understand what was happening.<br><br>" +
+         "<strong>What I offer:</strong><br>" +
+         "1. <strong>Plain-language explanations</strong> — not complicated finance jargon<br>" +
+         "2. <strong>Indonesian context</strong> — focused on OJK, IDX, BUMN, not foreign markets<br>" +
+         "3. <strong>ESG &amp; green investment education</strong> — so you can invest in a way that\'s good for the planet and your wallet<br>" +
+         "4. <strong>Honest about limits</strong> — I say \"I don\'t know\" when I don\'t, rather than making things up<br><br>" +
+         "<strong>What I am NOT for:</strong><br>" +
+         "• Not giving buy/sell stock advice — that\'s the job of OJK-licensed investment advisors<br>" +
+         "• Not selling investment products — I\'m just educational, free<br>" +
+         "• Not replacing experts — I\'m complementary for foundational literacy" },
 
 
   // ============================================================
@@ -4945,6 +5064,16 @@ function resolveReferences(rawQuery){
   // of >=4 chars ending in "nya" since the suffix is always attached.
   const ID_PRONOUN_RE = /\b(itu|ini|tersebut|mereka|tadi|yang\s+(tadi|barusan))\b|\b\w{2,}nya\b/i;
   if(!PRONOUN_RE.test(lc) && !ID_PRONOUN_RE.test(lc)) return rawQuery;
+  // GUARD: do NOT augment a query that already contains a proper noun /
+  // known entity. Doing so caused "siapa itu Sari?" to be rewritten to
+  // "siapa itu Sari? (Bibit)" because the conversation memory's most-
+  // recent entity was Bibit. The user mentioning Sari/MSCI/IDX/OJK/etc.
+  // by name is a clear signal that pronoun augmentation is unwanted.
+  const PROPER_NOUN_RE = /\b(sari|elemu|elmu|msci|idx|bei|ojk|pojk|seojk|kehati|ihsg|lq45|jii|issi|esg|lst|kkub|tkbi|jetp|etm|snlik|joves|ispo|rspo|bumn|bbca|bbri|bmri|bbni|asii|tlkm|unvr|klbf|ptba|aksi|aces|antm|inco|adro|aali|sjsm|cuq|asean|gss|sdg)\b/i;
+  if(PROPER_NOUN_RE.test(lc)) return rawQuery;
+  // GUARD: comparison queries ("X vs Y", "compare X and Y") are already
+  // explicit about their targets — don't pollute with a third entity.
+  if(/\b(vs|versus|compare|compared|bandingkan|perbedaan|bedakan|difference|or)\b/i.test(lc)) return rawQuery;
   // Short queries (≤6 tokens) with a pronoun → very likely a follow-up;
   // longer queries with a pronoun may already provide enough context, but
   // augmentation is still helpful. We rewrite by appending the entity to
@@ -5097,7 +5226,9 @@ const TOPIC_RELATIONS = {
   'cuq-methodology': ['esg-implementation-status'],
 
   // Identity / greetings
-  'about': ['esg','start','simulator'],
+  'about': ['creator','purpose','esg','start','simulator'],
+  'creator': ['purpose','about','esg','start'],
+  'purpose': ['creator','about','snlik','esg','msci_indonesia_crisis'],
   'hello': ['esg','start','ojk']
 };
 
@@ -5286,9 +5417,13 @@ function handleFollowUp(query){
 }
 
 function chatLabel(entry){
-  if(entry.q) return entry.q; // learned
+  if(entry.q) return entry.q; // learned entries already have proper-case questions
   const L = window.CURRENT_LANG;
-  return entry['kw_'+L]?.[0] || entry.kw_id?.[0] || '?';
+  const raw = entry['kw_'+L]?.[0] || entry.kw_id?.[0] || '?';
+  // formatChipLabel preserves acronyms (IDX, MSCI, OJK, IHSG, LST, etc.) and
+  // title-cases the rest. Without this, "Did you mean" chips would render
+  // as lowercase keyword strings like "ojk" / "msci" / "lst" — looks sloppy.
+  return formatChipLabel(raw);
 }
 
 function ensureDateSep(){
@@ -5612,6 +5747,33 @@ function _processMessage(v, input){
   addMessage(escapeHTML(v), 'user');
   input.value = '';
 
+  // IDENTITY INTENT — questions about the chatbot itself ("who are you",
+  // "who made you", "what is your purpose"). Pre-routed to dedicated FAQ
+  // entries so the matcher doesn't accidentally route them via Jaccard.
+  // Runs BEFORE pronoun resolution because "siapa itu sari?" would
+  // otherwise get hijacked (the resolver treats 'itu' as a pronoun and
+  // appends the last-mentioned entity).
+  const identityId = detectIdentityIntent(v);
+  if(identityId){
+    const target = getEntryById(identityId);
+    if(target){
+      showTyping();
+      const iDelay = 400 + Math.floor(Math.random()*300);
+      setTimeout(()=>{
+        hideTyping();
+        const L = window.CURRENT_LANG || 'id';
+        const body = target['a_'+L] || target.a_id;
+        const opener = pickOpener('definition');
+        const html = (opener ? opener + ' ' : '') + body + buildCuriosityHook(target.id);
+        _lastEntryId = target.id;
+        _lastQuery = v;
+        addMessage(html, 'bot');
+        _chatBusy = false;
+      }, iDelay);
+      return;
+    }
+  }
+
   // LAYER 3b · Pronoun resolution — rewrite short follow-up queries like
   // "tell me more about it" / "explain that" / "how does it work" to
   // include the last mentioned entity name. The augmented form `vMatch`
@@ -5620,8 +5782,8 @@ function _processMessage(v, input){
   const vMatch = resolveReferences(v);
 
   // OFF-TOPIC GUARD — polite refusal for culinary / sports / coding /
-  // medical / etc. queries. Runs FIRST so unrelated requests cannot
-  // hijack a near-keyword (e.g. "Indonesian" rendang recipe → language).
+  // medical / etc. queries. Runs after identity so questions like
+  // "tell me about yourself" don't get classified as off-topic.
   const offTopicCategory = detectOffTopic(v);
   if(offTopicCategory){
     showTyping();
