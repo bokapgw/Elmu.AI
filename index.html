@@ -64,9 +64,31 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .hdr-btn svg{width:18px;height:18px}
 .hdr-btn.news-btn{position:relative}
 .hdr-btn.news-btn .news-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;display:grid;place-items:center;letter-spacing:0}
+/* Language toggle — SVG flag + target-language code. Flag size override beats
+   the generic .hdr-btn svg{18px} rule. Border + rounded corners make the flag
+   stand out on the cream header background. */
+.hdr-btn.lang-flag-btn{padding:0 8px 0 6px;gap:6px}
+.hdr-btn.lang-flag-btn .lang-flag{display:inline-flex;line-height:0;border-radius:3px;overflow:hidden;border:1px solid rgba(0,0,0,0.15);box-shadow:0 1px 2px rgba(0,0,0,0.08);transition:transform 0.18s ease, box-shadow 0.18s ease}
+.hdr-btn.lang-flag-btn .lang-flag svg{width:28px;height:20px;display:block}
+.hdr-btn.lang-flag-btn .lang-code{font-size:12px;font-weight:700;letter-spacing:0.6px;color:var(--emerald)}
+.hdr-btn.lang-flag-btn:hover .lang-flag{transform:scale(1.05);box-shadow:0 2px 5px rgba(0,0,0,0.18)}
+[data-theme="dark"] .hdr-btn.lang-flag-btn .lang-flag{border-color:rgba(255,255,255,0.18)}
 @media (max-width:600px){
   .hdr-btn.news-btn .news-btn-label{display:none}
+  .hdr-btn.lang-flag-btn{padding:0 7px 0 5px;gap:4px}
+  .hdr-btn.lang-flag-btn .lang-flag svg{width:24px;height:17px}
+  .hdr-btn.lang-flag-btn .lang-code{font-size:11px}
 }
+
+/* "Explain simply" button — appears under bot bubble when the matched FAQ
+   entry has a simple_id/simple_en field. Small, italic, subtle until hover. */
+.simplify-row{display:flex;justify-content:flex-end;margin-top:6px;animation:simplifyFadeIn 0.32s ease}
+@keyframes simplifyFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.simplify-btn{font-family:inherit;font-size:12px;font-style:italic;font-weight:600;color:var(--gold);background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:14px;padding:4px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all 0.18s ease;line-height:1.3}
+.simplify-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold);transform:translateY(-1px);box-shadow:0 2px 6px rgba(184,134,11,0.25)}
+[data-theme="dark"] .simplify-btn:hover{color:#0F1612}
+.simplify-btn:disabled{opacity:0.5;cursor:default;transform:none;box-shadow:none}
+.simplified-tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--gold);background:var(--gold-pale);padding:3px 9px;border-radius:10px;margin-bottom:8px;letter-spacing:0.3px;border:1px solid var(--gold-light)}
 
 /* News modal */
 .news-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(2px)}
@@ -560,7 +582,9 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
         <span>📰</span><span class="news-btn-label" data-i18n="news.btn">Berita</span>
         <span class="news-badge" id="newsBadge" style="display:none">0</span>
       </button>
-      <button class="hdr-btn" id="langToggle" title="Bahasa/English" aria-label="Toggle language"><span id="langIcon">EN</span></button>
+      <button class="hdr-btn lang-flag-btn" id="langToggle" title="Switch to English" aria-label="Toggle language">
+        <span class="lang-flag" id="langFlag" aria-hidden="true"></span><span class="lang-code" id="langIcon">EN</span>
+      </button>
       <button class="hdr-btn" id="themeToggle" title="Light/Dark theme" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
     </div>
     <div class="meta">
@@ -2393,7 +2417,10 @@ const I18N = {
     'greeting.evening':'Selamat sore',
     'greeting.night':'Selamat malam',
     'location.label':'Bursa Efek Indonesia · Jakarta',
-    'intro.first':'Saya <strong>Sari</strong>, asisten investasi ESG kamu. Ada yang bisa saya bantu hari ini?',
+    'intro.first':'Saya <strong>Sari</strong>, asisten investasi ESG kamu. Ada yang bisa saya bantu hari ini?<br><br><em>Baru kenal ESG? Coba tanya \'Apa itu ESG?\' — lalu klik <strong>💡 Jelaskan sederhana</strong> kalau ada jawaban yang terasa terlalu teknis.</em>',
+    'simplify.btn':'Jelaskan sederhana',
+    'simplify.tag':'🌱 Versi sederhana',
+    'simplify.hover':'Klik untuk penjelasan lebih sederhana',
     'intro.returning':'Senang bertemu lagi. Apa yang ingin kamu pelajari hari ini tentang ESG?',
     'name.welcome':'Senang berkenalan dengan',
     'name.welcome_suffix':'! 🌿 Sekarang kamu bisa tanya saya apa saja tentang ESG investing, regulasi Indonesia, krisis MSCI 2026, atau produk investasi hijau.',
@@ -2517,7 +2544,10 @@ const I18N = {
     'greeting.evening':'Good evening',
     'greeting.night':'Good night',
     'location.label':'Indonesia Stock Exchange · Jakarta',
-    'intro.first':'I\'m <strong>Sari</strong>, your ESG investment assistant. What can I help you with today?',
+    'intro.first':'I\'m <strong>Sari</strong>, your ESG investment assistant. What can I help you with today?<br><br><em>Brand new to ESG? Try asking \'What is ESG?\' — then click <strong>💡 Explain simply</strong> if any answer feels too technical.</em>',
+    'simplify.btn':'Explain simply',
+    'simplify.tag':'🌱 Simplified version',
+    'simplify.hover':'Click for a simpler explanation',
     'intro.returning':'Nice to see you again. What would you like to learn about ESG today?',
     'name.welcome':'Nice to meet you,',
     'name.welcome_suffix':'! 🌿 You can now ask me anything about ESG investing, Indonesian regulation, the 2026 MSCI crisis, or green investment products.',
@@ -2887,6 +2917,8 @@ const FAQ_DATA = [
   // SECTION 2 · ESG BASICS — definitions of ESG, LST, pillars
   // ============================================================
   { id:'esg', category:'esg-basics', intent:'definitional', kw_id:['esg','apa itu esg','definisi esg','environmental social governance','jelaskan esg','tentang esg','konsep esg'], kw_en:['esg','what is esg','definition esg','environmental social governance','explain esg','about esg','esg concept'],
+    simple_id:"<strong>ESG</strong> itu seperti rapor sekolah buat perusahaan — menilai 3 mata pelajaran: cara mereka memperlakukan <em>alam</em>, cara mereka memperlakukan <em>orang</em>, dan apakah mereka <em>jujur</em> dalam menjalankan bisnis. Investasi dengan prinsip ESG = pilih perusahaan yang nilainya bagus di tiga hal itu, bukan cuma karena lebih baik, tapi karena perusahaan yang dikelola dengan baik biasanya lebih aman untuk jangka panjang.<br><br><strong>Praktiknya:</strong> kalau mau cari saham ESG, mulai dari daftar IDX ESG Leaders atau SRI-KEHATI — sudah disaring oleh BEI.",
+    simple_en:"<strong>ESG</strong> is a report card grading companies on three things: how they treat the environment, how they treat people, and how honestly they\'re run. Investing with ESG in mind means picking companies that score well — not just because it\'s nicer, but because well-run companies tend to be safer long-term bets.<br><br><strong>Practical takeaway:</strong> if you want ESG stocks, start with the IDX ESG Leaders or SRI-KEHATI index — they\'ve already been screened by IDX.",
     a_id:"<strong>ESG</strong> itu cara menilai sebuah perusahaan <em>bukan cuma</em> dari untung-ruginya, tapi juga dari 3 hal penting:<br><br>" +
          "<strong>🌳 E — Lingkungan</strong><br>" +
          "Apakah perusahaan ramah ke alam? Berapa banyak asap (emisi karbon) yang dibuang? Apakah hemat air dan listrik? Apakah pernah membuang limbah sembarangan?<br>" +
@@ -2947,6 +2979,8 @@ const FAQ_DATA = [
   // separate entry (`msci_indonesia_crisis`) so case/news queries don't
   // hijack definitional ones.
   { id:'msci', category:'indices', intent:'definitional', kw_id:['msci','apa itu msci','msci adalah','definisi msci','pengertian msci','tentang msci','apa msci','arti msci','morgan stanley capital'], kw_en:['msci','what is msci','define msci','explain msci','about msci','meaning msci','morgan stanley capital international','msci definition'],
+    simple_id:"<strong>MSCI</strong> itu perusahaan yang menentukan negara mana yang \"penting\" di mata investor dunia — seperti Michelin Guide tapi untuk pasar saham. Kalau MSCI naikkan peringkat Indonesia, uang asing masuk; kalau diturunkan, uang asing keluar dalam hitungan hari.<br><br><strong>Praktiknya:</strong> kamu tidak bisa berinvestasi di MSCI langsung, tapi keputusan MSCI memengaruhi harga saham di portofolio kamu — terutama saham besar seperti BBCA, BBRI, TLKM, ASII.",
+    simple_en:"<strong>MSCI</strong> is a company that decides which countries are \"important\" in global investing — like a Michelin guide for stock markets. When MSCI upgrades Indonesia, foreign money flows in; when it downgrades, money flows out within days.<br><br><strong>Practical takeaway:</strong> you can\'t invest in MSCI directly, but MSCI\'s decisions move the prices of stocks in your portfolio — especially the big ones like BBCA, BBRI, TLKM, ASII.",
     a_id:"<strong>MSCI</strong> adalah perusahaan asing dari Amerika yang tugasnya membuat <em>daftar peringkat</em> dan <em>data</em> tentang pasar saham di seluruh dunia. Kantornya di New York, berdiri sejak 1969.<br><br>" +
          "<strong>Anggap saja MSCI itu seperti \"Forbes\" atau \"FIFA Ranking\":</strong> Mereka tidak punya bursa saham sendiri, tapi peringkat yang mereka buat dipakai oleh ribuan pengelola dana besar di luar negeri untuk memutuskan akan investasi ke mana.<br><br>" +
          "<strong>3 Hal Penting MSCI untuk Indonesia:</strong><br>" +
@@ -2970,6 +3004,8 @@ const FAQ_DATA = [
   // queries: "krisis MSCI", "MSCI Jan 2026", "downgrade Indonesia",
   // "MSCI penurunan status". Not by "what is MSCI".
   { id:'msci_indonesia_crisis', category:'case-studies', intent:'case', kw_id:['krisis msci','msci indonesia crisis','msci januari 2026','msci jan 2026','msci downgrade','penurunan status indonesia','indonesia downgrade msci','emerging ke frontier','frontier market indonesia','crisis januari'], kw_en:['msci crisis','msci indonesia crisis','msci january 2026','msci jan 2026','indonesia downgrade','emerging to frontier','frontier market indonesia','crisis january','indonesia market crisis'],
+    simple_id:"Pada Januari 2026, MSCI (perusahaan peringkat pasar saham global) mengumumkan akan menurunkan status Indonesia karena beberapa perusahaan ketahuan menyembunyikan siapa pemilik aslinya. Akibatnya, pasar saham Indonesia kehilangan sekitar <strong>USD 80 miliar</strong> dalam 2 hari. <br><br><strong>Pelajarannya:</strong> siapa pemilik asli sebuah perusahaan itu <em>penting</em> — kalau tidak jelas, seluruh pasar bisa kehilangan kepercayaan dan harga saham anjlok bersama-sama.",
+    simple_en:"In January 2026, MSCI (the global stock-market ratings company) announced it might downgrade Indonesia because some Indonesian companies were caught hiding who really owned them. The market lost about <strong>USD 80 billion</strong> in value over two days.<br><br><strong>The lesson:</strong> who actually owns a company matters — when ownership is unclear, the entire market can lose trust and stock prices crash together.",
     a_id:"<strong>Krisis MSCI Indonesia · Januari 2026</strong> 🚨<br>Pada 28 Januari 2026, MSCI membekukan perubahan positif untuk saham Indonesia dan mempertimbangkan menurunkan status dari <em>emerging market</em> ke <em>frontier market</em>. Alasannya:<br>• Transparansi kepemilikan saham tidak jelas<br>• Akurasi data <em>free-float</em> diragukan<br>• Dugaan <em>coordinated trading</em><br>Akibatnya: ~<strong>USD 80 miliar</strong> kapitalisasi pasar hilang dalam 2 hari. CEO BEI &amp; Ketua OJK mundur. Goldman Sachs turunkan rekomendasi ke <em>underweight</em>.",
     a_en:"<strong>MSCI Indonesia Crisis · January 2026</strong> 🚨<br>On 28 January 2026, MSCI froze positive changes to Indonesian stocks and considered downgrading from <em>emerging market</em> to <em>frontier market</em>. Reasons:<br>• Unclear ownership transparency<br>• Doubtful <em>free-float</em> data accuracy<br>• Suspected <em>coordinated trading</em><br>Impact: ~<strong>USD 80 billion</strong> in market cap lost in 2 days. IDX CEO &amp; OJK Chairman resigned. Goldman Sachs downgraded to <em>underweight</em>." },
 
@@ -2986,6 +3022,8 @@ const FAQ_DATA = [
   // SECTION 4 · REGULATIONS — OJK + POJKs (most POJK detail in knowledge.js)
   // ============================================================
   { id:'ojk', category:'regulations', intent:'definitional', kw_id:['ojk','otoritas jasa keuangan','regulator','siapa ojk','apa itu ojk','tentang ojk','fungsi ojk'], kw_en:['ojk','otoritas','indonesian financial services authority','what is ojk','who is ojk','indonesia regulator','about ojk'],
+    simple_id:"<strong>OJK</strong> itu pengawas keuangan Indonesia — yang membuat aturan untuk bank, pasar saham, asuransi, dan layanan pinjaman online. Anggap saja OJK seperti polisi untuk dunia keuangan: tugasnya menjaga supaya kamu tidak ditipu.<br><br><strong>Praktiknya:</strong> kalau kamu invest pakai aplikasi Bibit, Ajaib, Stockbit, atau IPOT — semua sudah terdaftar di OJK, jadi uangmu dilindungi secara hukum.",
+    simple_en:"<strong>OJK</strong> is Indonesia\'s financial watchdog — it makes the rules for banks, the stock market, insurance, and online lending. Think of it like Indonesia\'s version of the Securities and Exchange Commission: its job is to make sure you don\'t get scammed.<br><br><strong>Practical takeaway:</strong> when you invest through any Indonesian platform like Bibit, Ajaib, Stockbit, or IPOT — they\'re all OJK-licensed, so your money is legally protected.",
     a_id:"<strong>OJK</strong> singkatan dari <strong>Otoritas Jasa Keuangan</strong> — lembaga negara yang mengawasi <em>semua hal yang berhubungan dengan uang</em> di Indonesia. Didirikan tahun 2011, mulai jalan penuh 2013.<br><br>" +
          "<strong>Anggap OJK seperti \"polisi\" untuk dunia keuangan</strong> — tugasnya menjaga supaya bank, asuransi, perusahaan saham, perusahaan fintech, dan layanan pinjaman online tidak merugikan masyarakat.<br><br>" +
          "<strong>3 Tugas Utama OJK:</strong><br>" +
@@ -3031,6 +3069,8 @@ const FAQ_DATA = [
     a_en:"<strong>IDX</strong> (Indonesia Stock Exchange) publishes several ESG indices:<br>• <strong>IDX ESG Leaders</strong> — highest ESG-scored stocks<br>• <strong>IDX KEHATI SRI</strong> — oldest SRI index (since 2009)<br>• <strong>ESG Sector Leaders KEHATI</strong> — leader per sector<br>• <strong>IDX Climate</strong> — climate focus<br>~25-30 stocks across these indices total." },
 
   { id:'kehati', category:'indices', intent:'definitional', kw_id:['kehati','sri','yayasan'], kw_en:['kehati','sri index','yayasan'],
+    simple_id:"Bayangin pasar saham Indonesia punya \"klub anak baik\" — itulah <strong>Indeks SRI-KEHATI</strong>. Isinya 25 perusahaan Indonesia yang sudah diseleksi: tidak mencemari berat, perlakuan ke karyawan baik, dan jujur soal keuangannya.<br><br><strong>Praktiknya:</strong> kalau kamu mau invest di saham Indonesia yang \"lebih baik\" tanpa harus riset satu-satu, kamu bisa beli reksa dana yang mengikuti daftar ini.",
+    simple_en:"Imagine the Indonesian stock market has a \"good citizens club\" — that\'s the <strong>SRI-KEHATI Index</strong>. It\'s a list of 25 Indonesian companies that have been screened: they\'re not heavy polluters, they treat workers well, and they\'re honest about their finances.<br><br><strong>Practical takeaway:</strong> if you want to invest in \"better\" Indonesian companies without researching each one, you can buy a mutual fund that follows this list.",
     a_id:"<strong>Indeks SRI-KEHATI</strong> adalah daftar saham hijau tertua di Indonesia, dibuat sejak tahun 2009. <em>SRI</em> singkatan dari <em>Sustainable and Responsible Investment</em> — artinya investasi yang bertanggung jawab dan ramah lingkungan.<br><br>" +
          "<strong>Siapa yang membuat?</strong> Bursa Efek Indonesia (BEI/IDX) bekerja sama dengan <strong>Yayasan KEHATI</strong> — yayasan yang peduli pada keanekaragaman hayati Indonesia (kehidupan alam: hewan, tumbuhan, hutan, laut).<br><br>" +
          "<strong>Isinya apa?</strong> Daftar ini berisi <strong>25 saham terpilih</strong> dari perusahaan-perusahaan yang sudah lulus penilaian ESG yang ketat. Beberapa nama yang masuk: BCA, Astra International, Unilever Indonesia, Telkom Indonesia.<br><br>" +
@@ -3042,10 +3082,14 @@ const FAQ_DATA = [
   // SECTION 5 · INSTRUMENTS & SCORING — green bonds, ratings, greenwashing
   // ============================================================
   { id:'sukuk', category:'frameworks', intent:'definitional', kw_id:['sukuk','green sukuk','obligasi syariah','sukuk ritel'], kw_en:['sukuk','green sukuk','islamic bond'],
+    simple_id:"<strong>Sukuk</strong> itu versi syariah dari obligasi — kamu meminjamkan uang ke pemerintah dan dibayar balik plus bagi hasil (bukan bunga, karena bunga dilarang di syariah). <strong>Sukuk Hijau</strong> khusus mendanai proyek hijau seperti panel surya dan transportasi bersih.<br><br><strong>Praktiknya:</strong> kamu bisa beli mulai <strong>Rp 1 juta</strong> lewat bank apa saja di Indonesia, dan uang pokokmu dijamin pemerintah.",
+    simple_en:"<strong>Sukuk</strong> is Indonesia\'s version of an Islamic bond — you lend money to the government and get paid back with profit-sharing (not interest, which is forbidden in Islam). <strong>Green Sukuk</strong> specifically funds environmental projects like solar panels and clean transport.<br><br><strong>Practical takeaway:</strong> you can buy it through any Indonesian bank starting from <strong>IDR 1 million</strong>, and the government guarantees your principal back.",
     a_id:"<strong>Green Sukuk Indonesia</strong> 🌱<br>Indonesia adalah penerbit <em>Green Sukuk</em> negara pertama di dunia (2018). Pemerintah menerbitkan <strong>Green Sukuk Ritel</strong> seri ST (Sukuk Tabungan) dan SR (Sukuk Ritel) yang khusus mendanai proyek hijau: energi terbarukan, transportasi rendah karbon, pengelolaan air. Minimum <strong>Rp 1 juta</strong>, return tahunan kompetitif dengan deposito.",
     a_en:"<strong>Indonesia Green Sukuk</strong> 🌱<br>Indonesia is the world\'s first sovereign <em>Green Sukuk</em> issuer (2018). The government issues <strong>Retail Green Sukuk</strong> in ST (Savings Sukuk) and SR (Retail Sukuk) series, dedicated to green projects: renewables, low-carbon transport, water management. Min <strong>IDR 1 million</strong>, yields competitive with deposits." },
 
   { id:'greenwashing', category:'frameworks', intent:'definitional', kw_id:['greenwashing','green washing','klaim palsu'], kw_en:['greenwashing','fake green','fake sustainability'],
+    simple_id:"<strong>Greenwashing</strong> itu kalau perusahaan pura-pura ramah lingkungan padahal sebenarnya tidak — seperti restoran cepat saji yang jualan burger \"ramah lingkungan\" sambil tetap menggunduli hutan.<br><br><strong>Praktiknya:</strong> kalau lihat klaim hijau dari perusahaan, jangan langsung percaya iklan — cek apakah ada bukti dari lembaga rating independen (Sustainalytics, MSCI ESG, FTSE Russell), bukan cuma dari pemasaran mereka sendiri.",
+    simple_en:"<strong>Greenwashing</strong> is when a company pretends to be environmentally friendly when it really isn\'t — like a fast-food chain selling \"eco\" burgers while still cutting down forests.<br><br><strong>Practical takeaway:</strong> when you see green claims from a company, don\'t just trust the marketing — check if their claims have proof from independent rating agencies (Sustainalytics, MSCI ESG, FTSE Russell), not just from their own brochures.",
     a_id:"<strong>Greenwashing</strong> itu istilah untuk perusahaan yang <em>pura-pura ramah lingkungan</em> padahal sebenarnya tidak — hanya untuk gimmick iklan.<br><br>" +
          "<strong>Anggap saja seperti orang pakai topeng hijau:</strong> Dari luar terlihat peduli alam, tapi kalau topengnya dibuka — masih merusak.<br><br>" +
          "<strong>Contoh nyata yang sering terjadi:</strong><br>" +
@@ -3080,6 +3124,8 @@ const FAQ_DATA = [
 
   { id:'bibit-vs-ajaib', category:'brokers', intent:'comparison', kw_id:['bibit vs ajaib','perbandingan bibit ajaib','bandingkan bibit ajaib','beda bibit ajaib','perbedaan bibit ajaib','bibit atau ajaib','pilih bibit ajaib'],
     kw_en:['bibit vs ajaib','compare bibit ajaib','difference bibit ajaib','bibit or ajaib','bibit versus ajaib'],
+    simple_id:"Ini empat aplikasi investasi di Indonesia: <strong>Bibit</strong> paling mudah untuk pemula — dia yang memilihkan reksa dana untukmu, mulai dari Rp 100 ribu per bulan. <strong>Ajaib</strong> dan <strong>Stockbit</strong> untuk beli saham individu (lebih advanced). <strong>IPOT</strong> lebih tua dan cocok untuk trader serius.<br><br><strong>Praktiknya:</strong> keempatnya berlisensi OJK jadi uangmu dilindungi hukum. Mulai dari Bibit kalau benar-benar pemula.",
+    simple_en:"These are four Indonesian investment apps: <strong>Bibit</strong> is the easiest for beginners — it picks mutual funds for you, starting from IDR 100,000 a month. <strong>Ajaib</strong> and <strong>Stockbit</strong> let you buy individual stocks (more advanced). <strong>IPOT</strong> is older and more for serious traders.<br><br><strong>Practical takeaway:</strong> all four are OJK-licensed, so your money is legally protected. Start with Bibit if you\'re a true beginner.",
     a_id:"<strong>Bibit vs Ajaib</strong> — perbandingan singkat:<br><br>" +
       "🤖 <strong>Bibit</strong> — robo-advisor reksa dana<br>" +
       "• Hanya jual reksa dana (bukan saham individual)<br>" +
@@ -3307,6 +3353,8 @@ const FAQ_DATA = [
   { id:'scope3_data', category:'frameworks',
     kw_id:['scope 3','emisi scope 3','data scope 3','keterbatasan scope 3','scope 3 indonesia','emisi tidak langsung','financed emissions','scope 3 saham','scope 3 mid-cap','emisi rantai pasok','value chain emissions'],
     kw_en:['scope 3','scope 3 emissions','scope 3 data','scope 3 historical data','indirect emissions','value chain emissions','financed emissions','scope 3 mid-cap stocks','how to deal with scope 3','lack of scope 3 data','scope 3 disclosure indonesia'],
+    simple_id:"Saat perusahaan melaporkan jejak karbonnya, dibagi 3 lingkup: <strong>Scope 1</strong> = asap dari pabrik mereka sendiri; <strong>Scope 2</strong> = listrik yang mereka beli; <strong>Scope 3</strong> = semua sisanya — emisi dari pemasok, produk saat dipakai konsumen, dan rantai distribusi.<br><br><strong>Praktiknya:</strong> Scope 3 paling sulit dihitung tapi sering paling besar. Di Indonesia, banyak perusahaan belum melaporkan ini — jadi sulit menilai dampak iklim mereka secara jujur.",
+    simple_en:"When a company reports its carbon footprint, it\'s split into 3 scopes: <strong>Scope 1</strong> = smoke from its own factories; <strong>Scope 2</strong> = electricity it buys; <strong>Scope 3</strong> = everything else — emissions from suppliers, products being used, and the distribution chain.<br><br><strong>Practical takeaway:</strong> Scope 3 is the hardest to measure but often the biggest. In Indonesia, most companies still don\'t report it — making it hard to honestly assess their climate impact.",
     a_id:"<strong>Keterbatasan Data Scope 3 untuk Saham Indonesia</strong> 🌫️<br><br>" +
          "<strong>Konteks masalah:</strong> Scope 3 (emisi rantai nilai tidak langsung — supplier, distribusi, penggunaan produk) saat ini <em>belum wajib lapor</em> secara penuh di Indonesia. POJK 51/2017 mendorong pengungkapan tapi tidak memaksa cakupan Scope 3 lengkap, terutama untuk emiten mid-cap.<br><br>" +
          "<strong>Realitas saat ini:</strong><br>" +
@@ -3341,6 +3389,8 @@ const FAQ_DATA = [
   { id:'third_party_assurance', category:'frameworks',
     kw_id:['third party assurance','verifikasi independen','assurance laporan keberlanjutan','assurance sustainability report','wajib assurance','isae 3000','verifikasi pihak ketiga','laporan keberlanjutan diaudit','independent assurance','assurance pojk 51'],
     kw_en:['third party assurance','third-party assurance','independent assurance','assurance sustainability report','isae 3000','sustainability report verification','assurance mandatory indonesia','assurance pojk 51','assurance requirements indonesia','do companies need assurance for sustainability report'],
+    simple_id:"<strong>Third-party assurance</strong> itu seperti audit untuk laporan keberlanjutan — auditor independen mengecek apakah klaim perusahaan benar (sama seperti auditor keuangan mengecek laporan keuangan). Tanpa audit ini, perusahaan bisa bilang apa saja.<br><br><strong>Praktiknya:</strong> di Indonesia saat ini ini baru <em>dianjurkan</em>, belum diwajibkan untuk semua. Saat membaca Laporan Keberlanjutan, cek dulu apakah ada cap auditor — kalau tidak ada, anggap sebagai \"klaim sepihak\".",
+    simple_en:"<strong>Third-party assurance</strong> is like an audit for a sustainability report — an independent auditor checks if the company\'s claims are true (similar to how financial auditors check financial reports). Without this check, a company could say anything.<br><br><strong>Practical takeaway:</strong> in Indonesia this is currently <em>encouraged</em> but not yet legally required for everyone. When reading a Sustainability Report, check for an auditor\'s stamp — if it\'s missing, treat the claims as \"the company\'s word only\".",
     a_id:"<strong>Third-Party Assurance untuk Sustainability Report — Status Indonesia</strong> 🔎<br><br>" +
          "<strong>Status saat ini (per Mei 2026):</strong> Verifikasi pihak ketiga (third-party assurance) atas Sustainability Report di Indonesia masih bersifat <em>comply-or-explain</em> — bukan mandat penuh. POJK 51/2017 Lampiran II hanya menyebutkan \"verifikasi tertulis dari pihak independen, <em>jika ada</em>\".<br><br>" +
          "<strong>Standar Internasional yang Dipakai Secara Sukarela:</strong><br>" +
@@ -3558,6 +3608,8 @@ const FAQ_DATA = [
   { id:'ispo_palm_oil', category:'case-studies',
     kw_id:['ispo','sawit ispo','sawit lestari','sertifikat sawit indonesia','palm oil indonesia','sertifikasi sawit','perpres 44 2020','indonesian sustainable palm oil','rspo vs ispo','sawit berkelanjutan'],
     kw_en:['ispo','indonesian sustainable palm oil','palm oil certification indonesia','rspo vs ispo','presidential regulation 44 2020 palm oil','ispo palm oil mandatory','indonesia palm oil sustainability','palm oil esg'],
+    simple_id:"<strong>ISPO</strong> itu sertifikat WAJIB untuk perusahaan sawit Indonesia, membuktikan mereka tidak merusak hutan atau mengabaikan hak pekerja. Ini standar minimum legal. <strong>RSPO</strong> adalah versi internasional yang lebih ketat.<br><br><strong>Praktiknya:</strong> investor ESG umumnya melihat ISPO sebagai \"sudah memenuhi syarat\" dan RSPO sebagai \"bagus\". Saat cek emiten sawit, lihat dulu sertifikatnya — kalau cuma ISPO, hanya minimum; kalau ISPO + RSPO, lebih kredibel.",
+    simple_en:"<strong>ISPO</strong> is Indonesia\'s MANDATORY certification for palm oil companies, proving they\'re not destroying forests or violating worker rights. It\'s the minimum legal bar. <strong>RSPO</strong> is the stricter international version.<br><br><strong>Practical takeaway:</strong> ESG investors generally view ISPO as \"acceptable\" and RSPO as \"good\". When checking a palm oil issuer, look at their certifications — ISPO-only means just the minimum; ISPO + RSPO is more credible.",
     a_id:"<strong>ISPO — Sertifikasi Sawit Berkelanjutan Wajib</strong> 🌴<br><br>" +
          "<strong>ISPO</strong> = <em>Indonesian Sustainable Palm Oil</em> — sistem sertifikasi keberlanjutan sawit Indonesia yang bersifat <strong>wajib</strong> berdasarkan <strong>Peraturan Presiden No. 44 Tahun 2020</strong> (ditetapkan 13 Maret 2020, diundangkan 16 Maret 2020).<br><br>" +
          "<strong>Tujuan Perpres 44/2020:</strong><br>" +
@@ -3726,6 +3778,8 @@ const FAQ_DATA = [
   { id:'beneficial_ownership', category:'governance', intent:'definitional',
     kw_id:['beneficial ownership','pemilik manfaat','ubo','perpres 13 2018','disclosure kepemilikan','pemegang saham akhir','free-float palsu','ownership transparency','ultimate beneficial owner','kewajiban bo'],
     kw_en:['beneficial ownership','beneficial owner','ubo','ultimate beneficial owner','perpres 13 2018','indonesia bo disclosure','ownership transparency indonesia','beneficial ownership threshold','disclosure of beneficial owners','bo reporting indonesia'],
+    simple_id:"<strong>Pemilik manfaat</strong> (beneficial owner) artinya <em>manusia asli yang benar-benar mengendalikan</em> sebuah perusahaan — bukan lapisan perusahaan cangkang di kertas, tapi bos sebenarnya di balik semuanya. Menyembunyikan ini adalah tanda bahaya — bisa menyembunyikan penggelapan pajak, korupsi, atau pencucian uang.<br><br><strong>Praktiknya:</strong> setelah krisis MSCI 2026, Indonesia memperketat aturan supaya informasi ini wajib terbuka. Saat menilai sebuah perusahaan, cek dulu siapa pemilik akhirnya — kalau tersembunyi di balik holding berlapis-lapis, hati-hati.",
+    simple_en:"<strong>Beneficial owner</strong> means the <em>actual human being who ultimately controls</em> a company — not the layers of shell companies on paper, but the real boss behind everything. Hiding this is a red flag — it can mask tax evasion, corruption, or money laundering.<br><br><strong>Practical takeaway:</strong> after the MSCI 2026 crisis, Indonesia tightened the rules to force this information into the open. When evaluating a company, check who the ultimate owner is — if it\'s hidden behind layered holding structures, be cautious.",
     a_id:"<strong>Beneficial Ownership (BO) — Pilar G Paling Kritikal di Indonesia</strong> 🔍<br><br>" +
          "<strong>Apa itu BO?</strong> <em>Pemilik manfaat akhir</em> dari suatu perusahaan — orang individu yang punya kontrol substantif atau keuntungan ekonomi, bahkan jika namanya tidak tercatat sebagai pemegang saham langsung.<br><br>" +
          "<strong>Regulasi Indonesia:</strong><br>" +
@@ -3796,6 +3850,8 @@ const FAQ_DATA = [
   { id:'free_float', category:'glossary', intent:'definitional',
     kw_id:['free float','free-float','saham beredar','saham publik','kepemilikan publik','porsi publik','public float','free float adalah','apa itu free float','arti free float','saham yang beredar bebas'],
     kw_en:['free float','free-float','public float','what is free float','define free float','meaning of free float','free float meaning','floating shares','tradeable shares'],
+    simple_id:"<strong>Free-float</strong> artinya berapa banyak saham sebuah perusahaan yang benar-benar bisa dibeli oleh masyarakat umum di pasar saham. Kalau perusahaan bilang \"<em>free-float</em> 40 persen\" tapi sebenarnya 30 persen disimpan diam-diam oleh teman pemilik, <em>free-float</em> aslinya cuma 10 persen.<br><br><strong>Praktiknya:</strong> kebohongan inilah yang memicu krisis MSCI Indonesia Januari 2026. Saat memilih saham, lihat <em>free-float</em>-nya — kalau terlalu rendah, harga mudah dimanipulasi.",
+    simple_en:"<strong>Free-float</strong> means how many shares of a company are actually available to be bought by regular people on the stock market. If a company says \"40 per cent free-float\" but actually 30 per cent is secretly held by the owner\'s friends, the real free-float is only 10 per cent.<br><br><strong>Practical takeaway:</strong> that\'s the lying that triggered Indonesia\'s MSCI crisis in January 2026. When picking stocks, check the free-float — if it\'s too low, the price is easy to manipulate.",
     a_id:"<strong>Free-Float</strong> 📊<br><br>" +
          "<em>Free-float</em> adalah persentase saham emiten yang benar-benar <strong>beredar bebas di pasar</strong> dan bisa diperdagangkan publik — bukan dikuasai oleh pengendali, manajemen, atau pihak yang dilarang trading (locked-up shares).<br><br>" +
          "<strong>Rumus sederhana:</strong><br>" +
@@ -4151,6 +4207,8 @@ const FAQ_DATA = [
   { id:'bursa_karbon_idxcarbon', category:'climate',
     kw_id:['bursa karbon','idx carbon','idxcarbon','perdagangan karbon','jual beli karbon','karbon kredit indonesia','spe-grk','ptbae-pu','bursa karbon launch','bursa karbon ritel','sertifikat karbon'],
     kw_en:['bursa karbon','idx carbon','idxcarbon','indonesia carbon exchange','carbon trading indonesia','carbon credit indonesia','spe-grk','ptbae-pu','indonesia carbon market','retail carbon trading','carbon exchange launch'],
+    simple_id:"<strong>IDXCarbon</strong> itu pasar untuk jual-beli \"kredit karbon\" di Indonesia, dibuka tahun 2023 oleh Presiden. Perusahaan yang mencemari bisa <em>beli</em> kredit untuk \"menebus\" emisinya, sementara proyek yang mengurangi karbon (misal pelestarian hutan) bisa <em>menjual</em> kredit untuk dapat uang.<br><br><strong>Praktiknya:</strong> untuk investor individu, akses langsung masih terbatas — tapi ini sinyal bahwa Indonesia serius soal keuangan iklim. Saham emiten yang aktif di IDXCarbon (misal pemain energi bersih) bisa dapat aliran pendapatan tambahan dari penjualan kredit.",
+    simple_en:"<strong>IDXCarbon</strong> is Indonesia\'s carbon-credit marketplace, launched in 2023 by the President. Companies that pollute can <em>buy</em> credits to offset their emissions, and projects that reduce carbon (like forest preservation) can <em>sell</em> credits to earn money.<br><br><strong>Practical takeaway:</strong> for individual investors, direct access is still limited — but it\'s a sign Indonesia is taking climate finance seriously. Listed companies active on IDXCarbon (like clean-energy players) can earn extra revenue selling credits.",
     a_id:"<strong>IDXCarbon — Bursa Karbon Indonesia</strong> 🌳<br><br>" +
          "<strong>Peluncuran:</strong> 26 September 2023 oleh <strong>Presiden Joko Widodo</strong>. Dikelola oleh PT Bursa Efek Indonesia (BEI) sebagai infrastruktur perdagangan unit karbon dalam negeri.<br><br>" +
          "<strong>Dasar Hukum:</strong> <strong>POJK 14 Tahun 2023</strong> tentang Perdagangan Karbon Melalui Bursa Karbon — yang menetapkan kerangka regulasi bursa karbon Indonesia.<br><br>" +
@@ -4664,10 +4722,22 @@ const THEME = {
 };
 
 /* ===== Language manager ===== */
+// SVG flags — inline so we work offline (Netlify CDN-cached, no external image
+// requests). Emoji flags render inconsistently on Windows (often as country
+// codes like "ID"), which is why these are full SVGs.
+const FLAG_UK_SVG = '<svg viewBox="0 0 60 30" width="28" height="20" xmlns="http://www.w3.org/2000/svg" focusable="false"><clipPath id="ukclip"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#ukclip)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg>';
+const FLAG_ID_SVG = '<svg viewBox="0 0 60 40" width="28" height="20" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="60" height="20" fill="#FF0000"/><rect y="20" width="60" height="20" fill="#FFFFFF"/></svg>';
+
 const LANG = {
   apply(L){
     window.CURRENT_LANG = L;
     document.documentElement.lang = L;
+    // Toggle button shows the flag of the language you'll SWITCH TO,
+    // not the language you're currently in. Tooltip mirrors that.
+    const flagEl = document.getElementById('langFlag');
+    const btn = document.getElementById('langToggle');
+    if(flagEl){ flagEl.innerHTML = (L==='id') ? FLAG_UK_SVG : FLAG_ID_SVG; }
+    if(btn){ btn.title = (L==='id') ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'; }
     document.getElementById('langIcon').textContent = L==='id'?'EN':'ID';
     document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
     const map = {
@@ -5537,8 +5607,53 @@ function addMessage(content, who, meta){
   }
 }
 
-// Common post-render work: did-you-mean chips + conversation memory append.
+/* ===== "Explain simply" button =====
+   Rendered under a bot bubble when the matched FAQ entry has a `simple_id`
+   or `simple_en` field. Clicking it appends a NEW bot bubble below with the
+   simpler explanation — does NOT replace the original answer.
+   Entries without a simple_* field show no button (so "hello", "thanks",
+   etc. stay clean). */
+function _renderSimplifyButton(entryId){
+  if(!entryId) return null;
+  const entry = (typeof getEntryById === 'function') ? getEntryById(entryId) : null;
+  if(!entry) return null;
+  const L = window.CURRENT_LANG || 'id';
+  const simpleField = 'simple_'+L;
+  const simpleFallback = (L==='en') ? 'simple_id' : 'simple_en';
+  const simple = entry[simpleField] || entry[simpleFallback];
+  if(!simple) return null; // no simple version → no button
+  const row = document.createElement('div');
+  row.className = 'simplify-row';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'simplify-btn';
+  btn.setAttribute('data-faq-id', entryId);
+  btn.title = t('simplify.hover');
+  btn.innerHTML = '💡 <span class="simplify-text">'+escapeHTML(t('simplify.btn'))+'</span>';
+  btn.onclick = ()=>{
+    // Idempotent — repeat clicks do nothing once the simplified message is shown.
+    if(btn.disabled) return;
+    btn.disabled = true;
+    const tag = '<div class="simplified-tag">'+t('simplify.tag')+'</div>';
+    addMessage(tag + simple, 'bot');
+  };
+  row.appendChild(btn);
+  return row;
+}
+
+// Common post-render work: did-you-mean chips + simplify button + memory append.
 function _afterAddMessage(content, who, meta){
+  // "Explain simply" button — only on bot bubbles, only when the matched
+  // entry has a simple_* field. Appended INSIDE the bubble's wrapper so
+  // it lives directly below the answer text.
+  if(who === 'bot' && meta && meta.simplifyEntryId){
+    const row = _renderSimplifyButton(meta.simplifyEntryId);
+    if(row){
+      const msgs = document.getElementById('chatMessages');
+      const lastMsg = msgs && msgs.lastElementChild;
+      if(lastMsg) lastMsg.appendChild(row);
+    }
+  }
   if(meta && meta.runners && meta.runners.length){
     const dym = document.createElement('div');
     dym.className = 'dym';
@@ -5767,7 +5882,7 @@ function _processMessage(v, input){
         const html = (opener ? opener + ' ' : '') + body + buildCuriosityHook(target.id);
         _lastEntryId = target.id;
         _lastQuery = v;
-        addMessage(html, 'bot');
+        addMessage(html, 'bot', { simplifyEntryId: target.id });
         _chatBusy = false;
       }, iDelay);
       return;
@@ -5888,7 +6003,7 @@ function _processMessage(v, input){
       const html = followUp.html + buildCuriosityHook(followUp.entryId);
       _lastEntryId = followUp.entryId;
       _lastQuery = v;
-      addMessage(html, 'bot');
+      addMessage(html, 'bot', { simplifyEntryId: followUp.entryId });
       _chatBusy = false;
     }, fDelay);
     return;
@@ -5916,7 +6031,7 @@ function _processMessage(v, input){
           const html = (opener ? opener + ' ' : '') + body + buildCuriosityHook(target.id);
           _lastEntryId = target.id;
           _lastQuery = v;
-          addMessage(html, 'bot');
+          addMessage(html, 'bot', { simplifyEntryId: target.id });
           _chatBusy = false;
         }, aDelay);
         return;
@@ -5981,7 +6096,7 @@ function _processMessage(v, input){
           html = html + buildCuriosityHook(reply.entryId);
           _lastEntryId = reply.entryId;
           _lastQuery = v;
-          addMessage(html, 'bot', { runners: reply.runners });
+          addMessage(html, 'bot', { runners: reply.runners, simplifyEntryId: reply.entryId });
         } else {
           addMessage(getUnknownReply(v, reply.runners), 'bot', { runners: reply.runners });
         }
@@ -6014,7 +6129,7 @@ function _processMessage(v, input){
       // Show did-you-mean ONLY when match wasn't confident, or comparison intent detected
       const isCompare = /\b(vs|versus|compare|perbedaan|bedakan|differentiate|difference|bandingkan|or)\b/i.test(v);
       const showRunners = isCompare || reply.score < 0.4;
-      addMessage(html, 'bot', { runners: showRunners ? reply.runners : [] });
+      addMessage(html, 'bot', { runners: showRunners ? reply.runners : [], simplifyEntryId: reply.entryId });
     }
     _chatBusy = false;
   }, delay);
