@@ -990,7 +990,16 @@ function escapeHTML(s){
    16-item Likert (1=Strongly Disagree → 7=Strongly Agree).
    Odd items are POSITIVE statements, even items are NEGATIVE.
    Score formula: sum((odd-1) + (7-even)) × (100/96) → 0–100 scale.
-====================================================================== */
+
+   ─────────────────────────────────────────────────────────────────────
+   RATING_FORM_URL — paste your Google Form URL here once you create it
+   following SETUP_GOOGLE_FORMS.md. When set, clicking "⭐ Nilai Sari"
+   opens that form in a new tab instead of the in-app modal. Submissions
+   land in your Google Sheet + email inbox (free, unlimited).
+   Leave empty ('') to keep the in-app modal (localStorage only).
+   ───────────────────────────────────────────────────────────────────── */
+const RATING_FORM_URL = '';
+
 const CUQ_ITEMS = [
   // [polarity, indonesian, english]
   ['pos', 'Kepribadian chatbot terasa realistis dan menarik.',                       'The chatbot\'s personality was realistic and engaging.'],
@@ -1109,58 +1118,16 @@ function submitCUQ(){
     scores: scores,
     cuq_score: score
   };
-  // 1. Local save — survives even if the network is down (the user still
-  //    sees their score and can export the JSON via the export button).
+  // Local save — survives offline and across sessions. The user sees their
+  // score immediately, and the export-to-JSON button below lets them send
+  // their results manually if a Google Form URL hasn't been configured yet.
+  //
+  // (For server-side delivery + email notifications, set RATING_FORM_URL
+  //  near the top of this script to a Google Form URL. See SETUP_GOOGLE_FORMS.md.)
   const all = STORE.get('cuq_responses', []) || [];
   all.push(entry);
   STORE.set('cuq_responses', all);
-  // 2. Server save — fire-and-forget POST to Netlify Forms. The site owner
-  //    receives an email per submission once they enable notifications in
-  //    the Netlify dashboard. Submissions also appear in the dashboard's
-  //    Forms → sari-rating tab as a searchable list with CSV export.
-  //    Failure is silent: the user already sees their score, and the local
-  //    copy in localStorage is still there as a backup.
-  _postRatingToNetlify(entry);
   renderCUQResult(score, all.length);
-}
-
-// Submit the rating to Netlify Forms. Form-encoded, no auth required —
-// Netlify recognises submissions to "/" by matching the form-name field
-// against the hidden form template in the HTML body.
-function _postRatingToNetlify(entry){
-  try {
-    const body = new URLSearchParams({
-      'form-name': 'sari-rating',
-      'bot-field': '', // honeypot — must stay empty
-      'ts': entry.ts,
-      'lang': entry.lang,
-      'user_name': entry.name || '',
-      'comments': entry.comments || '',
-      'cuq_score': String(entry.cuq_score),
-      'raw_scores': JSON.stringify(entry.scores),
-      'site_url': (typeof location !== 'undefined' ? location.href : ''),
-      'user_agent': (typeof navigator !== 'undefined' ? navigator.userAgent : '').slice(0, 200),
-    });
-    fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    }).then(resp => {
-      // 200 = stored. 404 means the build-time scanner didn't see the hidden
-      // form (rare — usually a deploy that ran before this file was added).
-      if(window.console && console.log){
-        console.log('[sari-rating] submitted to Netlify Forms:', resp.status);
-      }
-    }).catch(err => {
-      // Silent failure — local save already succeeded, and the user has the
-      // export-to-JSON button as a manual backup path.
-      if(window.console && console.warn){
-        console.warn('[sari-rating] network submission failed (local save still intact):', err && err.message);
-      }
-    });
-  } catch(e){
-    if(window.console && console.warn) console.warn('[sari-rating] could not build request body:', e);
-  }
 }
 
 function renderCUQResult(score, totalCount){
@@ -1173,8 +1140,8 @@ function renderCUQResult(score, totalCount){
   else if(score >= 50) label = L==='en' ? 'Acceptable usability': 'Usability cukup';
   else                 label = L==='en' ? 'Below acceptable'    : 'Di bawah standar';
   const savedNote = (L==='en')
-    ? '✉️ Your rating was sent to the developer\'s inbox · saved on the server.'
-    : '✉️ Penilaian kamu sudah dikirim ke email pengembang · tersimpan di server.';
+    ? '💾 Saved in your browser. Use the export button below to share it with the developer.'
+    : '💾 Tersimpan di browser kamu. Pakai tombol ekspor di bawah untuk berbagi ke pengembang.';
   body.innerHTML = '<div class="cuq-result">' +
     '<div class="cr-circle"><div><div class="cr-score">'+score.toFixed(1)+'</div><div class="cr-unit">'+escapeHTML(t('cuq.score_unit'))+'</div></div></div>' +
     '<h4>'+escapeHTML(label)+'</h4>' +
@@ -1226,7 +1193,22 @@ function clearCUQResponses(){
   renderCUQForm();
 }
 
-function openCUQModal(){ renderCUQForm(); document.getElementById('cuqModal').classList.add('show'); }
+function openCUQModal(){
+  // If Google Form URL is configured, redirect there instead of the in-app modal.
+  // Pre-fills lang + site_url + timestamp via URL params if the form has those fields.
+  if (RATING_FORM_URL && RATING_FORM_URL.length > 20) {
+    const L = (document.documentElement.getAttribute('lang') === 'en') ? 'en' : 'id';
+    let url = RATING_FORM_URL;
+    // Append lang as a query param so the user can see which language was used
+    const joiner = url.includes('?') ? '&' : '?';
+    url += joiner + 'usp=pp_url&lang=' + encodeURIComponent(L);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  // Fallback: in-app modal (saves to localStorage only)
+  renderCUQForm();
+  document.getElementById('cuqModal').classList.add('show');
+}
 function closeCUQModal(){ document.getElementById('cuqModal').classList.remove('show'); }
 
 /* ===== News modal (Bloomberg-style article list) ================
@@ -6967,26 +6949,11 @@ if(document.readyState==='loading'){
 </script>
 
 <!-- ============================================================
-     Netlify Forms — hidden detection form for "Sari Rating".
-     Netlify's deploy-time HTML parser scans for `data-netlify="true"`
-     attributes; any form found here gets a /forms/<name> endpoint.
-     We never actually display this form — the chatbot's existing
-     CUQ modal builds the UI; submitCUQ() POSTs to "/" with these
-     same field names so Netlify records each submission.
-     Set up an email notification at:
-       Netlify dashboard → Site → Forms → sari-rating → Notifications
+     RATING DELIVERY: this build uses Google Forms (not Netlify Forms).
+     Set RATING_FORM_URL near the top of the inline <script> to your
+     Google Form URL — clicking "⭐ Nilai Sari" then opens that form
+     in a new tab. Submissions land in your Google Sheet + email inbox.
+     Full setup walkthrough lives in SETUP_GOOGLE_FORMS.md.
      ============================================================ -->
-<form name="sari-rating" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input type="hidden" name="form-name" value="sari-rating">
-  <input type="text" name="bot-field">
-  <input type="text" name="ts">
-  <input type="text" name="lang">
-  <input type="text" name="user_name">
-  <input type="text" name="comments">
-  <input type="text" name="cuq_score">
-  <input type="text" name="raw_scores">
-  <input type="text" name="site_url">
-  <input type="text" name="user_agent">
-</form>
 </body>
 </html>
