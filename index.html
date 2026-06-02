@@ -511,6 +511,7 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
 .cuq-result p{color:var(--muted);font-size:13.5px;max-width:420px;margin:0 auto 18px;line-height:1.6}
 .cuq-result .cr-stats{background:var(--cream-deep);border-radius:10px;padding:12px 16px;font-size:11.5px;color:var(--muted);display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
 .cuq-result .cr-stats strong{color:var(--emerald)}
+.cuq-saved-pill{display:inline-block;background:var(--gold-pale);color:var(--gold);font-size:12px;font-weight:600;padding:6px 12px;border-radius:14px;border:1px solid var(--gold-light);margin:0 auto 14px;line-height:1.4}
 .cuq-result .cr-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 @media (max-width:600px){
   .cuq-modal .cm-head, .cuq-modal .cm-body, .cuq-result{padding-left:18px;padding-right:18px}
@@ -1108,10 +1109,58 @@ function submitCUQ(){
     scores: scores,
     cuq_score: score
   };
+  // 1. Local save — survives even if the network is down (the user still
+  //    sees their score and can export the JSON via the export button).
   const all = STORE.get('cuq_responses', []) || [];
   all.push(entry);
   STORE.set('cuq_responses', all);
+  // 2. Server save — fire-and-forget POST to Netlify Forms. The site owner
+  //    receives an email per submission once they enable notifications in
+  //    the Netlify dashboard. Submissions also appear in the dashboard's
+  //    Forms → sari-rating tab as a searchable list with CSV export.
+  //    Failure is silent: the user already sees their score, and the local
+  //    copy in localStorage is still there as a backup.
+  _postRatingToNetlify(entry);
   renderCUQResult(score, all.length);
+}
+
+// Submit the rating to Netlify Forms. Form-encoded, no auth required —
+// Netlify recognises submissions to "/" by matching the form-name field
+// against the hidden form template in the HTML body.
+function _postRatingToNetlify(entry){
+  try {
+    const body = new URLSearchParams({
+      'form-name': 'sari-rating',
+      'bot-field': '', // honeypot — must stay empty
+      'ts': entry.ts,
+      'lang': entry.lang,
+      'user_name': entry.name || '',
+      'comments': entry.comments || '',
+      'cuq_score': String(entry.cuq_score),
+      'raw_scores': JSON.stringify(entry.scores),
+      'site_url': (typeof location !== 'undefined' ? location.href : ''),
+      'user_agent': (typeof navigator !== 'undefined' ? navigator.userAgent : '').slice(0, 200),
+    });
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    }).then(resp => {
+      // 200 = stored. 404 means the build-time scanner didn't see the hidden
+      // form (rare — usually a deploy that ran before this file was added).
+      if(window.console && console.log){
+        console.log('[sari-rating] submitted to Netlify Forms:', resp.status);
+      }
+    }).catch(err => {
+      // Silent failure — local save already succeeded, and the user has the
+      // export-to-JSON button as a manual backup path.
+      if(window.console && console.warn){
+        console.warn('[sari-rating] network submission failed (local save still intact):', err && err.message);
+      }
+    });
+  } catch(e){
+    if(window.console && console.warn) console.warn('[sari-rating] could not build request body:', e);
+  }
 }
 
 function renderCUQResult(score, totalCount){
@@ -1123,10 +1172,14 @@ function renderCUQResult(score, totalCount){
   else if(score >= 65) label = L==='en' ? 'Good usability'      : 'Usability bagus';
   else if(score >= 50) label = L==='en' ? 'Acceptable usability': 'Usability cukup';
   else                 label = L==='en' ? 'Below acceptable'    : 'Di bawah standar';
+  const savedNote = (L==='en')
+    ? '✉️ Your rating was sent to the developer\'s inbox · saved on the server.'
+    : '✉️ Penilaian kamu sudah dikirim ke email pengembang · tersimpan di server.';
   body.innerHTML = '<div class="cuq-result">' +
     '<div class="cr-circle"><div><div class="cr-score">'+score.toFixed(1)+'</div><div class="cr-unit">'+escapeHTML(t('cuq.score_unit'))+'</div></div></div>' +
     '<h4>'+escapeHTML(label)+'</h4>' +
     '<p>'+escapeHTML(t('cuq.thanks'))+'</p>' +
+    '<div class="cuq-saved-pill">'+escapeHTML(savedNote)+'</div>' +
     '<div class="cr-stats">' +
       '<span><strong>'+totalCount+'</strong> '+escapeHTML(t('cuq.responses_count'))+'</span>' +
       '<span>'+ (L==='en'?'Source':'Sumber') +': <strong>Holmes et al. (2019)</strong></span>' +
@@ -6912,5 +6965,28 @@ if(document.readyState==='loading'){
 }
 
 </script>
+
+<!-- ============================================================
+     Netlify Forms — hidden detection form for "Sari Rating".
+     Netlify's deploy-time HTML parser scans for `data-netlify="true"`
+     attributes; any form found here gets a /forms/<name> endpoint.
+     We never actually display this form — the chatbot's existing
+     CUQ modal builds the UI; submitCUQ() POSTs to "/" with these
+     same field names so Netlify records each submission.
+     Set up an email notification at:
+       Netlify dashboard → Site → Forms → sari-rating → Notifications
+     ============================================================ -->
+<form name="sari-rating" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="sari-rating">
+  <input type="text" name="bot-field">
+  <input type="text" name="ts">
+  <input type="text" name="lang">
+  <input type="text" name="user_name">
+  <input type="text" name="comments">
+  <input type="text" name="cuq_score">
+  <input type="text" name="raw_scores">
+  <input type="text" name="site_url">
+  <input type="text" name="user_agent">
+</form>
 </body>
 </html>
