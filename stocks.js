@@ -21,12 +21,13 @@ window.STOCKS_DATA = {
   },
   "benchmark": {
     "jkse": {
-      "value": 6195.43,
-      "change_1d": 1.11,
-      "change_ytd": -29.2,
-      "change_1y": -12.1,
+      "value": 5941.07,
+      "change_1d": -3.04,
+      "change_ytd": -32.1,
+      "change_1y": -15.7,
       "name": "JCI / IHSG",
-      "description": "Jakarta Composite Index"
+      "description": "Jakarta Composite Index",
+      "value_source": "live news headline (cross-checked vs yfinance)"
     },
     "jklq45": {
       "value": 619.28,
@@ -36,11 +37,11 @@ window.STOCKS_DATA = {
       "name": "LQ45",
       "description": "45 most liquid IDX stocks"
     },
-    "jci_value": 6195.43,
-    "jci_ytd": -29.2,
-    "jci_1y": -12.1,
-    "jci_1d": 1.11,
-    "note": "Multi-index via yfinance"
+    "jci_value": 5941.07,
+    "jci_ytd": -32.1,
+    "jci_1y": -15.7,
+    "jci_1d": -3.04,
+    "note": "Multi-index via yfinance; IHSG cross-checked vs live news"
   },
   "stocks": [
     {

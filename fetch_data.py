@@ -363,6 +363,46 @@ def fetch_news():
     return articles, True
 
 
+# yfinance's ^JKSE (Jakarta Composite) frequently lags the real market by days,
+# while the RSS news is real-time. When a live headline states the IHSG level we
+# trust it, so the stat bar and the news ticker can never disagree.
+_IHSG_PAT = re.compile(r'IHSG\D{0,40}?(\d{1,2}[.,]\d{3}(?:[.,]\d{1,2})?)', re.IGNORECASE)
+
+def extract_ihsg_from_news(articles):
+    """Return the most recent IHSG index level mentioned in a news headline,
+    or None. Handles Indonesian (5.941,07) and English (5,941.07) number formats."""
+    try:
+        for art in articles:               # articles are newest-first from each feed
+            title = (art.get("title") or "")
+            m = _IHSG_PAT.search(title)
+            if not m:
+                continue
+            raw = m.group(1)
+            if ',' in raw and '.' in raw:
+                if raw.rfind(',') > raw.rfind('.'):   # ID: 5.941,07
+                    raw = raw.replace('.', '').replace(',', '.')
+                else:                                  # EN: 5,941.07
+                    raw = raw.replace(',', '')
+            elif ',' in raw:                           # thousands separator only
+                raw = raw.replace(',', '')
+            val = float(raw)
+            if 1000 <= val <= 15000:       # sanity range for the IHSG
+                return val
+    except Exception as exc:
+        print(f"  ! IHSG news cross-check skipped: {exc}", file=sys.stderr)
+    return None
+
+def _reprice_change(old_value, old_pct, new_value):
+    """Re-express a % change for a new index level, holding the historical
+    baseline constant (so value + % stay internally consistent)."""
+    if old_value is None or old_pct is None or new_value is None:
+        return old_pct
+    baseline = old_value / (1 + old_pct / 100.0)
+    if baseline == 0:
+        return old_pct
+    return (new_value / baseline - 1) * 100.0
+
+
 def main():
     print("=== Elemu Lestari v2 · data refresher ===")
     print(f"Run at {datetime.datetime.now().isoformat()}\n")
@@ -376,13 +416,35 @@ def main():
             key = sym.replace("^", "").lower()
             benchmark[key] = {**data, "name": name, "description": desc}
             print(f"  · {name}: {data['value']} ({data.get('change_1d','?')}% 1D · {data.get('change_ytd','?')}% YTD)")
-    # Back-compat: also expose JCI fields at top level
+    # --- News (fetched early so we can cross-check the IHSG level) ---
+    print("\nFetching RSS headlines where available...")
+    articles, is_live = fetch_news()
+
+    # --- Reconcile IHSG with the live news headline ---
+    # yfinance ^JKSE often lags; the RSS news is real-time. If a headline states
+    # the IHSG level, use it so the stat bar always matches the news ticker.
+    news_ihsg = extract_ihsg_from_news(articles) if is_live else None
+    if news_ihsg is not None:
+        jk = benchmark.setdefault("jkse", {"name": "JCI / IHSG",
+                                           "description": "Jakarta Composite Index",
+                                           "change_1d": None, "change_ytd": None, "change_1y": None})
+        old_val = jk.get("value")
+        if old_val is not None and abs(old_val - news_ihsg) > 1:
+            # Re-price % changes off the same historical baseline so value + % stay consistent.
+            if jk.get("change_1d")  is not None: jk["change_1d"]  = round(_reprice_change(old_val, jk["change_1d"],  news_ihsg), 2)
+            if jk.get("change_ytd") is not None: jk["change_ytd"] = round(_reprice_change(old_val, jk["change_ytd"], news_ihsg), 1)
+            if jk.get("change_1y")  is not None: jk["change_1y"]  = round(_reprice_change(old_val, jk["change_1y"],  news_ihsg), 1)
+            print(f"  -> IHSG reconciled: yfinance {old_val} -> live news {news_ihsg}")
+        jk["value"] = news_ihsg
+        jk["value_source"] = "live news headline (cross-checked vs yfinance)"
+
+    # Back-compat: also expose JCI fields at top level (after reconciliation)
     if "jkse" in benchmark:
         benchmark["jci_value"] = benchmark["jkse"]["value"]
         benchmark["jci_ytd"] = benchmark["jkse"]["change_ytd"]
         benchmark["jci_1y"] = benchmark["jkse"]["change_1y"]
         benchmark["jci_1d"] = benchmark["jkse"]["change_1d"]
-        benchmark["note"] = "Multi-index via yfinance"
+        benchmark["note"] = "Multi-index via yfinance; IHSG cross-checked vs live news"
 
     # --- Stocks ---
     print("\nFetching IDX stocks via yfinance...")
@@ -425,9 +487,7 @@ def main():
         f.write("window.STOCKS_DATA = " + json.dumps(stocks_payload, indent=2, ensure_ascii=False) + ";\n")
     print(f"\n✓ Wrote stocks.js ({len(stocks)} stocks, {len(benchmark)} indices)")
 
-    # --- News ---
-    print("\nFetching RSS headlines where available...")
-    articles, is_live = fetch_news()
+    # --- Write news.js (articles already fetched + cross-checked above) ---
     news_payload = {
         "updated": datetime.date.today().isoformat(),
         "source": "Live RSS via fetch_data.py v2" if is_live else "Curated fallback (live RSS unavailable)",
