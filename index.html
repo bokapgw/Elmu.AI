@@ -5656,6 +5656,41 @@ function addMessage(content, who, meta){
    simpler explanation — does NOT replace the original answer.
    Entries without a simple_* field show no button (so "hello", "thanks",
    etc. stay clean). */
+/* Auto-generate a plain-language version of an answer when an entry has no
+   hand-written simple_* field — so EVERY substantive topic gets an "Explain
+   simply" option, not just the curated ones. Strips HTML, regulation
+   citations (POJK/SEOJK/…) and parenthetical asides, then keeps the core
+   opening sentence(s) plus up to 3 bullet points. Curated simple_* is always
+   preferred when present (higher quality). */
+function _autoSimplify(html){
+  if(!html) return '';
+  let txt = String(html)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|h[1-6]|li)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '\n• ')
+    .replace(/<[^>]+>/g, '')                       // strip remaining tags
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&nbsp;/g,' ').replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/&rarr;/g,'→');
+  // Strip the verbose parenthetical asides (the real clutter). We keep short
+  // regulation codes like "POJK 51/2017" because they're usually the sentence
+  // subject — removing them would leave a headless "...is a rule that...".
+  txt = txt.replace(/\([^)]{0,90}\)/g, ' ')
+           .replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{2,}/g, '\n')
+           .replace(/ +([.,;:])/g, '$1').trim();
+  const lines   = txt.split('\n').map(s=>s.trim()).filter(Boolean);
+  const bullets = lines.filter(l=>l.startsWith('•')).slice(0, 3);
+  const prose   = lines.filter(l=>!l.startsWith('•'));
+  const core    = prose[0] || '';
+  // Split into sentences without using lookbehind (older-browser safe).
+  const sentences = core.match(/[^.!?]+[.!?]+|\S[^.!?]*$/g) || (core ? [core] : []);
+  let gist = sentences.slice(0, 2).join(' ').replace(/\s{2,}/g, ' ').trim();
+  if(gist.length > 320) gist = gist.slice(0, 317).replace(/\s+\S*$/, '') + '…';
+  const parts = [];
+  if(gist) parts.push(escapeHTML(gist));
+  if(bullets.length) parts.push(bullets.map(b=>escapeHTML(b)).join('<br>'));
+  return parts.join('<br>');
+}
+
 function _renderSimplifyButton(entryId){
   if(!entryId) return null;
   const entry = (typeof getEntryById === 'function') ? getEntryById(entryId) : null;
@@ -5663,8 +5698,19 @@ function _renderSimplifyButton(entryId){
   const L = window.CURRENT_LANG || 'id';
   const simpleField = 'simple_'+L;
   const simpleFallback = (L==='en') ? 'simple_id' : 'simple_en';
-  const simple = entry[simpleField] || entry[simpleFallback];
-  if(!simple) return null; // no simple version → no button
+  let simple = entry[simpleField] || entry[simpleFallback];
+  if(!simple){
+    // No curated simple version — auto-generate one so the topic still gets a
+    // button. Skip only when the answer is already short AND jargon-free
+    // (e.g. a one-line factual reply), so we don't add a pointless button.
+    const fullAns = entry['a_'+L] || entry.a_id || '';
+    const plainLen = fullAns.replace(/<[^>]+>/g, '').length;
+    const hasJargon = /\b(POJK|SEOJK|PBI|scope\s*[123]|taksonomi|taxonomy|assurance|materiality|free\s*float|beneficial|emiten|likuiditas|volatil|divestasi|sekuritisasi)\b/i.test(fullAns)
+                      || /\([^)]{15,}\)/.test(fullAns);
+    if(plainLen < 180 && !hasJargon) return null;
+    simple = _autoSimplify(fullAns);
+  }
+  if(!simple) return null; // nothing usable to simplify → no button
   const row = document.createElement('div');
   row.className = 'simplify-row';
   const btn = document.createElement('button');
