@@ -41,44 +41,34 @@ If `RATING_FORM_URL` is empty, the old in-app modal still works (saves to the us
 
 1. Go to <https://forms.google.com>
 2. Click the **+ Blank form** card (top-left)
-3. **Title:** `Nilai Sari — Chatbot Usability Questionnaire`
+3. **Title:** `Rate Sari / Nilai Sari — Usability & Trust Survey`
 4. **Description:** paste:
    ```
-   Bantu kami meningkatkan Elemu Lestari (elmu.ai). Isi 16 pernyataan singkat tentang pengalaman kamu menggunakan chatbot Sari. Skala 1 (Sangat Tidak Setuju) → 7 (Sangat Setuju).
+   Help us evaluate Elemu Lestari (elmu.ai), an ESG-investing education chatbot. Please rate 16 short statements about your experience. Scale: 1 (Strongly Disagree) to 7 (Strongly Agree).
 
-   Sumber: Chatbot Usability Questionnaire (Holmes et al. 2019).
+   Bantu kami mengevaluasi Elemu Lestari (elmu.ai), chatbot edukasi investasi ESG. Nilai 16 pernyataan singkat tentang pengalaman kamu. Skala: 1 (Sangat Tidak Setuju) sampai 7 (Sangat Setuju).
    ```
 
 ---
 
-## Step 2 — Add the 16 CUQ questions
+## Step 2 — Add the 16 survey questions (ELUTS)
 
-For **each** of the 16 questions below: click **+ Add question** → choose **Linear scale** as the type → set **scale 1 to 7** → set the labels: **1 = Sangat Tidak Setuju** and **7 = Sangat Setuju** → mark the question **Required**.
+> **Use the brand-new custom questions** — the full bilingual list with copy-paste blocks and the academic justification lives in **`QUESTIONNAIRE_ELUTS.md`**. (These replace the old copy-pasted CUQ items, per your lecturer's feedback.)
 
-> Tip: After you build the first one, click the **duplicate icon** (two squares) on the question card to copy it, then just edit the question text. Much faster than rebuilding 16 times.
+For **each** of the 16 questions: click **+ Add question** → choose **Linear scale** → set **scale 1 to 7** → set the labels **1 = Strongly Disagree / Sangat Tidak Setuju** and **7 = Strongly Agree / Sangat Setuju** → mark it **Required**.
 
-### Copy these question texts:
+> Tip: build the first question fully (scale + labels + Required), then click the **duplicate icon** (two squares) 15 times and just edit each one's text. Much faster than rebuilding 16 times.
 
-| # | Question (paste this as the question text) |
-|---|---|
-| 1 | Kepribadian chatbot terasa realistis dan menarik. |
-| 2 | Chatbot terasa terlalu seperti robot. |
-| 3 | Chatbot menyambut saya dengan baik saat awal mulai. |
-| 4 | Chatbot terasa sangat tidak ramah. |
-| 5 | Chatbot menjelaskan cakupan dan tujuannya dengan baik. |
-| 6 | Chatbot tidak memberi indikasi soal tujuannya. |
-| 7 | Chatbot mudah dinavigasi. |
-| 8 | Mudah merasa bingung saat menggunakan chatbot. |
-| 9 | Chatbot memahami saya dengan baik. |
-| 10 | Chatbot gagal mengenali banyak input saya. |
-| 11 | Tanggapan chatbot bermanfaat, relevan, dan informatif. |
-| 12 | Tanggapan chatbot tidak relevan. |
-| 13 | Chatbot menangani error atau kesalahan dengan baik. |
-| 14 | Chatbot terlihat tidak mampu menangani error apapun. |
-| 15 | Chatbot sangat mudah digunakan. |
-| 16 | Chatbot terasa sangat rumit. |
+**Each question is bilingual — paste English on line 1, Indonesian on line 2** (press Enter between them). Open `QUESTIONNAIRE_ELUTS.md` → section *"The 16 questions"* and copy each two-line block. Summary of what they measure:
 
-> **Why the alternating positive / negative phrasing?** This is the standard Holmes et al. (2019) design — it controls for "yes-bias" (people who reflexively agree with everything). Items 1, 3, 5, 7, 9, 11, 13, 15 are **positive** statements; items 2, 4, 6, 8, 10, 12, 14, 16 are **negative**. The scoring formula in your chatbot already handles the reverse-coding automatically.
+| # | Construct | # | Construct |
+|---|---|---|---|
+| 1–2 | First impression / onboarding | 9–10 | Clarity of explanations |
+| 3–4 | Navigation | 11–12 | Trust / credibility |
+| 5–6 | Understanding the user | 13–14 | Engagement / personality |
+| 7–8 | Relevance / usefulness | 15–16 | Learning value / intention |
+
+> **Keep the exact order.** Odd items are positively worded, even items negatively worded — this controls "yes-bias" (acquiescence), and the 0–100 scoring formula assumes this alternation. See `QUESTIONNAIRE_ELUTS.md` → *Scoring* for the maths.
 
 ---
 

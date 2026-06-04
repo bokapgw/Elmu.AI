@@ -251,6 +251,12 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .chip{background:var(--panel-bg);border:1px solid var(--border);color:var(--emerald);padding:8px 14px;border-radius:20px;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.2s}
 .chip:hover{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
 [data-theme="dark"] .chip:hover{color:#0F1612}
+/* Onboarding starter chips — first thing a new user sees */
+.onboard-hint{font-size:12.5px;color:var(--muted);margin:16px 0 4px;line-height:1.5;font-weight:500}
+.onboard-chips{margin-top:8px}
+.chip-help{background:var(--gold-pale);border-color:var(--gold-light);color:var(--gold);font-weight:600}
+.chip-help:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+[data-theme="dark"] .chip-help:hover{color:#0F1612}
 .dym{margin-top:-2px;margin-left:40px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:88%}
 .dym-label{font-size:11.5px;color:var(--muted);font-style:italic;white-space:nowrap}
 .dym a{color:var(--emerald);text-decoration:none;font-weight:600;cursor:pointer;font-size:12.5px;background:var(--cream-deep);padding:5px 12px;border-radius:14px;border:1px solid var(--border);transition:all 0.2s;display:inline-flex;align-items:center;gap:4px}
@@ -766,7 +772,7 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
     <div class="cm-head">
       <div class="cm-head-row">
         <div>
-          <h3 id="cuqTitle" data-i18n="cuq.title">Nilai Sari (CUQ)</h3>
+          <h3 id="cuqTitle" data-i18n="cuq.title">Nilai Sari</h3>
           <div class="cm-intro" id="cuqIntro"></div>
         </div>
         <button class="cm-close" id="cuqClose" aria-label="Close">✕</button>
@@ -986,8 +992,10 @@ function escapeHTML(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-/* ===== CUQ — Chatbot Usability Questionnaire (Holmes et al. 2019) ===
-   16-item Likert (1=Strongly Disagree → 7=Strongly Agree).
+/* ===== ELUTS — Elemu Lestari Usability & Trust Survey ==============
+   Custom 16-item Likert instrument (1=Strongly Disagree → 7=Strongly Agree).
+   Adapted in structure from the CUQ (Holmes et al. 2019), SUS (Brooke 1996)
+   and TAM (Davis 1989); all item wording is original and ESG-tailored.
    Odd items are POSITIVE statements, even items are NEGATIVE.
    Score formula: sum((odd-1) + (7-even)) × (100/96) → 0–100 scale.
 
@@ -1000,24 +1008,41 @@ function escapeHTML(s){
    ───────────────────────────────────────────────────────────────────── */
 const RATING_FORM_URL = 'https://forms.gle/M7Nvpj3jGh4WTQat8';
 
+/* ELUTS — Elemu Lestari Usability & Trust Survey (custom instrument).
+   16 original items written for an ESG financial-education chatbot, grouped
+   into 8 constructs (2 items each, one positive + one negative to control
+   acquiescence bias). Adapted in STRUCTURE from the CUQ (Holmes et al. 2019),
+   SUS (Brooke 1996), and TAM (Davis 1989), but all wording is original and
+   tailored to Sari's ESG / Indonesian-retail-investor context.
+   Constructs (in order): first-impression · navigation · understanding ·
+   relevance · clarity · trust · engagement · learning-intention.
+   Scale 1–7; scoring (odd=pos: score-1, even=neg: 7-score) ×100/96 → 0–100. */
 const CUQ_ITEMS = [
   // [polarity, indonesian, english]
-  ['pos', 'Kepribadian chatbot terasa realistis dan menarik.',                       'The chatbot\'s personality was realistic and engaging.'],
-  ['neg', 'Chatbot terasa terlalu seperti robot.',                                   'The chatbot seemed too robotic.'],
-  ['pos', 'Chatbot menyambut saya dengan baik saat awal mulai.',                     'The chatbot was welcoming during initial setup.'],
-  ['neg', 'Chatbot terasa sangat tidak ramah.',                                      'The chatbot seemed very unfriendly.'],
-  ['pos', 'Chatbot menjelaskan cakupan dan tujuannya dengan baik.',                  'The chatbot explained its scope and purpose well.'],
-  ['neg', 'Chatbot tidak memberi indikasi soal tujuannya.',                          'The chatbot gave no indication of its purpose.'],
-  ['pos', 'Chatbot mudah dinavigasi.',                                               'The chatbot was easy to navigate.'],
-  ['neg', 'Mudah merasa bingung saat menggunakan chatbot.',                          'It would be easy to get confused when using the chatbot.'],
-  ['pos', 'Chatbot memahami saya dengan baik.',                                      'The chatbot understood me well.'],
-  ['neg', 'Chatbot gagal mengenali banyak input saya.',                              'The chatbot failed to recognise a lot of my inputs.'],
-  ['pos', 'Tanggapan chatbot bermanfaat, relevan, dan informatif.',                  'Chatbot responses were useful, appropriate and informative.'],
-  ['neg', 'Tanggapan chatbot tidak relevan.',                                        'Chatbot responses were not relevant.'],
-  ['pos', 'Chatbot menangani error atau kesalahan dengan baik.',                     'The chatbot coped well with any errors or mistakes.'],
-  ['neg', 'Chatbot terlihat tidak mampu menangani error apapun.',                    'The chatbot seemed unable to handle any errors.'],
-  ['pos', 'Chatbot sangat mudah digunakan.',                                         'The chatbot was very easy to use.'],
-  ['neg', 'Chatbot terasa sangat rumit.',                                            'The chatbot was very complex.']
+  // — First impression / onboarding —
+  ['pos', 'Saat pertama membuka Sari, jelas bagaimana cara mulai bertanya.',          'When I first opened Sari, it was clear how to begin asking questions.'],
+  ['neg', 'Di awal, saya bingung apa yang bisa saya lakukan atau tanyakan.',          'At the start, I felt unsure about what I could do or ask.'],
+  // — Navigation —
+  ['pos', 'Berpindah antara bagian Chat, Belajar, dan Berita terasa mudah.',          'Moving between the Chat, Learn, and News sections felt easy.'],
+  ['neg', 'Menurut saya tata letaknya membingungkan untuk dijelajahi.',               'I found the layout confusing to find my way around.'],
+  // — Understanding the user —
+  ['pos', 'Sari memahami pertanyaan saya, bahkan saat saya pakai bahasa sehari-hari.','Sari understood my questions, even when I used everyday language.'],
+  ['neg', 'Sari sering salah memahami maksud pertanyaan saya.',                        'Sari often misunderstood what I was asking.'],
+  // — Relevance / usefulness —
+  ['pos', 'Jawabannya relevan dan berguna untuk investasi ESG di Indonesia.',         'The answers were relevant and useful for ESG investing in Indonesia.'],
+  ['neg', 'Jawaban Sari sering terasa melenceng atau kurang membantu.',               'Sari\'s answers often felt off-topic or unhelpful.'],
+  // — Clarity of explanations —
+  ['pos', 'Sari menjelaskan istilah ESG dengan cara yang mudah dipahami.',            'Sari explained ESG terms in a way that was easy to understand.'],
+  ['neg', 'Penjelasannya terlalu teknis atau penuh istilah rumit.',                   'The explanations were too technical or full of jargon.'],
+  // — Trust / credibility (critical for financial information) —
+  ['pos', 'Saya merasa bisa memercayai informasi ESG yang diberikan Sari.',           'I felt I could trust the ESG information Sari gave me.'],
+  ['neg', 'Saya ragu apakah informasi Sari akurat atau dapat diandalkan.',            'I was unsure whether Sari\'s information was accurate or reliable.'],
+  // — Engagement / personality —
+  ['pos', 'Mengobrol dengan Sari terasa alami dan menyenangkan.',                     'Chatting with Sari felt natural and pleasant.'],
+  ['neg', 'Berinteraksi dengan Sari terasa kaku atau seperti robot.',                 'Interacting with Sari felt robotic or impersonal.'],
+  // — Learning value / behavioural intention —
+  ['pos', 'Menggunakan Sari membuat saya lebih percaya diri soal investasi ESG.',     'Using Sari made me more confident about ESG investing.'],
+  ['neg', 'Saya tidak akan memilih chatbot seperti Sari untuk belajar investasi.',    'I would not choose a chatbot like Sari to learn about investing.']
 ];
 
 function computeCUQScore(scores){
@@ -1149,7 +1174,7 @@ function renderCUQResult(score, totalCount){
     '<div class="cuq-saved-pill">'+escapeHTML(savedNote)+'</div>' +
     '<div class="cr-stats">' +
       '<span><strong>'+totalCount+'</strong> '+escapeHTML(t('cuq.responses_count'))+'</span>' +
-      '<span>'+ (L==='en'?'Source':'Sumber') +': <strong>Holmes et al. (2019)</strong></span>' +
+      '<span>'+ (L==='en'?'Adapted from':'Diadaptasi dari') +': <strong>CUQ · SUS · TAM</strong></span>' +
     '</div>' +
     '<div class="cr-actions">' +
       '<button class="cuq-btn" id="cuqExportBtn2">'+escapeHTML(t('cuq.export_btn'))+'</button>' +
@@ -2486,8 +2511,8 @@ const I18N = {
     'ticker.hint':'geser / klik',
     'banner.empty':'Jalankan <code>python fetch_data.py</code> untuk fetch berita terbaru.',
     'cuq.btn':'⭐ Nilai Sari',
-    'cuq.title':'Nilai Sari (CUQ)',
-    'cuq.intro':'<strong>Chatbot Usability Questionnaire</strong> (Holmes et al., 2019) — 16 pertanyaan, skala 1–7. Hasil dipakai sebagai data evaluasi untuk tugas individu Master of Finance (FinTech).',
+    'cuq.title':'Nilai Sari',
+    'cuq.intro':'<strong>Survei Kegunaan &amp; Kepercayaan Sari</strong> — 16 pernyataan, skala 1–7. Disusun khusus untuk chatbot edukasi ESG, diadaptasi dari kerangka CUQ, SUS, dan TAM. Hasil dipakai sebagai data evaluasi untuk tugas individu Master of Finance (FinTech).',
     'cuq.name_label':'Nama (opsional)',
     'cuq.name_placeholder':'Misal: Joves',
     'cuq.comments_label':'Komentar tambahan (opsional)',
@@ -2613,8 +2638,8 @@ const I18N = {
     'ticker.hint':'swipe / click',
     'banner.empty':'Run <code>python fetch_data.py</code> to fetch the latest news.',
     'cuq.btn':'⭐ Rate Sari',
-    'cuq.title':'Rate Sari (CUQ)',
-    'cuq.intro':'<strong>Chatbot Usability Questionnaire</strong> (Holmes et al., 2019) — 16 items, 1–7 scale. Responses are used as evaluation data for the Master of Finance (FinTech) individual assignment.',
+    'cuq.title':'Rate Sari',
+    'cuq.intro':'<strong>Sari Usability &amp; Trust Survey</strong> — 16 statements, 1–7 scale. Purpose-built for an ESG-education chatbot and adapted from the CUQ, SUS, and TAM frameworks. Responses are used as evaluation data for the Master of Finance (FinTech) individual assignment.',
     'cuq.name_label':'Your name (optional)',
     'cuq.name_placeholder':'e.g. Joves',
     'cuq.comments_label':'Additional comments (optional)',
@@ -5731,6 +5756,61 @@ function addChips(){
   document.getElementById('chatMessages').appendChild(wrap);
 }
 
+/* ===== Onboarding starter chips =================================
+   Shown on chat load so a brand-new user always has something to
+   TAP — they never have to guess a magic word like "help".
+   Each starter chip fires a real question through sendMessage();
+   the last chip opens the full help menu.
+================================================================ */
+function addOnboardingChips(){
+  const L = window.CURRENT_LANG;
+  const starters = (L==='en') ? [
+    'What is ESG?',
+    'Why the 2026 MSCI Indonesia crisis?',
+    'Bibit vs Ajaib',
+    'Best ESG stock today',
+    'How do I start ESG investing?'
+  ] : [
+    'Apa itu ESG?',
+    'Kenapa krisis MSCI Indonesia 2026?',
+    'Bibit vs Ajaib',
+    'Saham ESG terbaik hari ini',
+    'Gimana cara mulai investasi ESG?'
+  ];
+  const hintText = (L==='en')
+    ? '👇 New here? Tap a question to begin — or type your own below.'
+    : '👇 Baru di sini? Ketuk salah satu pertanyaan untuk mulai — atau ketik sendiri di bawah.';
+  const helpLabel = (L==='en') ? '💡 What else can I ask?' : '💡 Apa lagi yang bisa saya tanya?';
+
+  const msgs = document.getElementById('chatMessages');
+  if(!msgs) return;
+
+  const hint = document.createElement('div');
+  hint.className = 'onboard-hint';
+  hint.textContent = hintText;
+  msgs.appendChild(hint);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-chips onboard-chips';
+  starters.forEach(s=>{
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = s;
+    c.onclick = ()=>{ document.getElementById('chatInput').value = s; sendMessage(); };
+    wrap.appendChild(c);
+  });
+  // Help opener — reuses the existing "help"/"bantuan" conversational flow
+  const h = document.createElement('button');
+  h.className = 'chip chip-help';
+  h.textContent = helpLabel;
+  h.onclick = ()=>{ document.getElementById('chatInput').value = (L==='en' ? 'help' : 'bantuan'); sendMessage(); };
+  wrap.appendChild(h);
+
+  msgs.appendChild(wrap);
+  const body = document.getElementById('chatBody');
+  if(body) body.scrollTop = 9999;
+}
+
 /* ===== Help category chips (step-by-step) ===== */
 function addHelpChips(){
   const L = window.CURRENT_LANG;
@@ -6182,7 +6262,10 @@ function renderChat(){
     // "my name is X" / "call me X" / "panggil saya X" patterns.
     addMessage(escapeHTML(getGreeting())+'! 🌿 '+t('intro.first'), 'bot');
   }
-  // Returning visit: chat fully blank — Sari speaks only when the user does.
+  // Always give a tappable starting point so the user is never stranded on a
+  // blank screen wondering what to type. This fixes the new-user navigation
+  // gap: previously a first-timer had to guess they could type "help".
+  addOnboardingChips();
 }
 
 /* ===== Teach modal ===== */
