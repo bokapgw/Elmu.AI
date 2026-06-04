@@ -993,11 +993,9 @@ function escapeHTML(s){
 }
 
 /* ===== ELUTS — Elemu Lestari Usability & Trust Survey ==============
-   Custom 16-item Likert instrument (1=Strongly Disagree → 7=Strongly Agree).
-   Adapted in structure from the CUQ (Holmes et al. 2019), SUS (Brooke 1996)
-   and TAM (Davis 1989); all item wording is original and ESG-tailored.
-   Odd items are POSITIVE statements, even items are NEGATIVE.
-   Score formula: sum((odd-1) + (7-even)) × (100/96) → 0–100 scale.
+   Custom SHORT instrument: 8 positively-worded items, one per construct,
+   on a 5-point Likert scale (1=Strongly Disagree → 5=Strongly Agree).
+   Built for quick (~1 min) feedback from casual respondents.
 
    ─────────────────────────────────────────────────────────────────────
    RATING_FORM_URL — paste your Google Form URL here once you create it
@@ -1008,56 +1006,41 @@ function escapeHTML(s){
    ───────────────────────────────────────────────────────────────────── */
 const RATING_FORM_URL = 'https://forms.gle/M7Nvpj3jGh4WTQat8';
 
-/* ELUTS — Elemu Lestari Usability & Trust Survey (custom instrument).
-   16 original items written for an ESG financial-education chatbot, grouped
-   into 8 constructs (2 items each, one positive + one negative to control
-   acquiescence bias). Adapted in STRUCTURE from the CUQ (Holmes et al. 2019),
-   SUS (Brooke 1996), and TAM (Davis 1989), but all wording is original and
-   tailored to Sari's ESG / Indonesian-retail-investor context.
-   Constructs (in order): first-impression · navigation · understanding ·
-   relevance · clarity · trust · engagement · learning-intention.
-   Scale 1–7; scoring (odd=pos: score-1, even=neg: 7-score) ×100/96 → 0–100. */
+/* ELUTS — short 8-item version (one positively-worded item per construct).
+   Adapted in STRUCTURE from CUQ (Holmes et al. 2019), SUS (Brooke 1996) and
+   TAM (Davis 1989); all wording is original and tailored to Sari's ESG /
+   Indonesian-retail-investor context. Constructs (in order): first-impression
+   · navigation · understanding · usefulness · clarity · trust · engagement ·
+   overall/intention. Scale 1–5; score = sum(answer-1) ×100/(items×4) → 0–100.
+   The fuller 16-item version (with reverse-coded items) is in
+   QUESTIONNAIRE_ELUTS.md for more rigorous psychometric evaluation. */
 const CUQ_ITEMS = [
-  // [polarity, indonesian, english]
-  // — First impression / onboarding —
-  ['pos', 'Saat pertama membuka Sari, jelas bagaimana cara mulai bertanya.',          'When I first opened Sari, it was clear how to begin asking questions.'],
-  ['neg', 'Di awal, saya bingung apa yang bisa saya lakukan atau tanyakan.',          'At the start, I felt unsure about what I could do or ask.'],
-  // — Navigation —
-  ['pos', 'Berpindah antara bagian Chat, Belajar, dan Berita terasa mudah.',          'Moving between the Chat, Learn, and News sections felt easy.'],
-  ['neg', 'Menurut saya tata letaknya membingungkan untuk dijelajahi.',               'I found the layout confusing to find my way around.'],
-  // — Understanding the user —
-  ['pos', 'Sari memahami pertanyaan saya, bahkan saat saya pakai bahasa sehari-hari.','Sari understood my questions, even when I used everyday language.'],
-  ['neg', 'Sari sering salah memahami maksud pertanyaan saya.',                        'Sari often misunderstood what I was asking.'],
-  // — Relevance / usefulness —
-  ['pos', 'Jawabannya relevan dan berguna untuk investasi ESG di Indonesia.',         'The answers were relevant and useful for ESG investing in Indonesia.'],
-  ['neg', 'Jawaban Sari sering terasa melenceng atau kurang membantu.',               'Sari\'s answers often felt off-topic or unhelpful.'],
-  // — Clarity of explanations —
-  ['pos', 'Sari menjelaskan istilah ESG dengan cara yang mudah dipahami.',            'Sari explained ESG terms in a way that was easy to understand.'],
-  ['neg', 'Penjelasannya terlalu teknis atau penuh istilah rumit.',                   'The explanations were too technical or full of jargon.'],
-  // — Trust / credibility (critical for financial information) —
-  ['pos', 'Saya merasa bisa memercayai informasi ESG yang diberikan Sari.',           'I felt I could trust the ESG information Sari gave me.'],
-  ['neg', 'Saya ragu apakah informasi Sari akurat atau dapat diandalkan.',            'I was unsure whether Sari\'s information was accurate or reliable.'],
-  // — Engagement / personality —
-  ['pos', 'Mengobrol dengan Sari terasa alami dan menyenangkan.',                     'Chatting with Sari felt natural and pleasant.'],
-  ['neg', 'Berinteraksi dengan Sari terasa kaku atau seperti robot.',                 'Interacting with Sari felt robotic or impersonal.'],
-  // — Learning value / behavioural intention —
-  ['pos', 'Menggunakan Sari membuat saya lebih percaya diri soal investasi ESG.',     'Using Sari made me more confident about ESG investing.'],
-  ['neg', 'Saya tidak akan memilih chatbot seperti Sari untuk belajar investasi.',    'I would not choose a chatbot like Sari to learn about investing.']
+  // [polarity, indonesian, english] — short version: all positively worded
+  ['pos', 'Saat pertama membuka Sari, jelas cara memulainya.',                        'When I first opened Sari, it was clear how to start.'],                       // onboarding
+  ['pos', 'Sari mudah dijelajahi — navigasinya gampang.',                             'Sari was easy to navigate and find my way around.'],                          // navigation
+  ['pos', 'Sari memahami pertanyaan saya dengan baik.',                               'Sari understood my questions well.'],                                          // understanding
+  ['pos', 'Jawaban Sari berguna dan relevan untuk investasi ESG.',                    'Sari\'s answers were useful and relevant to ESG investing.'],                  // usefulness
+  ['pos', 'Sari menjelaskan dengan cara yang mudah dipahami.',                        'Sari explained things in a way that was easy to understand.'],                 // clarity
+  ['pos', 'Saya bisa memercayai informasi yang diberikan Sari.',                      'I could trust the information Sari gave me.'],                                 // trust
+  ['pos', 'Mengobrol dengan Sari terasa menyenangkan dan alami.',                     'Talking to Sari felt pleasant and natural.'],                                 // engagement
+  ['pos', 'Secara keseluruhan, saya akan merekomendasikan Sari untuk belajar ESG.',   'Overall, I would recommend Sari for learning about ESG.']                      // overall / intention
 ];
 
 function computeCUQScore(scores){
-  // scores: array of 16 values 1-7
-  // Positive items (odd index, 0-based i=0,2,4...): score-1
-  // Negative items (even-positioned items, 0-based i=1,3,5...): 7-score
+  // scores: array of values on a 1–5 Likert scale.
+  // Positive items contribute (score-1); negative items contribute (5-score).
+  // Normalised to a 0–100 composite (higher = better). Scale-aware so the
+  // same code works whether there are 8 items or the full 16.
+  const MAX = 5;
   let total = 0;
   for(let i=0; i<CUQ_ITEMS.length; i++){
     const polarity = CUQ_ITEMS[i][0];
     const s = scores[i];
     if(polarity === 'pos') total += (s - 1);
-    else                    total += (7 - s);
+    else                    total += (MAX - s);
   }
-  // total max = 16 × 6 = 96; normalize to 0-100
-  return Math.round(total * (100/96) * 10) / 10;
+  const maxTotal = CUQ_ITEMS.length * (MAX - 1); // e.g. 8 × 4 = 32
+  return Math.round(total * (100/maxTotal) * 10) / 10;
 }
 
 function renderCUQForm(){
@@ -1068,14 +1051,14 @@ function renderCUQForm(){
   const L = window.CURRENT_LANG || 'id';
   const itemLang = L === 'en' ? 2 : 1;
 
-  let html = '<div class="cm-scale-labels"><span>1 = '+escapeHTML(t('cuq.scale_low'))+'</span><span>7 = '+escapeHTML(t('cuq.scale_high'))+'</span></div>';
+  let html = '<div class="cm-scale-labels"><span>1 = '+escapeHTML(t('cuq.scale_low'))+'</span><span>5 = '+escapeHTML(t('cuq.scale_high'))+'</span></div>';
   CUQ_ITEMS.forEach((it, i)=>{
     const polarity = it[0];
     const text = it[itemLang];
     html += '<div class="cuq-item">' +
       '<div><span class="ci-num">'+(i+1)+'</span><span class="ci-text '+polarity+'">'+escapeHTML(text)+'</span></div>' +
       '<div class="cuq-radios" data-item="'+i+'">';
-    for(let v=1; v<=7; v++){
+    for(let v=1; v<=5; v++){
       html += '<label data-val="'+v+'"><input type="radio" name="cuq_'+i+'" value="'+v+'">'+v+'</label>';
     }
     html += '</div></div>';
@@ -2512,7 +2495,7 @@ const I18N = {
     'banner.empty':'Jalankan <code>python fetch_data.py</code> untuk fetch berita terbaru.',
     'cuq.btn':'⭐ Nilai Sari',
     'cuq.title':'Nilai Sari',
-    'cuq.intro':'<strong>Survei Kegunaan &amp; Kepercayaan Sari</strong> — 16 pernyataan, skala 1–7. Disusun khusus untuk chatbot edukasi ESG, diadaptasi dari kerangka CUQ, SUS, dan TAM. Hasil dipakai sebagai data evaluasi untuk tugas individu Master of Finance (FinTech).',
+    'cuq.intro':'<strong>Survei Kegunaan &amp; Kepercayaan Sari</strong> — 8 pernyataan singkat, skala 1–5 (cuma ~1 menit). Disusun khusus untuk chatbot edukasi ESG, diadaptasi dari kerangka CUQ, SUS, dan TAM. Hasil dipakai sebagai data evaluasi untuk tugas individu Master of Finance (FinTech).',
     'cuq.name_label':'Nama (opsional)',
     'cuq.name_placeholder':'Misal: Joves',
     'cuq.comments_label':'Komentar tambahan (opsional)',
@@ -2639,7 +2622,7 @@ const I18N = {
     'banner.empty':'Run <code>python fetch_data.py</code> to fetch the latest news.',
     'cuq.btn':'⭐ Rate Sari',
     'cuq.title':'Rate Sari',
-    'cuq.intro':'<strong>Sari Usability &amp; Trust Survey</strong> — 16 statements, 1–7 scale. Purpose-built for an ESG-education chatbot and adapted from the CUQ, SUS, and TAM frameworks. Responses are used as evaluation data for the Master of Finance (FinTech) individual assignment.',
+    'cuq.intro':'<strong>Sari Usability &amp; Trust Survey</strong> — 8 short statements, 1–5 scale (about 1 minute). Purpose-built for an ESG-education chatbot and adapted from the CUQ, SUS, and TAM frameworks. Responses are used as evaluation data for the Master of Finance (FinTech) individual assignment.',
     'cuq.name_label':'Your name (optional)',
     'cuq.name_placeholder':'e.g. Joves',
     'cuq.comments_label':'Additional comments (optional)',

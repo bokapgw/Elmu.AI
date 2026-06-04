@@ -41,44 +41,45 @@ If `RATING_FORM_URL` is empty, the old in-app modal still works (saves to the us
 
 1. Go to <https://forms.google.com>
 2. Click the **+ Blank form** card (top-left)
-3. **Title:** `Rate Sari / Nilai Sari — Usability & Trust Survey`
+3. **Title:** `Rate Sari / Nilai Sari — Quick Feedback`
 4. **Description:** paste:
    ```
-   Help us evaluate Elemu Lestari (elmu.ai), an ESG-investing education chatbot. Please rate 16 short statements about your experience. Scale: 1 (Strongly Disagree) to 7 (Strongly Agree).
+   Help us evaluate Elemu Lestari (elmu.ai), an ESG-investing education chatbot. 8 quick statements — about 1 minute. Scale: 1 (Strongly Disagree) to 5 (Strongly Agree).
 
-   Bantu kami mengevaluasi Elemu Lestari (elmu.ai), chatbot edukasi investasi ESG. Nilai 16 pernyataan singkat tentang pengalaman kamu. Skala: 1 (Sangat Tidak Setuju) sampai 7 (Sangat Setuju).
+   Bantu kami mengevaluasi Elemu Lestari (elmu.ai), chatbot edukasi investasi ESG. 8 pernyataan singkat — sekitar 1 menit. Skala: 1 (Sangat Tidak Setuju) sampai 5 (Sangat Setuju).
    ```
 
 ---
 
-## Step 2 — Add the 16 survey questions (ELUTS)
+## Step 2 — Add the 8 survey questions (ELUTS, short version)
 
-> **Use the brand-new custom questions** — the full bilingual list with copy-paste blocks and the academic justification lives in **`QUESTIONNAIRE_ELUTS.md`**. (These replace the old copy-pasted CUQ items, per your lecturer's feedback.)
+> **Use the brand-new custom questions** — the full bilingual copy-paste blocks + academic justification live in **`QUESTIONNAIRE_ELUTS.md`** (section *"RECOMMENDED: the short version"*). These replace the old copy-pasted CUQ items, per your lecturer's feedback.
 
-For **each** of the 16 questions: click **+ Add question** → choose **Linear scale** → set **scale 1 to 7** → set the labels **1 = Strongly Disagree / Sangat Tidak Setuju** and **7 = Strongly Agree / Sangat Setuju** → mark it **Required**.
+For **each** of the 8 questions: click **+ Add question** → choose **Linear scale** → set **scale 1 to 5** → set the labels **1 = Strongly Disagree / Sangat Tidak Setuju** and **5 = Strongly Agree / Sangat Setuju** → mark it **Required**.
 
-> Tip: build the first question fully (scale + labels + Required), then click the **duplicate icon** (two squares) 15 times and just edit each one's text. Much faster than rebuilding 16 times.
+> Tip: build the first question fully (scale + labels + Required), then click the **duplicate icon** (two squares) 7 times and just edit each one's text. Much faster than rebuilding 8 times.
 
-**Each question is bilingual — paste English on line 1, Indonesian on line 2** (press Enter between them). Open `QUESTIONNAIRE_ELUTS.md` → section *"The 16 questions"* and copy each two-line block. Summary of what they measure:
+**Each question is bilingual — paste English on line 1, Indonesian on line 2** (press Enter between them). The 8 questions measure:
 
 | # | Construct | # | Construct |
 |---|---|---|---|
-| 1–2 | First impression / onboarding | 9–10 | Clarity of explanations |
-| 3–4 | Navigation | 11–12 | Trust / credibility |
-| 5–6 | Understanding the user | 13–14 | Engagement / personality |
-| 7–8 | Relevance / usefulness | 15–16 | Learning value / intention |
+| 1 | First impression / onboarding | 5 | Clarity of explanations |
+| 2 | Navigation / ease of use | 6 | Trust / credibility |
+| 3 | Understanding the user | 7 | Engagement / personality |
+| 4 | Usefulness | 8 | Overall / recommendation |
 
-> **Keep the exact order.** Odd items are positively worded, even items negatively worded — this controls "yes-bias" (acquiescence), and the 0–100 scoring formula assumes this alternation. See `QUESTIONNAIRE_ELUTS.md` → *Scoring* for the maths.
+> **Why a 5-point scale, not 7?** It's quicker for casual respondents and matches what most people are used to. The respondent only ever picks **1–5** — the "0–100" you may have seen is just the final score *you* compute from those answers (see `QUESTIONNAIRE_ELUTS.md` → *Scoring*).
+
+> **Already built the old 16-question form?** Easiest fix: open it, delete the questions you don't need (16 → 8), switch the scale from 1–7 to 1–5, and update the wording. The form link stays the same, so nothing in the code changes.
 
 ---
 
 ## Step 3 — Add the open-text follow-up fields
 
-After question 16, add **3 more questions** (these are **not** required):
+After question 8, add **2 more questions** (these are **not** required):
 
-1. **Short answer**: `Nama (opsional)` — optional name
-2. **Paragraph**: `Saran atau kritik (opsional)` — comments
-3. **Multiple choice** (single answer): `Bahasa yang dipakai saat menilai` — options: `Indonesian (id)`, `English (en)`. *(This one is auto-filled when the user clicks "⭐ Nilai Sari" — see Step 7.)*
+1. **Short answer**: `Name / Nama (optional / opsional)` — optional name
+2. **Paragraph**: `Comments or suggestions / Saran atau kritik (optional / opsional)` — comments
 
 ---
 
