@@ -257,6 +257,17 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .chip-help{background:var(--gold-pale);border-color:var(--gold-light);color:var(--gold);font-weight:600}
 .chip-help:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
 [data-theme="dark"] .chip-help:hover{color:#0F1612}
+/* First-visit welcome card (3-tab explainer) — re-openable via the "?" header button */
+.welcome-card{background:var(--hint-bg);border:1.5px solid var(--border);border-left:4px solid var(--emerald);border-radius:12px;padding:14px 16px;margin:4px 0 6px;font-size:13px;line-height:1.6;color:var(--ink)}
+.welcome-card .wc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}
+.welcome-card h4{margin:0;font-size:14.5px;color:var(--emerald);font-weight:800;letter-spacing:0.2px;flex:1}
+.welcome-card ul{margin:0;padding:0;list-style:none}
+.welcome-card li{margin:6px 0;color:var(--ink)}
+.welcome-card .wc-tip{margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);font-size:12px;color:var(--muted)}
+.welcome-card .wc-dismiss{flex:none;background:var(--panel-bg);border:1px solid var(--border);color:var(--emerald);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s}
+.welcome-card .wc-dismiss:hover{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
+[data-theme="dark"] .welcome-card .wc-dismiss:hover{color:#0F1612}
+@media(max-width:480px){.welcome-card{font-size:12.5px;padding:12px 13px}.welcome-card h4{font-size:13.5px}.welcome-card .wc-dismiss{font-size:10px;padding:3px 7px}}
 .dym{margin-top:-2px;margin-left:40px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:88%}
 .dym-label{font-size:11.5px;color:var(--muted);font-style:italic;white-space:nowrap}
 .dym a{color:var(--emerald);text-decoration:none;font-weight:600;cursor:pointer;font-size:12.5px;background:var(--cream-deep);padding:5px 12px;border-radius:14px;border:1px solid var(--border);transition:all 0.2s;display:inline-flex;align-items:center;gap:4px}
@@ -593,6 +604,7 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
         <span class="lang-flag" id="langFlag" aria-hidden="true"></span><span class="lang-code" id="langIcon">EN</span>
       </button>
       <button class="hdr-btn" id="themeToggle" title="Light/Dark theme" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+      <button class="hdr-btn" id="helpBtn" title="Cara pakai Sari" aria-label="How to use Sari"><span aria-hidden="true">?</span></button>
     </div>
     <div class="meta">
       <strong id="metaDegree">Master of Finance · FinTech</strong><br>
@@ -2461,6 +2473,19 @@ const I18N = {
     'greeting.night':'Selamat malam',
     'location.label':'Bursa Efek Indonesia · Jakarta',
     'intro.first':'Saya <strong>Sari</strong>, asisten investasi ESG kamu. Ada yang bisa saya bantu hari ini?<br><br><em>Baru kenal ESG? Coba tanya \'Apa itu ESG?\' — lalu klik <strong>💡 Jelaskan sederhana</strong> kalau ada jawaban yang terasa terlalu teknis.</em>',
+    'onb.hint':'👇 Baru di sini? Ketuk salah satu pertanyaan untuk mulai — atau ketik sendiri di bawah.',
+    'onb.chip.esg':'Apa itu ESG?',
+    'onb.chip.start':'Saya baru — mulai dari mana?',
+    'onb.chip.msci':'Apa itu krisis MSCI 2026?',
+    'onb.chip.invest':'Cara mulai investasi di Indonesia?',
+    'onb.chip.profit':'Apakah investasi ESG menguntungkan?',
+    'onb.card.title':'Selamat datang di Elemu Lestari 🌿',
+    'onb.card.ask':'💬 <strong>Tanya</strong> — tanya apa saja tentang investasi ESG',
+    'onb.card.learn':'📚 <strong>Belajar</strong> — belajar langkah demi langkah, dari dasar',
+    'onb.card.advise':'🎯 <strong>Saran</strong> — jawab 5 pertanyaan untuk saran ESG personal',
+    'onb.card.tip':'Baru kenal ESG? Ketuk "Saya baru — mulai dari mana?" di bawah.',
+    'onb.card.dismiss':'Mengerti',
+    'onb.help.tip':'Cara pakai Sari',
     'simplify.btn':'Jelaskan sederhana',
     'simplify.tag':'🌱 Versi sederhana',
     'simplify.hover':'Klik untuk penjelasan lebih sederhana',
@@ -2588,6 +2613,19 @@ const I18N = {
     'greeting.night':'Good night',
     'location.label':'Indonesia Stock Exchange · Jakarta',
     'intro.first':'I\'m <strong>Sari</strong>, your ESG investment assistant. What can I help you with today?<br><br><em>Brand new to ESG? Try asking \'What is ESG?\' — then click <strong>💡 Explain simply</strong> if any answer feels too technical.</em>',
+    'onb.hint':'👇 New here? Tap a question to begin — or type your own below.',
+    'onb.chip.esg':'What is ESG?',
+    'onb.chip.start':'I\'m new — where do I start?',
+    'onb.chip.msci':'What happened with MSCI in 2026?',
+    'onb.chip.invest':'How do I start investing in Indonesia?',
+    'onb.chip.profit':'Is ESG investing profitable?',
+    'onb.card.title':'Welcome to Elemu Lestari 🌿',
+    'onb.card.ask':'💬 <strong>Tanya (Ask)</strong> — ask me anything about ESG investing',
+    'onb.card.learn':'📚 <strong>Belajar (Learn)</strong> — learn step by step, from the basics',
+    'onb.card.advise':'🎯 <strong>Saran (Advise)</strong> — answer 5 questions for personal ESG suggestions',
+    'onb.card.tip':'New to ESG? Tap "I\'m new — where do I start?" below.',
+    'onb.card.dismiss':'Got it',
+    'onb.help.tip':'How to use Sari',
     'simplify.btn':'Explain simply',
     'simplify.tag':'🌱 Simplified version',
     'simplify.hover':'Click for a simpler explanation',
@@ -4782,6 +4820,7 @@ const LANG = {
     if(flagEl){ flagEl.innerHTML = (L==='id') ? FLAG_UK_SVG : FLAG_ID_SVG; }
     if(btn){ btn.title = (L==='id') ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'; }
     document.getElementById('langIcon').textContent = L==='id'?'EN':'ID';
+    const helpBtnEl = document.getElementById('helpBtn'); if(helpBtnEl) helpBtnEl.title = t('onb.help.tip');
     document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
     const map = {
       'tagline':'tagline','metaDegree':'meta.degree','metaSchool':'meta.school',
@@ -5791,50 +5830,89 @@ function addChips(){
    Each starter chip fires a real question through sendMessage();
    the last chip opens the full help menu.
 ================================================================ */
-function addOnboardingChips(){
-  const L = window.CURRENT_LANG;
-  const starters = (L==='en') ? [
-    'What is ESG?',
-    'Why the 2026 MSCI Indonesia crisis?',
-    'Bibit vs Ajaib',
-    'Best ESG stock today',
-    'How do I start ESG investing?'
-  ] : [
-    'Apa itu ESG?',
-    'Kenapa krisis MSCI Indonesia 2026?',
-    'Bibit vs Ajaib',
-    'Saham ESG terbaik hari ini',
-    'Gimana cara mulai investasi ESG?'
-  ];
-  const hintText = (L==='en')
-    ? '👇 New here? Tap a question to begin — or type your own below.'
-    : '👇 Baru di sini? Ketuk salah satu pertanyaan untuk mulai — atau ketik sendiri di bawah.';
-  const helpLabel = (L==='en') ? '💡 What else can I ask?' : '💡 Apa lagi yang bisa saya tanya?';
-
+/* ===== First-visit welcome card (explains the 3 tabs) =====
+   Shown once on first load (gated by STORE 'seen_intro'). Dismissed by the ✕
+   button, by the first chat send, or by tapping the "I'm new" starter chip.
+   The "?" header button re-opens it any time. All copy is bilingual via t(). */
+function buildWelcomeCard(){
+  const card = document.createElement('div');
+  card.className = 'welcome-card';
+  card.id = 'welcomeCard';
+  // <li> items carry <strong> tags from the (trusted) i18n table → inserted as
+  // raw HTML; plain-text fields are escaped.
+  card.innerHTML =
+    '<div class="wc-head"><h4>'+escapeHTML(t('onb.card.title'))+'</h4>'+
+    '<button type="button" class="wc-dismiss" aria-label="'+escapeHTML(t('onb.card.dismiss'))+'">✕ '+escapeHTML(t('onb.card.dismiss'))+'</button></div>'+
+    '<ul><li>'+t('onb.card.ask')+'</li><li>'+t('onb.card.learn')+'</li><li>'+t('onb.card.advise')+'</li></ul>'+
+    '<div class="wc-tip">'+escapeHTML(t('onb.card.tip'))+'</div>';
+  card.querySelector('.wc-dismiss').onclick = dismissWelcomeCard;
+  return card;
+}
+function showWelcomeCard(){
   const msgs = document.getElementById('chatMessages');
   if(!msgs) return;
+  const old = document.getElementById('welcomeCard');
+  if(old) old.remove();
+  msgs.insertBefore(buildWelcomeCard(), msgs.firstChild); // pin to top of chat area
+  const body = document.getElementById('chatBody');
+  if(body) body.scrollTop = 0; // ensure it's visible even mid-conversation
+}
+function dismissWelcomeCard(){
+  const c = document.getElementById('welcomeCard');
+  if(c) c.remove();
+  STORE.set('seen_intro', true); // never auto-show again
+}
+
+/* ===== Starter question chips (first-load onboarding) =====
+   Tappable, jargon-free questions so a first-timer is never stranded on a blank
+   input. Shown ONLY when the chat has no user turns yet (so they don't clutter an
+   ongoing conversation). Each label is also the query that gets sent (read via
+   t(), so it follows the active language). The "start" chip is special: it routes
+   the beginner into Lesson 1 instead of sending a chat message. */
+function addOnboardingChips(){
+  const msgs = document.getElementById('chatMessages');
+  if(!msgs) return;
+  if(msgs.querySelector('.msg.user')) return; // ongoing conversation → skip
+
+  const chips = [
+    { key:'onb.chip.esg',    action:'ask'   },
+    { key:'onb.chip.start',  action:'learn' },
+    { key:'onb.chip.msci',   action:'ask'   },
+    { key:'onb.chip.invest', action:'ask'   },
+    { key:'onb.chip.profit', action:'ask'   }
+  ];
 
   const hint = document.createElement('div');
   hint.className = 'onboard-hint';
-  hint.textContent = hintText;
+  hint.textContent = t('onb.hint');
   msgs.appendChild(hint);
 
   const wrap = document.createElement('div');
-  wrap.className = 'quick-chips onboard-chips';
-  starters.forEach(s=>{
-    const c = document.createElement('button');
-    c.className = 'chip';
-    c.textContent = s;
-    c.onclick = ()=>{ document.getElementById('chatInput').value = s; sendMessage(); };
-    wrap.appendChild(c);
+  wrap.className = 'onboard-chips';
+  chips.forEach(c=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'suggest-chip';
+    b.textContent = t(c.key);
+    if(c.action === 'learn'){
+      // Beginner path → structured lessons, not the chat matcher.
+      b.onclick = ()=>{
+        STORE.set('seen_intro', true);
+        const wc = document.getElementById('welcomeCard'); if(wc) wc.remove();
+        activateTab('learn');
+        _currentLesson = 0;
+        STORE.set('lesson', 0);
+        renderLesson();
+      };
+    } else {
+      b.onclick = ()=>{
+        const input = document.getElementById('chatInput');
+        if(input) input.value = t(c.key);
+        sendMessage(); // auto-send: beginners shouldn't have to find the send button
+      };
+    }
+    wrap.appendChild(b);
   });
-  // Help opener — reuses the existing "help"/"bantuan" conversational flow
-  const h = document.createElement('button');
-  h.className = 'chip chip-help';
-  h.textContent = helpLabel;
-  h.onclick = ()=>{ document.getElementById('chatInput').value = (L==='en' ? 'help' : 'bantuan'); sendMessage(); };
-  wrap.appendChild(h);
-
   msgs.appendChild(wrap);
   const body = document.getElementById('chatBody');
   if(body) body.scrollTop = 9999;
@@ -5978,6 +6056,11 @@ function sendMessage(){
   const input = document.getElementById('chatInput');
   const v = input.value.trim();
   if(!v) return;
+  // First real interaction retires the one-time welcome card for good.
+  if(!STORE.get('seen_intro', false)){
+    STORE.set('seen_intro', true);
+    const wc = document.getElementById('welcomeCard'); if(wc) wc.remove();
+  }
   _chatBusy = true;
   // Safety unlock — guarantee unlock even if a code path forgets to clear it
   // (eg. an unexpected exception inside a setTimeout callback)
@@ -6284,6 +6367,9 @@ function renderChat(){
   if(!msgs) return;
   msgs.innerHTML = '';
   _awaitingName = false; // no more proactive name-asking
+  // First-visit welcome card explaining the 3 tabs (Tanya / Belajar / Saran).
+  // Shown once; the "?" header button re-opens it later. Sits above the greeting.
+  if(!STORE.get('seen_intro', false)) showWelcomeCard();
   const name = STORE.get('user_name', null);
   if(!name){
     // First visit: soft offer of help, NO demand for name.
@@ -7001,6 +7087,9 @@ function initApp(){
   document.getElementById('langToggle').onclick = ()=>LANG.toggle();
   document.getElementById('themeToggle').onclick = ()=>THEME.toggle();
   document.getElementById('newsBtn').onclick = openNewsModal;
+  // "?" help button → jump to chat and re-show the welcome / 3-tab guide.
+  const helpBtn = document.getElementById('helpBtn');
+  if(helpBtn) helpBtn.onclick = ()=>{ activateTab('chat'); showWelcomeCard(); };
   document.getElementById('newsModalClose').onclick = closeNewsModal;
   document.getElementById('newsModal').addEventListener('click', e=>{ if(e.target.id==='newsModal') closeNewsModal(); });
   updateNewsBadge();
