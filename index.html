@@ -5867,20 +5867,17 @@ function dismissWelcomeCard(){
    Tappable, jargon-free questions so a first-timer is never stranded on a blank
    input. Shown ONLY when the chat has no user turns yet (so they don't clutter an
    ongoing conversation). Each label is also the query that gets sent (read via
-   t(), so it follows the active language). The "start" chip is special: it routes
-   the beginner into Lesson 1 instead of sending a chat message. */
+   t(), so it follows the active language). EVERY chip keeps the beginner inside
+   the conversation — Sari does the guiding. "Saya baru — mulai dari mana?" routes
+   to the 'start' getting-started answer via the normal matcher; we deliberately do
+   NOT teleport first-timers into the Belajar/Saran tabs (those are optional extras,
+   the chatbot is the main experience). */
 function addOnboardingChips(){
   const msgs = document.getElementById('chatMessages');
   if(!msgs) return;
   if(msgs.querySelector('.msg.user')) return; // ongoing conversation → skip
 
-  const chips = [
-    { key:'onb.chip.esg',    action:'ask'   },
-    { key:'onb.chip.start',  action:'learn' },
-    { key:'onb.chip.msci',   action:'ask'   },
-    { key:'onb.chip.invest', action:'ask'   },
-    { key:'onb.chip.profit', action:'ask'   }
-  ];
+  const chips = ['onb.chip.esg','onb.chip.start','onb.chip.msci','onb.chip.invest','onb.chip.profit'];
 
   const hint = document.createElement('div');
   hint.className = 'onboard-hint';
@@ -5889,28 +5886,18 @@ function addOnboardingChips(){
 
   const wrap = document.createElement('div');
   wrap.className = 'onboard-chips';
-  chips.forEach(c=>{
+  chips.forEach(key=>{
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'suggest-chip';
-    b.textContent = t(c.key);
-    if(c.action === 'learn'){
-      // Beginner path → structured lessons, not the chat matcher.
-      b.onclick = ()=>{
-        STORE.set('seen_intro', true);
-        const wc = document.getElementById('welcomeCard'); if(wc) wc.remove();
-        activateTab('learn');
-        _currentLesson = 0;
-        STORE.set('lesson', 0);
-        renderLesson();
-      };
-    } else {
-      b.onclick = ()=>{
-        const input = document.getElementById('chatInput');
-        if(input) input.value = t(c.key);
-        sendMessage(); // auto-send: beginners shouldn't have to find the send button
-      };
-    }
+    b.textContent = t(key);
+    // Every chip sends its question to Sari — including the beginner "where do I
+    // start?" one. The chatbot guides; we never teleport the user out to a tab.
+    b.onclick = ()=>{
+      const input = document.getElementById('chatInput');
+      if(input) input.value = t(key);
+      sendMessage(); // auto-send: beginners shouldn't have to find the send button
+    };
     wrap.appendChild(b);
   });
   msgs.appendChild(wrap);
