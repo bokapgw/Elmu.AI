@@ -1904,6 +1904,21 @@ function detectIdentityIntent(query){
   return null;
 }
 
+/* ORIENTATION INTENT — a true beginner ("I'm new", "where do I start?",
+   "saya baru", "mulai dari mana") wants to UNDERSTAND ESG first, not get
+   brokerage steps. Returns true only for beginner-orientation phrasing AND
+   only when the user did NOT mention investing/stocks — those go to the
+   separate 'start' investment guide. */
+function detectOrientationIntent(query){
+  if(!query) return false;
+  const q = ' ' + query.toLowerCase().replace(/[—–-]/g,' ').replace(/[?.,!]/g,' ').replace(/\s+/g,' ') + ' ';
+  // Investment-flavoured → let it fall through to the 'start' how-to instead.
+  if(/\b(investasi|investing|invest|saham|stock|stocks|beli|buy|reksa\s?dana|reksadana|sukuk|portofolio|portfolio|trading|broker|sekuritas|nabung)\b/.test(q)) return false;
+  const en = /\b(i\s?am\s+new|i'?m\s+new|new\s+here|new\s+to\s+esg|where\s+(do|should|can)\s+i\s+(start|begin)|where\s+to\s+(start|begin)|how\s+do\s+i\s+begin|just\s+starting|complete\s+beginner|total\s+beginner|total\s+newbie)\b/.test(q);
+  const id = /\b(saya\s+baru|aku\s+baru|gue\s+baru|baru\s+di\s+sini|baru\s+disini|mulai\s+dari\s+mana|dari\s+mana\s+(saya\s+)?mulai|harus\s+mulai\s+dari\s+mana|masih\s+awam|orang\s+awam|baru\s+kenal|baru\s+belajar|panduan\s+pemula)\b/.test(q);
+  return en || id;
+}
+
 // Off-topic detection. Returns a category string (eg 'culinary') or null.
 // Tuned for clear off-topic intent — e.g. recipes, sports scores, jokes —
 // while still allowing legitimate ESG queries that mention food companies
@@ -3246,6 +3261,34 @@ const FAQ_DATA = [
   // ============================================================
   // SECTION 7 · RETAIL EDUCATION — beginner guide, literacy, risk
   // ============================================================
+  { id:'orientation', category:'retail-literacy', intent:'definitional', kw_id:['mulai dari mana','baru kenal esg','pemula esg','awam esg','panduan pemula','orientasi esg'], kw_en:['where do i start','i am new','new to esg','beginner guide','getting started esg','esg orientation'],
+    a_id:"<strong>Selamat datang! 🌿 Yuk kenalan dulu dengan ESG</strong><br><br>" +
+         "Santai aja — kamu belum perlu paham saham atau investasi. Kita mulai dari konsepnya dulu.<br><br>" +
+         "<strong>ESG itu cara menilai perusahaan</strong> bukan cuma dari untungnya, tapi dari 3 sisi:<br>" +
+         "• 🌱 <strong>E — Environmental (Lingkungan)</strong>: dampak ke alam — emisi, limbah, energi<br>" +
+         "• 🤝 <strong>S — Social (Sosial)</strong>: cara memperlakukan karyawan, komunitas, konsumen<br>" +
+         "• ⚖️ <strong>G — Governance (Tata Kelola)</strong>: kejujuran &amp; transparansi cara perusahaan dikelola<br><br>" +
+         "<strong>Coba ketuk salah satu ini untuk lanjut:</strong><br>" +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu ESG?'; sendMessage();\">Apa itu ESG?</button> " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu greenwashing?'; sendMessage();\">Apa itu greenwashing?</button> " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu krisis MSCI 2026?'; sendMessage();\">Krisis MSCI 2026?</button><br><br>" +
+         "Nanti kalau kamu sudah paham dan <em>tertarik mulai investasi</em> — itu bagian yang berbeda — tinggal ketuk: " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Cara mulai investasi ESG'; sendMessage();\">Cara mulai investasi ESG</button> 😊",
+    simple_id:"ESG itu menilai perusahaan dari 3 sisi: Lingkungan (E), Sosial (S), dan Tata Kelola/kejujuran (G) — bukan cuma untung. Untuk mulai, kamu cukup paham konsepnya dulu. Kalau sudah siap, baru belajar cara investasinya (itu bagian terpisah).",
+    a_en:"<strong>Welcome! 🌿 Let's get to know ESG first</strong><br><br>" +
+         "Relax — you don't need to understand stocks or investing yet. Let's start with the idea itself.<br><br>" +
+         "<strong>ESG is a way of judging a company</strong> not just by its profit, but by 3 things:<br>" +
+         "• 🌱 <strong>E — Environmental</strong>: impact on nature — emissions, waste, energy<br>" +
+         "• 🤝 <strong>S — Social</strong>: how it treats employees, communities, customers<br>" +
+         "• ⚖️ <strong>G — Governance</strong>: honesty &amp; transparency in how it's run<br><br>" +
+         "<strong>Tap one of these to continue:</strong><br>" +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is ESG?'; sendMessage();\">What is ESG?</button> " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is greenwashing?'; sendMessage();\">What is greenwashing?</button> " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What happened with MSCI in 2026?'; sendMessage();\">MSCI 2026 crisis?</button><br><br>" +
+         "Later, once you understand the basics and <em>want to start investing</em> — that's a separate part — just tap: " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='How to start ESG investing'; sendMessage();\">How to start ESG investing</button> 😊",
+    simple_en:"ESG judges a company on 3 things: Environment (E), Social (S), and Governance/honesty (G) — not just profit. To begin, you just need to understand the concept. When you're ready, then learn how to invest (that's a separate part)." },
+
   { id:'start', category:'retail-literacy', intent:'how-to', kw_id:['mulai','pemula','baru','cara mulai','newbie'], kw_en:['start','begin','beginner','how to start','new investor'],
     a_id:"<strong>Cara mulai investasi yang ramah lingkungan di Indonesia</strong> 🌱<br><br>" +
          "Tenang, kamu tidak perlu jadi ahli untuk mulai. Ikuti langkah-langkah ini:<br><br>" +
@@ -6099,6 +6142,27 @@ function _processMessage(v, input){
         addMessage(html, 'bot', { simplifyEntryId: target.id });
         _chatBusy = false;
       }, iDelay);
+      return;
+    }
+  }
+
+  // ORIENTATION INTENT — beginner "where do I start / I'm new" → concept-first
+  // ESG welcome, NOT the investment how-to. Mirrors the identity pre-router so
+  // the chatbot itself guides the newcomer (no teleport to other tabs).
+  if(detectOrientationIntent(v)){
+    const target = getEntryById('orientation');
+    if(target){
+      showTyping();
+      const oDelay = 400 + Math.floor(Math.random()*300);
+      setTimeout(()=>{
+        hideTyping();
+        const L = window.CURRENT_LANG || 'id';
+        const body = target['a_'+L] || target.a_id;
+        _lastEntryId = target.id;
+        _lastQuery = v;
+        addMessage(body, 'bot', { noAnimation: true, simplifyEntryId: target.id });
+        _chatBusy = false;
+      }, oDelay);
       return;
     }
   }
