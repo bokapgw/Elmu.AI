@@ -3262,32 +3262,26 @@ const FAQ_DATA = [
   // SECTION 7 · RETAIL EDUCATION — beginner guide, literacy, risk
   // ============================================================
   { id:'orientation', category:'retail-literacy', intent:'definitional', kw_id:['mulai dari mana','baru kenal esg','pemula esg','awam esg','panduan pemula','orientasi esg'], kw_en:['where do i start','i am new','new to esg','beginner guide','getting started esg','esg orientation'],
-    a_id:"<strong>Selamat datang! 🌿 Yuk kenalan dulu dengan ESG</strong><br><br>" +
-         "Santai aja — kamu belum perlu paham saham atau investasi. Kita mulai dari konsepnya dulu.<br><br>" +
-         "<strong>ESG itu cara menilai perusahaan</strong> bukan cuma dari untungnya, tapi dari 3 sisi:<br>" +
-         "• 🌱 <strong>E — Environmental (Lingkungan)</strong>: dampak ke alam — emisi, limbah, energi<br>" +
-         "• 🤝 <strong>S — Social (Sosial)</strong>: cara memperlakukan karyawan, komunitas, konsumen<br>" +
-         "• ⚖️ <strong>G — Governance (Tata Kelola)</strong>: kejujuran &amp; transparansi cara perusahaan dikelola<br><br>" +
-         "<strong>Coba ketuk salah satu ini untuk lanjut:</strong><br>" +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu ESG?'; sendMessage();\">Apa itu ESG?</button> " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu greenwashing?'; sendMessage();\">Apa itu greenwashing?</button> " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu krisis MSCI 2026?'; sendMessage();\">Krisis MSCI 2026?</button><br><br>" +
-         "Nanti kalau kamu sudah paham dan <em>tertarik mulai investasi</em> — itu bagian yang berbeda — tinggal ketuk: " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Cara mulai investasi ESG'; sendMessage();\">Cara mulai investasi ESG</button> 😊",
-    simple_id:"ESG itu menilai perusahaan dari 3 sisi: Lingkungan (E), Sosial (S), dan Tata Kelola/kejujuran (G) — bukan cuma untung. Untuk mulai, kamu cukup paham konsepnya dulu. Kalau sudah siap, baru belajar cara investasinya (itu bagian terpisah).",
-    a_en:"<strong>Welcome! 🌿 Let's get to know ESG first</strong><br><br>" +
-         "Relax — you don't need to understand stocks or investing yet. Let's start with the idea itself.<br><br>" +
-         "<strong>ESG is a way of judging a company</strong> not just by its profit, but by 3 things:<br>" +
-         "• 🌱 <strong>E — Environmental</strong>: impact on nature — emissions, waste, energy<br>" +
-         "• 🤝 <strong>S — Social</strong>: how it treats employees, communities, customers<br>" +
-         "• ⚖️ <strong>G — Governance</strong>: honesty &amp; transparency in how it's run<br><br>" +
-         "<strong>Tap one of these to continue:</strong><br>" +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is ESG?'; sendMessage();\">What is ESG?</button> " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is greenwashing?'; sendMessage();\">What is greenwashing?</button> " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What happened with MSCI in 2026?'; sendMessage();\">MSCI 2026 crisis?</button><br><br>" +
-         "Later, once you understand the basics and <em>want to start investing</em> — that's a separate part — just tap: " +
-         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='How to start ESG investing'; sendMessage();\">How to start ESG investing</button> 😊",
-    simple_en:"ESG judges a company on 3 things: Environment (E), Social (S), and Governance/honesty (G) — not just profit. To begin, you just need to understand the concept. When you're ready, then learn how to invest (that's a separate part)." },
+    a_id:"<strong>Selamat datang! 🌿 Saya Sari — saya di sini buat bantu kamu paham ESG, pelan-pelan.</strong><br><br>" +
+         "Tenang, kamu belum perlu tahu apa-apa. Cara pakai saya gampang: <strong>ketik pertanyaan apa aja</strong>, atau ketuk salah satu topik di bawah. Tiap jawaban ada tombol <strong>💡 \"Jelaskan sederhana\"</strong> kalau ada yang terlalu teknis.<br><br>" +
+         "<strong>Hal yang bisa kamu tanyakan ke saya:</strong><br>" +
+         "🌱 <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu ESG?'; sendMessage();\">Apa itu ESG?</button> konsep dasarnya (E, S, G)<br>" +
+         "⚠️ <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu greenwashing?'; sendMessage();\">Apa itu greenwashing?</button> biar nggak ketipu klaim \"hijau\" palsu<br>" +
+         "📉 <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Apa itu krisis MSCI 2026?'; sendMessage();\">Krisis MSCI 2026?</button> kenapa pasar Indonesia sempat heboh<br><br>" +
+         "Kalau nanti kamu sudah paham dan <em>mau mulai investasi</em> — itu bagian yang berbeda — tinggal ketuk: " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='Cara mulai investasi ESG'; sendMessage();\">Cara mulai investasi ESG</button><br><br>" +
+         "Jadi, mau mulai dari mana? 😊",
+    simple_id:"Saya Sari, asisten ESG kamu. Ketik pertanyaan apa aja, atau ketuk topik di bawah (Apa itu ESG?, greenwashing, krisis MSCI). Tiap jawaban ada tombol \"Jelaskan sederhana\". Soal cara investasi, itu bagian terpisah — tanya kalau sudah siap.",
+    a_en:"<strong>Welcome! 🌿 I'm Sari — I'm here to help you understand ESG, step by step.</strong><br><br>" +
+         "No need to know anything yet. Using me is easy: <strong>type any question</strong>, or tap one of the topics below. Every answer has a <strong>💡 \"Explain simply\"</strong> button if something feels too technical.<br><br>" +
+         "<strong>Things you can ask me:</strong><br>" +
+         "🌱 <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is ESG?'; sendMessage();\">What is ESG?</button> the basics (E, S, G)<br>" +
+         "⚠️ <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What is greenwashing?'; sendMessage();\">What is greenwashing?</button> so you're not fooled by fake \"green\" claims<br>" +
+         "📉 <button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='What happened with MSCI in 2026?'; sendMessage();\">MSCI 2026 crisis?</button> why Indonesia's market got shaken<br><br>" +
+         "When you understand the basics and <em>want to start investing</em> — that's a separate part — just tap: " +
+         "<button class=\"suggest-chip\" onclick=\"document.getElementById('chatInput').value='How to start ESG investing'; sendMessage();\">How to start ESG investing</button><br><br>" +
+         "So — where would you like to start? 😊",
+    simple_en:"I'm Sari, your ESG assistant. Type any question, or tap a topic below (What is ESG?, greenwashing, MSCI crisis). Every answer has an \"Explain simply\" button. Investing is a separate part — ask when you're ready." },
 
   { id:'start', category:'retail-literacy', intent:'how-to', kw_id:['mulai','pemula','baru','cara mulai','newbie'], kw_en:['start','begin','beginner','how to start','new investor'],
     a_id:"<strong>Cara mulai investasi yang ramah lingkungan di Indonesia</strong> 🌱<br><br>" +
