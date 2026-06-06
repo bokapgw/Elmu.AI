@@ -668,7 +668,7 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
         </div>
         <div class="character-info">
           <div class="character-name">Sari</div>
-          <div class="character-subtitle" data-i18n="character.subtitle">Asisten Investasi ESG</div>
+          <div class="character-subtitle" data-i18n="character.subtitle">Asisten ESG</div>
           <div class="character-status" data-i18n="character.status">Online · siap membantu</div>
         </div>
       </div>
@@ -835,7 +835,7 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
 "use strict";
 
 /* =============================================================================
-   ELEMU LESTARI · elmu.ai · ESG INVESTMENT ASSISTANT
+   ELEMU LESTARI · elmu.ai · ESG ASSISTANT
    Bilingual (id/en), themed, persistent, multi-tab — single static HTML file.
    Deployment: GitHub → Netlify auto-deploy. Zero backend.
    =============================================================================
@@ -1660,8 +1660,8 @@ const CONVERSATIONAL = [
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en'
-        ? "My name is <strong>Sari</strong> 🌿 — I\'m the ESG investment assistant in ELMU.AI."
-        : "Nama saya <strong>Sari</strong> 🌿 — asisten investasi ESG di ELMU.AI.";
+        ? "My name is <strong>Sari</strong> 🌿 — I\'m the ESG assistant in ELMU.AI."
+        : "Nama saya <strong>Sari</strong> 🌿 — asisten ESG di ELMU.AI.";
     }
   },
   {
@@ -1670,8 +1670,8 @@ const CONVERSATIONAL = [
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en'
-        ? "I\'m <strong>Sari</strong>, the ESG investment assistant in <strong>ELMU.AI</strong> 🌿 — built as a Master of Finance (FinTech) prototype at Asia Pacific University. I help Indonesian retail investors understand ESG, OJK regulations, the 2026 MSCI crisis, and green investment products. I\'m a rule-based chatbot, not a generative AI."
-        : "Saya <strong>Sari</strong>, asisten investasi ESG di <strong>ELMU.AI</strong> 🌿 — proyek prototipe Master of Finance (FinTech) di Asia Pacific University. Saya bantu investor ritel Indonesia memahami ESG, regulasi OJK, krisis MSCI 2026, dan produk investasi hijau. Saya chatbot berbasis aturan (rule-based), bukan AI generatif.";
+        ? "I\'m <strong>Sari</strong>, the ESG assistant in <strong>ELMU.AI</strong> 🌿 — built as a Master of Finance (FinTech) prototype at Asia Pacific University. I help Indonesian retail investors understand ESG, OJK regulations, the 2026 MSCI crisis, and green investment products. I\'m a rule-based chatbot, not a generative AI."
+        : "Saya <strong>Sari</strong>, asisten ESG di <strong>ELMU.AI</strong> 🌿 — proyek prototipe Master of Finance (FinTech) di Asia Pacific University. Saya bantu investor ritel Indonesia memahami ESG, regulasi OJK, krisis MSCI 2026, dan produk investasi hijau. Saya chatbot berbasis aturan (rule-based), bukan AI generatif.";
     }
   },
   {
@@ -2477,7 +2477,7 @@ const I18N = {
     'tab.data':'Data','tab.data_sub':'Markets',
     'tab.quiz':'Kuis','tab.quiz_sub':'Quiz',
     'head.chat':'Tanya Sari',
-    'character.subtitle':'Asisten Investasi ESG',
+    'character.subtitle':'Asisten ESG',
     'character.status':'Online · siap membantu',
     'market.topGainer':'Top Gainer',
     'market.updated':'Update',
@@ -2487,7 +2487,7 @@ const I18N = {
     'greeting.evening':'Selamat sore',
     'greeting.night':'Selamat malam',
     'location.label':'Bursa Efek Indonesia · Jakarta',
-    'intro.first':'Saya <strong>Sari</strong>, asisten investasi ESG kamu. Ada yang bisa saya bantu hari ini?<br><br><em>Baru kenal ESG? Coba tanya \'Apa itu ESG?\' — lalu klik <strong>💡 Jelaskan sederhana</strong> kalau ada jawaban yang terasa terlalu teknis.</em>',
+    'intro.first':'Saya <strong>Sari</strong>, asisten ESG kamu. Ada yang bisa saya bantu hari ini?<br><br><em>Baru kenal ESG? Coba tanya \'Apa itu ESG?\' — lalu klik <strong>💡 Jelaskan sederhana</strong> kalau ada jawaban yang terasa terlalu teknis.</em>',
     'onb.hint':'👇 Baru di sini? Ketuk salah satu pertanyaan untuk mulai — atau ketik sendiri di bawah.',
     'onb.chip.esg':'Apa itu ESG?',
     'onb.chip.start':'Saya baru — mulai dari mana?',
@@ -2560,7 +2560,7 @@ const I18N = {
     'footer.credit':'Elemu Lestari · Prototipe edukasi ESG · Proyek Master of Finance FinTech',
     'footer.disclaimer':'<strong>Disclaimer:</strong> Tools ini hanya untuk edukasi, BUKAN saran investasi yang teregulasi. Semua keputusan investasi adalah tanggung jawab pribadi. Konsultasikan dengan penasihat keuangan berlisensi OJK sebelum berinvestasi.',
     'chat.placeholder':"Coba: 'Apa itu ESG?' atau 'MSCI Indonesia kenapa?'",
-    'chat.welcome':'Halo, saya <strong>Sari</strong> 🌿 — asisten investasi ESG dari Elemu Lestari. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau.',
+    'chat.welcome':'Halo, saya <strong>Sari</strong> 🌿 — asisten ESG dari Elemu Lestari. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau.',
     'chat.unknown':"Saya belum yakin dengan pertanyaan itu. Coba salah satu topik di bawah, atau tanya dengan kalimat yang berbeda.",
     'chat.didYouMean':'Mungkin maksud kamu',
     'chat.confLow':'⚠ Tingkat keyakinan rendah — periksa juga sumber lain.',
@@ -2617,7 +2617,7 @@ const I18N = {
     'tab.data':'Markets','tab.data_sub':'Data',
     'tab.quiz':'Quiz','tab.quiz_sub':'Kuis',
     'head.chat':'Ask Sari',
-    'character.subtitle':'ESG Investment Assistant',
+    'character.subtitle':'ESG Assistant',
     'character.status':'Online · ready to help',
     'market.topGainer':'Top Gainer',
     'market.updated':'Updated',
@@ -2627,7 +2627,7 @@ const I18N = {
     'greeting.evening':'Good evening',
     'greeting.night':'Good night',
     'location.label':'Indonesia Stock Exchange · Jakarta',
-    'intro.first':'I\'m <strong>Sari</strong>, your ESG investment assistant. What can I help you with today?<br><br><em>Brand new to ESG? Try asking \'What is ESG?\' — then click <strong>💡 Explain simply</strong> if any answer feels too technical.</em>',
+    'intro.first':'I\'m <strong>Sari</strong>, your ESG assistant. What can I help you with today?<br><br><em>Brand new to ESG? Try asking \'What is ESG?\' — then click <strong>💡 Explain simply</strong> if any answer feels too technical.</em>',
     'onb.hint':'👇 New here? Tap a question to begin — or type your own below.',
     'onb.chip.esg':'What is ESG?',
     'onb.chip.start':'I\'m new — where do I start?',
@@ -2700,7 +2700,7 @@ const I18N = {
     'footer.credit':'Elemu Lestari · ESG Educational Prototype · Master of Finance FinTech project',
     'footer.disclaimer':'<strong>Disclaimer:</strong> This tool is for educational purposes only, NOT regulated investment advice. All investment decisions are your own responsibility. Consult an OJK-licensed financial advisor before investing.',
     'chat.placeholder':"Try: 'What is ESG?' or 'Why MSCI Indonesia?'",
-    'chat.welcome':'Hi, I\'m <strong>Sari</strong> 🌿 — the ESG investment assistant from Elemu Lestari. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products.',
+    'chat.welcome':'Hi, I\'m <strong>Sari</strong> 🌿 — the ESG assistant from Elemu Lestari. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products.',
     'chat.unknown':"I\'m not sure about that question. Try one of the topics below, or rephrase your question.",
     'chat.didYouMean':'Did you mean',
     'chat.confLow':'⚠ Low confidence — please verify with other sources too.',
@@ -2910,8 +2910,8 @@ const FAQ_DATA = [
   // SECTION 1 · CONVERSATIONAL — greetings, identity, language
   // ============================================================
   { id:'hello', kw_id:['halo','hai','selamat'], kw_en:['hello','hi'],
-    a_id:"Halo! 🌿 Saya <strong>Sari</strong>, asisten investasi ESG dari <strong>Elemu Lestari</strong>. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau. Mau saya bantu apa?",
-    a_en:"Hi! 🌿 I\'m <strong>Sari</strong>, the ESG investment assistant from <strong>Elemu Lestari</strong>. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products. What can I help you with?" },
+    a_id:"Halo! 🌿 Saya <strong>Sari</strong>, asisten ESG dari <strong>Elemu Lestari</strong>. Tanya saya tentang konsep ESG, regulasi OJK, krisis MSCI 2026, atau produk investasi hijau. Mau saya bantu apa?",
+    a_en:"Hi! 🌿 I\'m <strong>Sari</strong>, the ESG assistant from <strong>Elemu Lestari</strong>. Ask me about ESG concepts, OJK regulation, the 2026 MSCI crisis, or green investment products. What can I help you with?" },
 
   // ABOUT — chatbot self-identity. Massively expanded keyword set so any
   // phrasing of "who/what is Sari/this chatbot/Elemu" routes here. Critical
@@ -2921,7 +2921,7 @@ const FAQ_DATA = [
   { id:'about', category:'conversational', intent:'definitional',
     kw_id:['sari','siapa sari','sari siapa','sari itu siapa','siapa itu sari','apa itu sari','tentang sari','kenalan dengan sari','siapa kamu','kamu siapa','kamu itu siapa','tentang kamu','kenalan','perkenalan','kenalan dong','elemu lestari','elemu','elmu','nama kamu','identitas kamu','asisten siapa','chatbot siapa','apa itu elemu','apa itu elmu','apa itu chatbot ini','chatbot ini apa','sari adalah'],
     kw_en:['sari','who is sari','what is sari','about sari','tell me about yourself','introduce yourself','who are you','who are you sari','about you','what are you','what is this chatbot','your name','your identity','what is elemu','what is elmu','about elemu lestari','identity'],
-    a_id:"Saya <strong>Sari</strong> — asisten investasi ESG dari <strong>Elemu Lestari</strong>. Saya bukan AI seperti ChatGPT atau Claude; saya chatbot berbasis aturan dengan basis pengetahuan khusus tentang investasi hijau di Indonesia.<br><br>" +
+    a_id:"Saya <strong>Sari</strong> — asisten ESG dari <strong>Elemu Lestari</strong>. Saya bukan AI seperti ChatGPT atau Claude; saya chatbot berbasis aturan dengan basis pengetahuan khusus tentang investasi hijau di Indonesia.<br><br>" +
          "<strong>Apa itu Elemu Lestari?</strong><br>" +
          "Nama saya gabungan dari 2 bahasa:<br>" +
          "• <strong>Elemu</strong> = kebijaksanaan (Bahasa Nias)<br>" +
@@ -2935,7 +2935,7 @@ const FAQ_DATA = [
          "• Produk investasi hijau (Sukuk Hijau, JETP, IDXCarbon)<br>" +
          "• Cara mulai investasi hijau untuk pemula<br><br>" +
          "Mau tahu siapa yang membuat saya, atau apa tujuan saya dibangun? Tanya saja: <em>\"siapa pembuat kamu?\"</em> atau <em>\"apa tujuan kamu?\"</em>",
-    a_en:"I\'m <strong>Sari</strong> — the ESG investment assistant of <strong>Elemu Lestari</strong>. I\'m not a general AI like ChatGPT or Claude; I\'m a rule-based chatbot with a curated knowledge base specifically on green investing in Indonesia.<br><br>" +
+    a_en:"I\'m <strong>Sari</strong> — the ESG assistant of <strong>Elemu Lestari</strong>. I\'m not a general AI like ChatGPT or Claude; I\'m a rule-based chatbot with a curated knowledge base specifically on green investing in Indonesia.<br><br>" +
          "<strong>What is Elemu Lestari?</strong><br>" +
          "My name combines 2 languages:<br>" +
          "• <strong>Elemu</strong> = wisdom (in Nias)<br>" +
