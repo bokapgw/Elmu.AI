@@ -263,6 +263,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .welcome-card h4{margin:0;font-size:14.5px;color:var(--emerald);font-weight:800;letter-spacing:0.2px;flex:1}
 .welcome-card ul{margin:0;padding:0;list-style:none}
 .welcome-card li{margin:6px 0;color:var(--ink)}
+.welcome-card .wc-howto{margin:0 0 10px;font-size:12.5px;line-height:1.55;color:var(--ink)}
 .welcome-card .wc-tip{margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);font-size:12px;color:var(--muted)}
 .welcome-card .wc-dismiss{flex:none;background:var(--panel-bg);border:1px solid var(--border);color:var(--emerald);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s}
 .welcome-card .wc-dismiss:hover{background:var(--emerald);color:var(--cream);border-color:var(--emerald)}
@@ -2487,14 +2488,15 @@ const I18N = {
     'greeting.evening':'Selamat sore',
     'greeting.night':'Selamat malam',
     'location.label':'Bursa Efek Indonesia · Jakarta',
-    'intro.first':'Saya <strong>Sari</strong>, asisten ESG kamu. Ada yang bisa saya bantu hari ini?<br><br><em>Baru kenal ESG? Coba tanya \'Apa itu ESG?\' — lalu klik <strong>💡 Jelaskan sederhana</strong> kalau ada jawaban yang terasa terlalu teknis.</em>',
+    'intro.first':'Saya <strong>Sari</strong>, asisten ESG kamu. Ketuk pertanyaan di bawah untuk mulai — atau tanya apa saja.',
     'onb.hint':'👇 Baru di sini? Ketuk salah satu pertanyaan untuk mulai — atau ketik sendiri di bawah.',
     'onb.chip.esg':'Apa itu ESG?',
     'onb.chip.start':'Saya baru — mulai dari mana?',
     'onb.chip.msci':'Apa itu krisis MSCI 2026?',
     'onb.chip.invest':'Cara mulai investasi di Indonesia?',
     'onb.chip.profit':'Apakah investasi ESG menguntungkan?',
-    'onb.card.title':'Selamat datang di Elemu Lestari 🌿',
+    'onb.card.title':'Selamat datang 🌿 — cara pakai Sari',
+    'onb.card.howto':'💬 Ketik pertanyaan, atau ketuk salah satu saran. Tiap jawaban ada tombol 💡 \"Jelaskan sederhana\" untuk versi lebih mudah.',
     'onb.card.ask':'💬 <strong>Tanya</strong> — tanya apa saja tentang investasi ESG',
     'onb.card.learn':'📚 <strong>Belajar</strong> — belajar langkah demi langkah, dari dasar',
     'onb.card.advise':'🎯 <strong>Saran</strong> — jawab 5 pertanyaan untuk saran ESG personal',
@@ -2627,14 +2629,15 @@ const I18N = {
     'greeting.evening':'Good evening',
     'greeting.night':'Good night',
     'location.label':'Indonesia Stock Exchange · Jakarta',
-    'intro.first':'I\'m <strong>Sari</strong>, your ESG assistant. What can I help you with today?<br><br><em>Brand new to ESG? Try asking \'What is ESG?\' — then click <strong>💡 Explain simply</strong> if any answer feels too technical.</em>',
+    'intro.first':'I\'m <strong>Sari</strong>, your ESG assistant. Tap a question below to begin — or just ask me anything.',
     'onb.hint':'👇 New here? Tap a question to begin — or type your own below.',
     'onb.chip.esg':'What is ESG?',
     'onb.chip.start':'I\'m new — where do I start?',
     'onb.chip.msci':'What happened with MSCI in 2026?',
     'onb.chip.invest':'How do I start investing in Indonesia?',
     'onb.chip.profit':'Is ESG investing profitable?',
-    'onb.card.title':'Welcome to Elemu Lestari 🌿',
+    'onb.card.title':'Welcome 🌿 — how to use Sari',
+    'onb.card.howto':'💬 Type a question, or tap a suggestion. Every answer has a 💡 \"Explain simply\" button for a plainer version.',
     'onb.card.ask':'💬 <strong>Tanya (Ask)</strong> — ask me anything about ESG investing',
     'onb.card.learn':'📚 <strong>Belajar (Learn)</strong> — learn step by step, from the basics',
     'onb.card.advise':'🎯 <strong>Saran (Advise)</strong> — answer 5 questions for personal ESG suggestions',
@@ -5880,6 +5883,7 @@ function buildWelcomeCard(){
   card.innerHTML =
     '<div class="wc-head"><h4>'+escapeHTML(t('onb.card.title'))+'</h4>'+
     '<button type="button" class="wc-dismiss" aria-label="'+escapeHTML(t('onb.card.dismiss'))+'">✕ '+escapeHTML(t('onb.card.dismiss'))+'</button></div>'+
+    '<div class="wc-howto">'+t('onb.card.howto')+'</div>'+
     '<ul><li>'+t('onb.card.ask')+'</li><li>'+t('onb.card.learn')+'</li><li>'+t('onb.card.advise')+'</li></ul>'+
     '<div class="wc-tip">'+escapeHTML(t('onb.card.tip'))+'</div>';
   card.querySelector('.wc-dismiss').onclick = dismissWelcomeCard;
@@ -5914,12 +5918,7 @@ function addOnboardingChips(){
   if(!msgs) return;
   if(msgs.querySelector('.msg.user')) return; // ongoing conversation → skip
 
-  const chips = ['onb.chip.esg','onb.chip.start','onb.chip.msci','onb.chip.invest','onb.chip.profit'];
-
-  const hint = document.createElement('div');
-  hint.className = 'onboard-hint';
-  hint.textContent = t('onb.hint');
-  msgs.appendChild(hint);
+  const chips = ['onb.chip.start','onb.chip.esg','onb.chip.msci','onb.chip.profit'];
 
   const wrap = document.createElement('div');
   wrap.className = 'onboard-chips';
