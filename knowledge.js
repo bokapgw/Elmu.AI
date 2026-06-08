@@ -26,6 +26,50 @@ window.KNOWLEDGE_DATA = {
   entries: [
 
     {
+      id:'regtech-esg', intent:'definitional',
+      kw_id:['regtech','reg tech','teknologi regulasi','regtech esg','regtech untuk esg','regtech indonesia','teknologi esg','teknologi pelaporan keberlanjutan','suptech'],
+      kw_en:['regtech','reg tech','regulatory technology','regtech esg','regtech for esg','regtech indonesia','suptech','esg technology','esg reporting technology','technology for esg'],
+      a_id:"<strong>RegTech untuk ESG di Indonesia</strong> 🛠️<br>" +
+            "<strong>RegTech</strong> (Regulatory Technology) adalah teknologi/software yang membantu perusahaan memenuhi kewajiban regulasi secara lebih cepat, murah, dan akurat. Untuk ESG, RegTech menyasar bagian tersulit dari keuangan berkelanjutan: <em>mengukur dan melaporkan</em> data non-keuangan.<br><br>" +
+            "<strong>Perannya di pasar Indonesia:</strong><br>" +
+            "• <strong>Pelaporan keberlanjutan</strong>, bank dan emiten wajib menerbitkan Laporan Keberlanjutan sesuai <strong>POJK 51/2017</strong>. RegTech mengotomasi pengumpulan data, format, dan publikasinya.<br>" +
+            "• <strong>Data &amp; rating ESG</strong>, mengumpulkan dan menilai data E/S/G (titik lemah yang nyata, MSCI menyoroti masalah kualitas data Indonesia saat krisis 2026).<br>" +
+            "• <strong>Akuntansi karbon</strong>, mengukur emisi Scope 1/2/3 dan mengelola kredit untuk IDXCarbon.<br>" +
+            "• <strong>SupTech</strong>, di sisi regulator, OJK memakai teknologi pengawasan untuk memantau kepatuhan dalam skala besar.<br><br>" +
+            "<strong>Kenapa penting:</strong> data ESG yang andal adalah fondasi keuangan berkelanjutan yang bisa dipercaya. RegTech yang baik berarti risiko greenwashing lebih kecil. <em>(Gambaran umum, verifikasi vendor/standar spesifik ke sumber primer.)</em>",
+      a_en:"<strong>RegTech for ESG in Indonesia</strong> 🛠️<br>" +
+            "<strong>RegTech</strong> (Regulatory Technology) is software that helps companies meet regulatory obligations faster, cheaper, and more accurately. For ESG, it targets the hardest part of sustainable finance: <em>measuring and reporting</em> non-financial data.<br><br>" +
+            "<strong>Where it fits in the Indonesian market:</strong><br>" +
+            "• <strong>Sustainability reporting</strong>, banks and listed issuers must publish a Sustainability Report (<em>Laporan Keberlanjutan</em>) under OJK\'s <strong>POJK 51/2017</strong>. RegTech automates the data collection, formatting, and disclosure.<br>" +
+            "• <strong>ESG data &amp; ratings</strong>, gathering and scoring E/S/G data (a real weak spot, MSCI flagged Indonesian data-quality issues in the 2026 crisis).<br>" +
+            "• <strong>Carbon accounting</strong>, measuring Scope 1/2/3 emissions and managing credits for IDXCarbon.<br>" +
+            "• <strong>SupTech</strong>, on the regulator side, OJK uses supervisory technology to monitor compliance at scale.<br><br>" +
+            "<strong>Why it matters:</strong> reliable ESG data is the foundation of trustworthy sustainable finance. Better RegTech means fewer greenwashing risks. <em>(General overview, verify specific vendors/standards against primary sources.)</em>"
+    },
+
+    {
+      id:'companies-esg-examples', intent:'definitional',
+      kw_id:['perusahaan yang menerapkan','contoh perusahaan','perusahaan esg','perusahaan yang sudah menerapkan','contoh perusahaan esg','perusahaan keberlanjutan','siapa yang menerapkan','perusahaan yang menerapkan esg','contoh emiten esg','perusahaan implementasi esg'],
+      kw_en:['companies implementing','which companies','company examples','examples of companies','companies that adopted','companies doing esg','companies implementing esg','companies implementing sustainable finance','who implements esg','esg companies indonesia','companies implemented','already implemented','companies that implemented','sustainable finance companies'],
+      a_id:"<strong>Perusahaan Indonesia yang sudah menerapkan ESG / keuangan berkelanjutan</strong> 🇮🇩🌱<br>" +
+            "Contoh yang bagus dijadikan rujukan, sebagian besar menerbitkan Laporan Keberlanjutan sesuai <strong>POJK 51/2017</strong> dan masuk indeks ESG seperti <strong>IDX ESG Leaders</strong> atau <strong>SRI-KEHATI</strong>:<br><br>" +
+            "• <strong>Bank Mandiri</strong>, portofolio pembiayaan berkelanjutan, target penurunan emisi, dan penyaluran KUR ke pelaku UMKM (pilar sosial).<br>" +
+            "• <strong>BCA &amp; BRI</strong>, green financing, perbankan digital tanpa kertas, program inklusi keuangan.<br>" +
+            "• <strong>Telkom Indonesia</strong>, mengarahkan pusat data ke energi yang lebih hijau dan efisien.<br>" +
+            "• <strong>Unilever Indonesia</strong>, sourcing berkelanjutan, pengurangan plastik, dan program akses air bersih.<br>" +
+            "• <strong>BUMN energi</strong> (Pertamina, PLN), proyek transisi/hijau dan partisipasi di IDXCarbon.<br><br>" +
+            "<strong>Cara verifikasi:</strong> baca <em>Laporan Keberlanjutan</em> tahunan perusahaan di halaman investor relations-nya, atau cek apakah ia konstituen indeks IDX ESG Leaders / SRI-KEHATI. <em>(Contoh untuk edukasi, selalu konfirmasi data terkini di laporan resmi perusahaan.)</em>",
+      a_en:"<strong>Indonesian companies already doing ESG / sustainable finance</strong> 🇮🇩🌱<br>" +
+            "Good examples to point to, most publish a Sustainability Report (<em>Laporan Keberlanjutan</em>) under <strong>POJK 51/2017</strong> and sit in ESG indices like <strong>IDX ESG Leaders</strong> or <strong>SRI-KEHATI</strong>:<br><br>" +
+            "• <strong>Bank Mandiri</strong>, sustainable-financing portfolio, emission-reduction targets, and KUR micro-loans channelled to MSMEs (social pillar).<br>" +
+            "• <strong>BCA &amp; BRI</strong>, green financing, paperless digital banking, financial-inclusion programs.<br>" +
+            "• <strong>Telkom Indonesia</strong>, moving data centers toward greener, more efficient energy.<br>" +
+            "• <strong>Unilever Indonesia</strong>, sustainable sourcing, plastic reduction, and clean-water access programs.<br>" +
+            "• <strong>State energy players</strong> (Pertamina, PLN), green/transition projects and IDXCarbon participation.<br><br>" +
+            "<strong>How to verify:</strong> read the company\'s annual <em>Sustainability Report</em> on its investor-relations page, or check whether it\'s a constituent of the IDX ESG Leaders / SRI-KEHATI index. <em>(Examples for education, always confirm current data in the company\'s own disclosures.)</em>"
+    },
+
+    {
       id:'idx-carbon',
       kw_id:['idxcarbon','idx carbon','bursa karbon','bursa karbon indonesia','perdagangan karbon','karbon kredit indonesia'],
       kw_en:['idxcarbon','idx carbon','indonesia carbon exchange','carbon trading indonesia','carbon credit indonesia'],
