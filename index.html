@@ -1019,6 +1019,17 @@ function escapeHTML(s){
    ───────────────────────────────────────────────────────────────────── */
 const RATING_FORM_URL = 'https://forms.gle/M7Nvpj3jGh4WTQat8';
 
+/* ─────────────────────────────────────────────────────────────────────
+   AI_PROXY_URL, the AI fallback endpoint for Sari's open-ended answers.
+   The local knowledge base answers most questions; when it has no
+   confident match, Sari asks this endpoint (a Cloudflare Worker that
+   proxies Gemini and keeps your API key server-side).
+   - Leave '' to use the Netlify Function at /api/ask (for local `netlify dev`).
+   - On GitHub Pages, paste your deployed Cloudflare Worker URL here.
+   See SETUP_CLOUDFLARE_AI.md for the ~10-minute setup.
+   ───────────────────────────────────────────────────────────────────── */
+const AI_PROXY_URL = '';
+
 /* ELUTS, short 8-item version (one positively-worded item per construct).
    Adapted in STRUCTURE from CUQ (Holmes et al. 2019), SUS (Brooke 1996) and
    TAM (Davis 1989); all wording is original and tailored to Sari's ESG /
@@ -2091,7 +2102,8 @@ async function askGeminiFallback(query){
       : [];
     const ctl = new AbortController();
     const timeoutId = setTimeout(()=>ctl.abort(), 28000); // hair past function max
-    const resp = await fetch('/api/ask', {
+    const endpoint = (typeof AI_PROXY_URL === 'string' && AI_PROXY_URL) ? AI_PROXY_URL : '/api/ask';
+    const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, lang, history: turns }),
