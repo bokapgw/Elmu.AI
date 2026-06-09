@@ -808,25 +808,6 @@ footer .footer-link:hover{color:var(--emerald);border-color:var(--emerald)}
   </div>
 </div>
 
-<div class="modal-overlay" id="teachModal">
-  <div class="modal">
-    <h3 id="teachTitle">Ajari Elemu</h3>
-    <p id="teachDesc">Saya belum tahu jawaban itu. Mau ajari saya? Jawaban kamu akan disimpan di browser ini dan dipakai untuk pertanyaan serupa nantinya.</p>
-    <div class="modal-field">
-      <label id="teachQLabel">Pertanyaan kamu</label>
-      <input type="text" class="modal-input" id="teachQ" readonly>
-    </div>
-    <div class="modal-field">
-      <label id="teachALabel">Jawaban yang seharusnya</label>
-      <textarea class="modal-input textarea" id="teachA" placeholder="Tulis jawaban yang menurut kamu tepat..."></textarea>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-secondary" id="teachCancel" data-i18n="btn.cancel">Batal</button>
-      <button class="btn-primary" id="teachSave" data-i18n="btn.save">Simpan</button>
-    </div>
-  </div>
-</div>
-
 <script src="stocks.js"></script>
 <script src="news.js"></script>
 <script src="knowledge.js"></script>
@@ -1708,12 +1689,12 @@ const CONVERSATIONAL = [
   },
   {
     type:'is_real',
-    re:/(are\s+you\s+(real|a\s+human|alive)|kamu\s+(beneran|asli|real|manusia|hidup)|kamu\s+bot|chatbot)/i,
+    re:/(are\s+you\s+(real|a\s+human|alive|a\s+robot|an?\s+ai|a\s+bot)|robot\s+or\s+(a\s+)?human|human\s+or\s+(a\s+)?robot|robot\s+atau\s+manusia|manusia\s+(asli\s+)?atau\s+robot|kamu\s+(beneran|asli|real|manusia|hidup|robot)|manusia\s+asli|kamu\s+bot|chatbot)/i,
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en'
-        ? "I\'m a chatbot 🤖🌿, built with rules and pattern matching, not a generative AI. So I have a defined knowledge base on ESG investing. I\'m honest about my limits: if I don\'t know, I\'ll say so."
-        : "Saya chatbot 🤖🌿, dibangun dengan aturan dan pola, bukan AI generatif. Jadi saya punya basis pengetahuan tertentu soal ESG investing. Saya jujur soal batas saya: kalau tidak tahu, akan saya akui.";
+        ? "I\'m a virtual assistant 🤖🌿, not a real person. I\'m built with rules and patterns, not a generative AI, and designed with patience to learn alongside you. So I won\'t pretend to be human, but I\'m happy to sit with your ESG questions. And I\'m honest about my limits: if I don\'t know, I\'ll say so."
+        : "Saya asisten virtual 🤖🌿, bukan manusia asli. Saya dibangun dengan aturan dan pola, bukan AI generatif, dan dirancang dengan kesabaran (dalam bahasa Nias: <em>wa\'ebolo dödö</em>) untuk belajar bareng kamu. Jadi saya nggak pura-pura jadi manusia, tapi saya siap dengerin kebingungan kamu soal ESG. Dan saya jujur soal batas saya: kalau nggak tahu, saya akui.";
     }
   },
   {
@@ -1729,7 +1710,7 @@ const CONVERSATIONAL = [
   /* ----- Help / "I don't know what to ask", SHORT bubble, chips below ----- */
   {
     type:'need_help',
-    re:/(saya\s+butuh\s+(bantuan|tolong|help)|butuh\s+(bantuan|tolong)|tolong\s+(saya|bantu|dong)|bantu\s+saya|please\s+help|can\s+you\s+help(\s+me)?|i\s+need\s+help|need\s+help|help\s+me|^help$|^tolong$|^bantuan$|bingung\s+(saya|aku|mau\s+tanya)?|saya\s+bingung|aku\s+bingung|mau\s+tanya\s+apa(\s+ya)?|don'?t\s+know\s+what\s+to\s+ask|gak?\s+tau\s+mau\s+(tanya|nanya)\s+apa|what\s+can\s+i\s+ask|apa\s+yang\s+bisa\s+(saya|aku)\s+tanya|topik\s+apa)/i,
+    re:/(saya\s+butuh\s+(bantuan|tolong|help)|butuh\s+(bantuan|tolong)|tolong\s+(saya|bantu|dong)|bantu\s+saya|please\s+help|can\s+you\s+help(\s+me)?|i\s+need\s+help|need\s+help|help\s+me|^help$|^tolong$|^bantuan$|^\s*bingung\b[\s!?.]*$|bingung\s+(mau\s+tanya|mau\s+nanya|harus\s+tanya|mulai\s+dari\s+mana)|saya\s+bingung|aku\s+bingung|mau\s+tanya\s+apa(\s+ya)?|don'?t\s+know\s+what\s+to\s+ask|gak?\s+tau\s+mau\s+(tanya|nanya)\s+apa|what\s+can\s+i\s+ask|apa\s+yang\s+bisa\s+(saya|aku)\s+tanya|topik\s+apa)/i,
     reply:(name)=>{
       const L = window.CURRENT_LANG;
       const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
@@ -1830,6 +1811,45 @@ const CONVERSATIONAL = [
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en' ? "Aw, thanks! 😊 Have more questions about ESG?" : "Wah, makasih! 😊 Ada pertanyaan lain soal ESG?";
+    }
+  },
+  /* ----- Presence check ("anyone there?", "halo ada orang?") → warm hello ----- */
+  {
+    type:'presence',
+    re:/(ada\s+orang\s*(di\s*sini|disini|gak|ga|nggak)?\s*[?.!]*|anyone\s+(there|here|home)|is\s+anyone\s+(there|here)|ada\s+yang\s+(jaga|online|aktif|dengerin)|hai+\s+ada\s+orang|halo+\s*,?\s*ada\s+orang)/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L === 'en'
+        ? 'Hi'+n+'! 🌿 Sari is right here, ready to help you make sense of ESG and green investing in Indonesia. What is on your mind?'
+        : 'Halo'+n+'! 🌿 Sari di sini, siap bantu kamu paham soal ESG dan investasi hijau di Indonesia. Lagi kepikiran apa?';
+    }
+  },
+  /* ----- "Suggest a topic / what should I learn next" → friendly topic menu.
+     Appended near the end so the more specific advice/help patterns above win
+     first; this only catches the leftover "nudge me, what next" style asks. ----- */
+  {
+    type:'suggest_topic',
+    re:/(can\s+you\s+suggest|what\s+(do|would)\s+you\s+suggest|any\s+(other\s+)?suggestions?|suggest\s+(me\s+)?(a\s+)?(topic|something|where)|what\s+(should|can|could)\s+i\s+(learn|understand|know|read|explore|study)(\s+(next|first|more|about))?|what(\s+is|'?s|s)\s+next|what\s+else\s+(can|should)\s+i|where\s+(do|should)\s+i\s+(go|start)\s+next|give\s+me\s+(some\s+)?ideas|kasih\s+saran\s*(topik|dong|nya)?\s*[?.!]*$|ada\s+saran\s*(topik|nya|dong)?\s*[?.!]*$|saran\s+(topik|belajar)|(belajar|paham|pelajari|baca)\s+apa\s+(lagi|dulu|selanjutnya)|selanjutnya\s+(apa|belajar)|apa\s+lagi\s+yang\s+(bisa|perlu|harus|saya|aku)|topik\s+(apa\s+)?(lain|lagi)|enaknya\s+(tanya|belajar|mulai)\s+apa)/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L === 'en'
+        ? 'Good question'+n+'! 🌿 If you\'re not sure what to ask, a nice path is: what ESG is, then greenwashing, then the 2026 MSCI story, then how to start. Pick a topic below ↓'
+        : 'Pertanyaan bagus'+n+'! 🌿 Kalau bingung mau tanya apa, urutan yang enak: apa itu ESG, lalu greenwashing, terus cerita krisis MSCI 2026, baru cara mulai. Pilih topik di bawah ↓';
+    }
+  },
+  /* ----- Emotional venting / stress → empathy first, then a gentle pivot.
+     Grounded in patience (Nias: wa'ebolo dödö) per Sari's persona. ----- */
+  {
+    type:'venting',
+    re:/(pusing|puyeng|mumet|capek|cape|capai|lelah|stress|stres|frustasi|frustrasi|nyerah|menyerah|give\s+up|giving\s+up|overwhelmed|burn(t|ed)?\s*[\s-]?out|too\s+hard|this\s+is\s+(so\s+)?hard|so\s+hard|susah\s+banget|ribet\s+banget|i'?m\s+(so\s+)?(tired|exhausted|stressed|lost|overwhelmed))/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
+      return L === 'en'
+        ? 'Take a breath'+n+'. 🌿 Learning to invest and understand sustainability takes time and a bit of patience, you don\'t have to get it all at once. Want to start from the simplest idea today? I can keep it light.'
+        : 'Tarik napas dulu'+n+'. 🌿 Belajar investasi dan keberlanjutan itu butuh waktu dan kesabaran, nggak harus paham semua sekaligus. Mau kita mulai dari konsep yang paling simpel dulu hari ini? Santai aja.';
     }
   }
 ];
@@ -2427,7 +2447,7 @@ function getUnknownReply(query, runners){
       '• <strong>Governance</strong>, MSCI 2026, beneficial ownership, free-float<br>' +
       '• <strong>Data &amp; methodology</strong>, Scope 3, third-party assurance, IFRS S1/S2<br>' +
       '• <strong>Live data</strong>, "Top gainer", "BBCA price", "best ESG stock"<br><br>' +
-      'Try one of these keywords above, or click <em>"teach me the answer"</em> below to add your own.'
+      'Try one of the keywords above, or rephrase your question and I\'ll take another look.'
     : '<br>• <strong>Regulasi OJK</strong>, POJK 51, TKBI, IDXCarbon, ISPO<br>' +
       '• <strong>Indeks ESG</strong>, KEHATI, IDX ESG Leaders, perbandingan IHSG<br>' +
       '• <strong>Produk</strong>, Green Sukuk, sustainability bond, karbon kredit<br>' +
@@ -2435,7 +2455,7 @@ function getUnknownReply(query, runners){
       '• <strong>Tata kelola</strong>, MSCI 2026, beneficial ownership, free-float<br>' +
       '• <strong>Data &amp; metodologi</strong>, Scope 3, third-party assurance, IFRS S1/S2<br>' +
       '• <strong>Data live</strong>, "Top gainer", "Harga BBCA", "saham ESG terbaik"<br><br>' +
-      'Coba salah satu kata kunci di atas, atau klik <em>"ajari saya jawabannya"</em> di bawah untuk tambah pengetahuan saya.';
+      'Coba salah satu kata kunci di atas, atau tulis ulang pertanyaan kamu dan saya cek lagi.';
   return chosen + menu;
 }
 
@@ -2579,11 +2599,6 @@ const I18N = {
     'chat.didYouMean':'Mungkin maksud kamu',
     'chat.confLow':'⚠ Tingkat keyakinan rendah, periksa juga sumber lain.',
     'chat.learned':'💡 Jawaban ini diajarkan oleh kamu sebelumnya.',
-    'teach.title':'Ajari Elemu',
-    'teach.desc':'Saya belum tahu jawaban itu. Mau ajari saya? Jawaban kamu akan disimpan di browser ini dan dipakai untuk pertanyaan serupa nantinya.',
-    'teach.qlabel':'Pertanyaan kamu',
-    'teach.alabel':'Jawaban yang seharusnya',
-    'teach.thanks':'Terima kasih sudah mengajari saya! 🌿 Jawaban kamu sudah disimpan.',
     'sim.initial':'Modal Awal','sim.initial_hint':'Investasi sekali di awal',
     'sim.monthly':'DCA Bulanan','sim.monthly_hint':'Dollar-Cost Averaging (rutin)',
     'sim.horizon':'Horizon (tahun)','sim.horizon_hint':'Lama investasi',
@@ -2720,11 +2735,6 @@ const I18N = {
     'chat.didYouMean':'Did you mean',
     'chat.confLow':'⚠ Low confidence, please verify with other sources too.',
     'chat.learned':'💡 This answer was taught by you previously.',
-    'teach.title':'Teach Elemu',
-    'teach.desc':"I don\'t know the answer yet. Want to teach me? Your answer is saved in this browser and used for similar questions later.",
-    'teach.qlabel':'Your question',
-    'teach.alabel':'What should the answer be',
-    'teach.thanks':'Thanks for teaching me! 🌿 Your answer has been saved.',
     'sim.initial':'Initial Amount','sim.initial_hint':'One-time upfront investment',
     'sim.monthly':'Monthly DCA','sim.monthly_hint':'Dollar-Cost Averaging (recurring)',
     'sim.horizon':'Horizon (years)','sim.horizon_hint':'Investment time horizon',
@@ -3198,7 +3208,7 @@ const FAQ_DATA = [
     a_id:"<strong>Green Sukuk Indonesia</strong> 🌱<br>Indonesia adalah penerbit <em>Green Sukuk</em> negara pertama di dunia (2018). Pemerintah menerbitkan <strong>Green Sukuk Ritel</strong> seri ST (Sukuk Tabungan) dan SR (Sukuk Ritel) yang khusus mendanai proyek hijau: energi terbarukan, transportasi rendah karbon, pengelolaan air. Minimum <strong>Rp 1 juta</strong>, return tahunan kompetitif dengan deposito.",
     a_en:"<strong>Indonesia Green Sukuk</strong> 🌱<br>Indonesia is the world\'s first sovereign <em>Green Sukuk</em> issuer (2018). The government issues <strong>Retail Green Sukuk</strong> in ST (Savings Sukuk) and SR (Retail Sukuk) series, dedicated to green projects: renewables, low-carbon transport, water management. Min <strong>IDR 1 million</strong>, yields competitive with deposits." },
 
-  { id:'greenwashing', category:'frameworks', intent:'definitional', kw_id:['greenwashing','green washing','klaim palsu'], kw_en:['greenwashing','fake green','fake sustainability'],
+  { id:'greenwashing', category:'frameworks', intent:'definitional', kw_id:['greenwashing','green washing','klaim palsu','cara tau esg beneran','instrumen esg asli','reksa dana esg beneran','beneran esg atau bukan','cek apakah esg asli','produk hijau beneran'], kw_en:['greenwashing','fake green','fake sustainability','is it really esg','really esg or not','how to know if esg is real','verify esg product','genuinely esg','real esg fund'],
     simple_id:"<strong>Greenwashing</strong> itu kalau perusahaan pura-pura ramah lingkungan padahal sebenarnya tidak, seperti restoran cepat saji yang jualan burger \"ramah lingkungan\" sambil tetap menggunduli hutan.<br><br><strong>Praktiknya:</strong> kalau lihat klaim hijau dari perusahaan, jangan langsung percaya iklan, cek apakah ada bukti dari lembaga rating independen (Sustainalytics, MSCI ESG, FTSE Russell), bukan cuma dari pemasaran mereka sendiri.",
     simple_en:"<strong>Greenwashing</strong> is when a company pretends to be environmentally friendly when it really isn\'t, like a fast-food chain selling \"eco\" burgers while still cutting down forests.<br><br><strong>Practical takeaway:</strong> when you see green claims from a company, don\'t just trust the marketing, check if their claims have proof from independent rating agencies (Sustainalytics, MSCI ESG, FTSE Russell), not just from their own brochures.",
     a_id:"<strong>Greenwashing</strong> itu istilah untuk perusahaan yang <em>pura-pura ramah lingkungan</em> padahal sebenarnya tidak, hanya untuk gimmick iklan.<br><br>" +
@@ -4883,10 +4893,6 @@ const LANG = {
     document.getElementById('disclaimer').innerHTML = '<strong>'+(L==='en'?'Disclaimer:':'Disclaimer:')+'</strong>'+t('footer.disclaimer').replace(/<\/?strong>/g,'').replace('Disclaimer:','');
     document.getElementById('disclaimer').innerHTML = t('footer.disclaimer');
     document.getElementById('chatInput').placeholder = t('chat.placeholder');
-    document.getElementById('teachTitle').textContent = t('teach.title');
-    document.getElementById('teachDesc').textContent = t('teach.desc');
-    document.getElementById('teachQLabel').textContent = t('teach.qlabel');
-    document.getElementById('teachALabel').textContent = t('teach.alabel');
     STORE.set('lang', L);
     // Re-render dynamic content
     renderMarketPanel();
@@ -6253,8 +6259,8 @@ function _processMessage(v, input){
     setTimeout(()=>{
       hideTyping();
       addMessage(conv.reply(name), 'bot');
-      // For help requests, append clickable category chips
-      if(conv.type === 'need_help') addHelpChips();
+      // For help / "suggest a topic" requests, append clickable category chips
+      if(conv.type === 'need_help' || conv.type === 'suggest_topic') addHelpChips();
       _chatBusy = false;
     }, delay);
     return;
@@ -6437,25 +6443,6 @@ function renderChat(){
   // blank screen wondering what to type. This fixes the new-user navigation
   // gap: previously a first-timer had to guess they could type "help".
   addOnboardingChips();
-}
-
-/* ===== Teach modal ===== */
-function openTeachModal(question){
-  document.getElementById('teachQ').value = question;
-  document.getElementById('teachA').value = '';
-  document.getElementById('teachModal').classList.add('show');
-  setTimeout(()=>document.getElementById('teachA').focus(), 100);
-}
-function closeTeachModal(){ document.getElementById('teachModal').classList.remove('show'); }
-function saveTeach(){
-  const q = document.getElementById('teachQ').value.trim();
-  const a = document.getElementById('teachA').value.trim();
-  if(!q || !a){ closeTeachModal(); return; }
-  const learned = getLearned();
-  learned.push({ q, a, ts: Date.now() });
-  STORE.set('learned', learned);
-  closeTeachModal();
-  addMessage('🌿 '+escapeHTML(t('teach.thanks')), 'bot');
 }
 
 /* ===== Lessons ===== */
@@ -7163,10 +7150,6 @@ function initApp(){
   document.getElementById('prevLesson').onclick = ()=>{ if(_currentLesson>0){ _currentLesson--; STORE.set('lesson',_currentLesson); renderLesson(); } };
   document.getElementById('nextLesson').onclick = ()=>{ if(_currentLesson<LESSONS.length-1){ _currentLesson++; STORE.set('lesson',_currentLesson); renderLesson(); } };
 
-  // Teach modal
-  document.getElementById('teachCancel').onclick = closeTeachModal;
-  document.getElementById('teachSave').onclick = saveTeach;
-
   // Reset name link
   const rn = document.getElementById('resetName');
   if(rn) rn.onclick = (e)=>{
@@ -7178,9 +7161,6 @@ function initApp(){
       renderChat();
     }
   };
-  document.getElementById('teachModal').addEventListener('click', e=>{
-    if(e.target.id==='teachModal') closeTeachModal();
-  });
 
   // Today's market panel (live data via fetch_data.py daily refresh)
   renderMarketPanel();

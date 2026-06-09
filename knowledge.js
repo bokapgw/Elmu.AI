@@ -70,6 +70,120 @@ window.KNOWLEDGE_DATA = {
     },
 
     {
+      id:'esg-everyday-relevance', intent:'definitional',
+      kw_id:['kenapa esg penting buat kita','esg dalam kehidupan sehari hari','esg sehari hari','esg cuma marketing','esg cuma gimmick','produk ramah lingkungan beneran ngaruh','esg ngaruh ke bumi','relevansi esg masyarakat','esg buat masyarakat umum','esg kualitas hidup','kenapa banyak polusi jakarta','perusahaan dipantau lingkungan','esg penting nggak','esg ngaruh apa ke hidup','kerja bakti','aksi kerja bakti','kerja bakti atau investasi','dukung bisnis hijau','bisnis hijau lewat investasi','mending kerja bakti atau investasi','aksi pribadi atau investasi hijau'],
+      kw_en:['why does esg matter','esg in daily life','esg everyday life','is esg just marketing','esg just a marketing tactic','does esg really help the planet','eco friendly product really help','esg relevance to ordinary people','esg and quality of life','esg for the general public','why so much pollution','are companies monitored pollution','does esg actually matter'],
+      a_id:"<strong>Kenapa ESG penting buat kita sehari-hari?</strong> 🌏<br>" +
+            "ESG bukan cuma istilah di berita. Tiga hurufnya nyangkut ke hidup harian:<br>" +
+            "• <strong>E (Lingkungan)</strong>, udara dan air bersih, polusi seperti yang sering kita rasakan di Jakarta.<br>" +
+            "• <strong>S (Sosial)</strong>, cara perusahaan memperlakukan pekerja dan komunitas sekitarnya.<br>" +
+            "• <strong>G (Tata kelola)</strong>, apakah perusahaan jujur, transparan, dan anti-korupsi.<br><br>" +
+            "<strong>Hubungannya ke kita:</strong> ke mana uang mengalir (tabungan, dana pensiun, investasi) ikut menentukan perusahaan mana yang tumbuh. Makin banyak orang dan investor menuntut praktik baik, makin besar tekanan buat perusahaan memperbaiki diri.<br><br>" +
+            "<strong>Soal \"cuma marketing\":</strong> sebagian klaim hijau memang gimmick (itu namanya greenwashing), makanya penting cek bukti dari rating independen, bukan iklan. Soal pemantauan, regulator seperti OJK dan KLHK mengatur pelaporan, walau penegakannya masih terus berkembang.<br><br>" +
+            "<strong>Aksi pribadi vs investasi hijau?</strong> Dua-duanya berguna, cuma beda skala. Kerja bakti memperbaiki lingkungan langsung di sekitarmu; investasi hijau mengarahkan modal ke perusahaan yang lebih bertanggung jawab. <em>(Gambaran edukasi, bukan saran investasi personal.)</em>",
+      a_en:"<strong>Why does ESG matter in everyday life?</strong> 🌏<br>" +
+            "ESG is not just a news buzzword. Its three letters touch daily life:<br>" +
+            "• <strong>E (Environmental)</strong>, clean air and water, the kind of pollution many of us feel in Jakarta.<br>" +
+            "• <strong>S (Social)</strong>, how a company treats its workers and the communities around it.<br>" +
+            "• <strong>G (Governance)</strong>, whether a company is honest, transparent, and anti-corruption.<br><br>" +
+            "<strong>How it connects to you:</strong> where money flows (savings, pensions, investments) helps decide which companies grow. The more people and investors demand good practice, the more pressure companies feel to improve.<br><br>" +
+            "<strong>On \"just marketing\":</strong> some green claims really are a gimmick (that is greenwashing), so it matters to check evidence from independent ratings, not the ads. On monitoring, regulators like OJK and KLHK set reporting rules, though enforcement is still developing.<br><br>" +
+            "<strong>Personal action vs green investing?</strong> Both help, they just work at different scales. Community clean-ups fix your immediate surroundings; green investing steers capital toward more responsible companies. <em>(Educational overview, not personalized investment advice.)</em>"
+    },
+
+    {
+      id:'esg-investing-small-capital', intent:'how-to',
+      kw_id:['modal kecil investasi esg','modal sedikit investasi esg','investasi esg modal kecil','minimum investasi esg','investasi hijau untuk pemula','takut rugi investasi hijau','return investasi hijau stabil','reksadana esg minimum berapa','reksa dana esg minimal','mulai investasi esg modal kecil','dana minim investasi hijau','investasi esg buat pemula modal kecil','modal saya dikit','modal dikit','modal sedikit','modal pas pasan','modal terbatas','investasi berbasis esg','bisa investasi esg','coba investasi esg','dana buat reksadana esg','minimal dana reksadana esg'],
+      kw_en:['small capital esg investing','invest esg with little money','minimum to start esg investing','esg investing for beginners','afraid of loss esg','is green investment return stable','beginner esg portfolio small budget','minimum esg mutual fund','start esg investing small money','limited capital esg'],
+      a_id:"<strong>Investasi ESG dengan modal kecil, bisa banget</strong> 🌱<br>" +
+            "Kamu nggak perlu modal besar buat mulai:<br>" +
+            "• <strong>Reksa dana ESG</strong> lewat aplikasi berlisensi OJK (misalnya Bibit) bisa mulai dari sekitar <strong>Rp 100.000</strong>.<br>" +
+            "• <strong>Green Sukuk ritel</strong> (negara) biasanya mulai sekitar <strong>Rp 1 juta</strong>, pokoknya dijamin pemerintah.<br><br>" +
+            "<strong>Takut rugi? Wajar.</strong> Semua investasi pasar ada risiko. Investasi hijau tidak otomatis lebih untung atau lebih rugi dari yang biasa, buktinya campuran (lihat topik <em>ESG vs kinerja keuangan</em>). Yang bisa dikurangi ESG adalah risiko jangka panjang seperti denda lingkungan atau masalah reputasi.<br><br>" +
+            "<strong>Tips buat pemula:</strong> mulai dari nominal kecil, sebar (diversifikasi), pakai horizon panjang, dan pastikan platformnya berlisensi OJK. <em>(Edukasi, bukan saran beli/jual personal. Untuk keputusan uang sungguhan, konsultasi penasihat berlisensi OJK.)</em>",
+      a_en:"<strong>ESG investing on a small budget, totally doable</strong> 🌱<br>" +
+            "You do not need big capital to start:<br>" +
+            "• <strong>ESG mutual funds</strong> through OJK-licensed apps (e.g. Bibit) can start from around <strong>Rp 100,000</strong>.<br>" +
+            "• <strong>Retail Green Sukuk</strong> (sovereign) usually starts around <strong>Rp 1 million</strong>, with principal backed by the government.<br><br>" +
+            "<strong>Afraid of losing money? That is normal.</strong> All market investing carries risk. Green investing is not automatically more or less profitable than ordinary funds, the evidence is mixed (see <em>ESG vs financial performance</em>). What ESG can reduce is long-run risk like environmental fines or reputation damage.<br><br>" +
+            "<strong>Beginner tips:</strong> start small, diversify, use a long horizon, and make sure the platform is OJK-licensed. <em>(Educational, not personalized buy/sell advice. For real money decisions, consult an OJK-licensed adviser.)</em>"
+    },
+
+    {
+      id:'esg-syariah', intent:'definitional',
+      kw_id:['esg syariah','investasi esg syariah','investasi esg sesuai syariah','investasi hijau halal','esg sesuai prinsip agama','esg sesuai agama','green sukuk syariah','saham syariah esg','reksa dana esg syariah','investasi halal ramah lingkungan','esg islami','sesuai syariah','esg sesuai syariah','pilihan esg syariah','pilihan esg sesuai syariah','prinsip agama','investasi aman sesuai syariah','investasi syariah ramah lingkungan','syariah ramah lingkungan'],
+      kw_en:['syariah esg','sharia compliant esg','islamic esg investing','halal esg investment','esg following religious principles','green sukuk sharia','sharia esg fund','halal green investment'],
+      a_id:"<strong>ESG dan Syariah, bisa keduanya?</strong> ☪️🌿<br>" +
+            "Bisa. Keduanya beririsan tapi fokusnya beda:<br>" +
+            "• <strong>Syariah</strong> menyaring sektor yang dilarang (riba, judi, alkohol, dan sejenisnya) lewat fatwa DSN-MUI.<br>" +
+            "• <strong>ESG</strong> menilai kinerja lingkungan, sosial, dan tata kelola.<br>" +
+            "Satu saham bisa lolos dua-duanya sekaligus.<br><br>" +
+            "<strong>Pilihan yang ramah syariah dan hijau:</strong><br>" +
+            "• <strong>Green Sukuk</strong> negara (syariah sekaligus hijau, mulai sekitar Rp 1 juta).<br>" +
+            "• Indeks syariah seperti <strong>ISSI</strong> atau <strong>JII</strong> sebagai titik awal saringan.<br>" +
+            "• <strong>Reksa dana ESG kategori Syariah</strong> (tersedia antara lain di Bibit).<br><br>" +
+            "<strong>Sebelum beli:</strong> cek isi portofolionya dan pastikan ada Dewan Pengawas Syariah (DPS). <em>(Edukasi, bukan saran personal, dan bukan fatwa. Untuk kepastian kepatuhan syariah, rujuk ke otoritas atau penasihat syariah.)</em>",
+      a_en:"<strong>ESG and Syariah, can you have both?</strong> ☪️🌿<br>" +
+            "Yes. They overlap but focus on different things:<br>" +
+            "• <strong>Syariah</strong> screens out forbidden sectors (riba/interest, gambling, alcohol, and the like) via DSN-MUI rulings.<br>" +
+            "• <strong>ESG</strong> scores environmental, social, and governance performance.<br>" +
+            "A single stock can pass both at once.<br><br>" +
+            "<strong>Sharia-friendly and green options:</strong><br>" +
+            "• Sovereign <strong>Green Sukuk</strong> (both sharia and green, from around Rp 1 million).<br>" +
+            "• Syariah indices like <strong>ISSI</strong> or <strong>JII</strong> as a starting screen.<br>" +
+            "• <strong>ESG mutual funds in the Syariah category</strong> (available on Bibit, among others).<br><br>" +
+            "<strong>Before you buy:</strong> check the portfolio holdings and confirm there is a Sharia Supervisory Board (DPS). <em>(Educational, not personalized advice, and not a religious ruling. For sharia-compliance certainty, refer to a sharia authority or adviser.)</em>"
+    },
+
+    {
+      id:'double-materiality', intent:'definitional',
+      kw_id:['double materiality','materialitas ganda','materialitas finansial','materialitas dampak','apa itu double materiality','skor esg batubara valid','csr menaikkan skor esg','emiten batubara skor esg tinggi','validitas skor esg csr'],
+      kw_en:['double materiality','what is double materiality','financial materiality','impact materiality','single materiality','coal company high esg score','csr esg score valid','is the esg score valid','materiality esg'],
+      a_id:"<strong>Double Materiality (Materialitas Ganda)</strong> ⚖️<br>" +
+            "Konsep ini melihat ESG dari dua arah sekaligus:<br>" +
+            "• <strong>Materialitas finansial</strong>, bagaimana isu ESG (iklim, sosial) memengaruhi nilai dan keuangan perusahaan.<br>" +
+            "• <strong>Materialitas dampak</strong>, bagaimana operasi perusahaan memengaruhi lingkungan dan masyarakat.<br><br>" +
+            "<strong>Standarnya beda penekanan:</strong> aturan Eropa (CSRD/ESRS) memakai double materiality, sedangkan <strong>IFRS S1/S2</strong> (yang sedang diselaraskan Indonesia) lebih menekankan materialitas finansial.<br><br>" +
+            "<strong>Soal emiten batubara berskor ESG tinggi karena CSR:</strong> di bawah lensa double materiality, program CSR yang bagus <em>tidak menghapus</em> dampak inti bisnisnya (emisi besar). Jadi skor tinggi yang ditopang CSR memang layak dikritisi, cek apakah ratingnya menimbang dampak iklim, bukan cuma filantropi. <em>(Verifikasi metodologi rating dan laporan resmi sebelum menyimpulkan.)</em>",
+      a_en:"<strong>Double Materiality</strong> ⚖️<br>" +
+            "This idea looks at ESG from two directions at once:<br>" +
+            "• <strong>Financial materiality</strong>, how ESG issues (climate, social) affect a company\'s value and finances.<br>" +
+            "• <strong>Impact materiality</strong>, how the company\'s operations affect the environment and society.<br><br>" +
+            "<strong>Standards differ in emphasis:</strong> Europe\'s rules (CSRD/ESRS) use double materiality, while <strong>IFRS S1/S2</strong> (which Indonesia is aligning toward) leans on financial materiality.<br><br>" +
+            "<strong>On a coal issuer with a high ESG score thanks to CSR:</strong> under a double-materiality lens, a strong CSR program <em>does not cancel out</em> the impact of the core business (large emissions). So a high score propped up by CSR is fair to question, check whether the rating weighs climate impact, not just philanthropy. <em>(Verify the rating methodology and official reports before concluding.)</em>"
+    },
+
+    {
+      id:'sri-kehati-vs-ihsg', intent:'comparison',
+      kw_id:['sri kehati vs ihsg','perbandingan kehati ihsg','kehati dibanding ihsg','kinerja sri kehati vs ihsg','return indeks esg vs ihsg','apakah indeks esg mengalahkan pasar','sri kehati lawan ihsg','indeks esg vs pasar'],
+      kw_en:['sri kehati vs ihsg','kehati index versus ihsg','sri-kehati performance comparison','does esg index beat the market','esg index return vs jci','kehati vs jci','esg index vs market indonesia'],
+      a_id:"<strong>SRI-KEHATI vs IHSG</strong> 📊<br>" +
+            "• <strong>SRI-KEHATI</strong>, indeks berisi 25 saham yang lolos saringan keberlanjutan.<br>" +
+            "• <strong>IHSG</strong>, indeks seluruh saham yang tercatat di bursa (cerminan pasar).<br><br>" +
+            "<strong>Soal kinerja:</strong> keduanya saling menyalip tergantung periode dan siklus komoditas. Saringan ESG <em>tidak menjamin</em> selalu menang atau kalah dari pasar. SRI-KEHATI cenderung <em>underweight</em> emiten polutif berat, ini bisa menguntungkan saat sektor tersebut lesu, dan sebaliknya bisa tertinggal saat harga batubara atau sawit melonjak.<br><br>" +
+            "<strong>Untuk angka return yang tepat</strong> (misalnya 3 tahun terakhir), lihat factsheet resmi Yayasan KEHATI atau data indeks IDX, jangan mengandalkan angka hafalan yang gampang basi. <em>(Edukasi, bukan saran investasi. Lihat juga topik ESG vs kinerja keuangan.)</em>",
+      a_en:"<strong>SRI-KEHATI vs IHSG</strong> 📊<br>" +
+            "• <strong>SRI-KEHATI</strong>, an index of 25 stocks that pass a sustainability screen.<br>" +
+            "• <strong>IHSG (JCI)</strong>, the index of all listed stocks (a proxy for the whole market).<br><br>" +
+            "<strong>On performance:</strong> the two trade places depending on the period and the commodity cycle. An ESG screen <em>does not guarantee</em> beating or lagging the market. SRI-KEHATI tends to be <em>underweight</em> heavy polluters, which can help when those sectors are weak and can lag when coal or palm-oil prices surge.<br><br>" +
+            "<strong>For exact return figures</strong> (say the last 3 years), check the official KEHATI Foundation factsheet or IDX index data rather than a memorized number that ages quickly. <em>(Educational, not investment advice. See also ESG vs financial performance.)</em>"
+    },
+
+    {
+      id:'scope3-disclosure-banks', intent:'definitional',
+      kw_id:['scope 3','pengungkapan scope 3','emisi scope 3 bank','financed emissions','emisi yang dibiayai','efektivitas pojk 51 scope 3','laporan scope 3 bank','scope 3 perbankan','emisi rantai nilai bank'],
+      kw_en:['scope 3','scope 3 disclosure','scope 3 emissions banks','financed emissions','pojk 51 scope 3 effectiveness','scope 3 reporting indonesia','scope 3 banking sector','value chain emissions bank'],
+      a_id:"<strong>Pengungkapan Scope 3 dan efektivitas POJK 51</strong> 🏦💨<br>" +
+            "<strong>Scope 3</strong> adalah emisi tidak langsung di sepanjang rantai nilai. Untuk bank, porsi terbesarnya adalah <strong>financed emissions</strong>, yaitu emisi dari nasabah dan proyek yang mereka biayai.<br><br>" +
+            "<strong>POJK 51/2017</strong> mewajibkan Laporan Keberlanjutan, tapi kedalaman data Scope 3 masih timpang: sebagian pemimpin pasar (misalnya Bank Mandiri) sudah mulai melaporkan financed emissions, sementara banyak lembaga lain belum.<br><br>" +
+            "<strong>Arah ke depan:</strong> penyelarasan Indonesia ke standar <strong>IFRS S1/S2</strong> diharapkan memperketat dan menyeragamkan pengungkapan ini. Jadi efektivitasnya masih berkembang. <em>(Untuk menilai satu bank, baca Laporan Keberlanjutan terbarunya langsung dan verifikasi ke sumber resmi.)</em>",
+      a_en:"<strong>Scope 3 disclosure and how effective POJK 51 is</strong> 🏦💨<br>" +
+            "<strong>Scope 3</strong> is indirect emissions along the value chain. For banks, the largest slice is <strong>financed emissions</strong>, the emissions of the clients and projects they fund.<br><br>" +
+            "<strong>POJK 51/2017</strong> requires a Sustainability Report, but the depth of Scope 3 data is uneven: some market leaders (for example Bank Mandiri) have started disclosing financed emissions, while many others have not.<br><br>" +
+            "<strong>Where it is heading:</strong> Indonesia\'s alignment toward <strong>IFRS S1/S2</strong> is expected to tighten and standardize this disclosure. So effectiveness is still developing. <em>(To judge a specific bank, read its latest Sustainability Report directly and verify against official sources.)</em>"
+    },
+
+    {
       id:'idx-carbon',
       kw_id:['idxcarbon','idx carbon','bursa karbon','bursa karbon indonesia','perdagangan karbon','karbon kredit indonesia'],
       kw_en:['idxcarbon','idx carbon','indonesia carbon exchange','carbon trading indonesia','carbon credit indonesia'],
@@ -146,9 +260,9 @@ window.KNOWLEDGE_DATA = {
     },
 
     {
-      id:'transition-risk',
-      kw_id:['transition risk','risiko transisi','stranded asset','aset terdampar','fossil fuel risk','risiko fossil','risiko karbon'],
-      kw_en:['transition risk','stranded asset','fossil fuel risk','carbon risk','climate risk'],
+      id:'transition-risk', intent:'how-to',
+      kw_id:['transition risk','risiko transisi','stranded asset','aset terdampar','fossil fuel risk','risiko fossil','risiko karbon','mitigasi risiko transisi','memitigasi risiko transisi','cara mitigasi risiko transisi','emiten mitigasi risiko transisi','menghadapi risiko transisi','mengurangi risiko transisi'],
+      kw_en:['transition risk','stranded asset','fossil fuel risk','carbon risk','climate risk','mitigate transition risk','managing transition risk'],
       a_id:"<strong>Transition Risk</strong> ⚠️ adalah risiko finansial yang muncul ketika ekonomi global beralih ke <em>low-carbon</em>. Untuk investor Indonesia, ini sangat relevan karena banyak saham besar di sektor fossil fuel.<br><br>" +
             "<strong>3 jenis transition risk:</strong><br>" +
             "1. <strong>Policy risk</strong>, pajak karbon, larangan ekspor batubara, mandate energi terbarukan<br>" +
