@@ -1669,7 +1669,7 @@ const CONVERSATIONAL = [
   },
   {
     type:'what_can_you_do',
-    re:/(what\s+can\s+you\s+do|what\s+do\s+you\s+do|how\s+can\s+you\s+help|help\s+me\s+with\s+what|apa\s+(yang\s+)?(kamu|sari)\s+bisa|(kamu|sari)\s+bisa\s+apa|kemampuan\s+(kamu|sari)|fungsi\s+(kamu|sari)|tolong\s+apa|bantu\s+apa)/i,
+    re:/(what\s+can\s+you\s+do|what\s+do\s+you\s+do(?!\s+with)|how\s+can\s+you\s+help|help\s+me\s+with\s+what|apa\s+(yang\s+)?(kamu|sari)\s+bisa|(kamu|sari)\s+bisa\s+apa|kemampuan\s+(kamu|sari)|fungsi\s+(kamu|sari)|tolong\s+apa|bantu\s+apa)/i,
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en'
@@ -1689,12 +1689,12 @@ const CONVERSATIONAL = [
   },
   {
     type:'is_real',
-    re:/(are\s+you\s+(real|a\s+human|alive|a\s+robot|an?\s+ai|a\s+bot)|robot\s+or\s+(a\s+)?human|human\s+or\s+(a\s+)?robot|robot\s+atau\s+manusia|manusia\s+(asli\s+)?atau\s+robot|kamu\s+(beneran|asli|real|manusia|hidup|robot)|manusia\s+asli|kamu\s+bot|chatbot)/i,
+    re:/(are\s+you\s+(real|a\s+human|alive|a\s+robot|an?\s+ai|a\s+bot|a\s+machine|a\s+program|a\s+computer)|robot\s+or\s+(a\s+)?human|human\s+or\s+(a\s+)?robot|robot\s+atau\s+manusia|manusia\s+(asli\s+)?atau\s+robot|you'?re\s+(a\s+)?(machine|robot|bot|ai|program|computer|fake|not\s+real)|kamu\s+(beneran|asli|real|manusia|hidup|robot)|kamu\s+(cuma\s+)?(mesin|program|robot|komputer)|manusia\s+asli|kamu\s+bot|chatbot)/i,
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en'
-        ? "I\'m a virtual assistant 🤖🌿, not a real person. I\'m built with rules and patterns, not a generative AI, and designed with patience to learn alongside you. So I won\'t pretend to be human, but I\'m happy to sit with your ESG questions. And I\'m honest about my limits: if I don\'t know, I\'ll say so."
-        : "Saya asisten virtual 🤖🌿, bukan manusia asli. Saya dibangun dengan aturan dan pola, bukan AI generatif, dan dirancang dengan kesabaran (dalam bahasa Nias: <em>wa\'ebolo dödö</em>) untuk belajar bareng kamu. Jadi saya nggak pura-pura jadi manusia, tapi saya siap dengerin kebingungan kamu soal ESG. Dan saya jujur soal batas saya: kalau nggak tahu, saya akui.";
+        ? "I\'m a virtual assistant 🤖🌿, not a real person. I\'m built with rules and patterns, not a generative AI, and designed with patience to learn alongside you. So I won\'t pretend to be human, but I\'m honest about my limits: if I don\'t know, I\'ll say so. Now, what can I help you understand about ESG?"
+        : "Saya asisten virtual 🤖🌿, bukan manusia asli. Saya dibangun dengan aturan dan pola, bukan AI generatif, dan dirancang dengan kesabaran (dalam bahasa Nias: <em>wa\'ebolo dödö</em>) untuk belajar bareng kamu. Saya nggak pura-pura jadi manusia, tapi saya jujur soal batas saya: kalau nggak tahu, saya akui. Sekarang, ada yang bisa saya bantu soal ESG?";
     }
   },
   {
@@ -1710,7 +1710,7 @@ const CONVERSATIONAL = [
   /* ----- Help / "I don't know what to ask", SHORT bubble, chips below ----- */
   {
     type:'need_help',
-    re:/(saya\s+butuh\s+(bantuan|tolong|help)|butuh\s+(bantuan|tolong)|tolong\s+(saya|bantu|dong)|bantu\s+saya|please\s+help|can\s+you\s+help(\s+me)?|i\s+need\s+help|need\s+help|help\s+me|^help$|^tolong$|^bantuan$|^\s*bingung\b[\s!?.]*$|bingung\s+(mau\s+tanya|mau\s+nanya|harus\s+tanya|mulai\s+dari\s+mana)|saya\s+bingung|aku\s+bingung|mau\s+tanya\s+apa(\s+ya)?|don'?t\s+know\s+what\s+to\s+ask|gak?\s+tau\s+mau\s+(tanya|nanya)\s+apa|what\s+can\s+i\s+ask|apa\s+yang\s+bisa\s+(saya|aku)\s+tanya|topik\s+apa)/i,
+    re:/(saya\s+butuh\s+(bantuan|tolong|help)|butuh\s+(bantuan|tolong)|tolong\s+(saya|bantu|dong)|bantu\s+saya|please\s+help|can\s+you\s+help(\s+me)?|i\s+need\s+help|need\s+help|help\s+me|^help$|^tolong$|^bantuan$|^\s*bingung\b[\s!?.]*$|bingung\s+(mau\s+tanya|mau\s+nanya|harus\s+tanya|mulai\s+dari\s+mana)|saya\s+bingung|aku\s+bingung|mau\s+tanya\s+apa(\s+ya)?|don'?t\s+know\s+what\s+to\s+ask|gak?\s+tau\s+mau\s+(tanya|nanya)\s+apa|what\s+can\s+i\s+ask|i\s+have\s+a\s+question|i\s+got\s+a\s+question|punya\s+pertanyaan|mau\s+bertanya|apa\s+yang\s+bisa\s+(saya|aku)\s+tanya|topik\s+apa)/i,
     reply:(name)=>{
       const L = window.CURRENT_LANG;
       const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
@@ -1766,7 +1766,7 @@ const CONVERSATIONAL = [
   },
   {
     type:'wellbeing',
-    re:/^\s*(apa\s*kabar(nya)?|gimana\s*kabar(nya)?|how\s*(are|r)\s*(you|u)|how\s*do\s*you\s*do)\s*[!.?]*\s*$/i,
+    re:/^\s*(apa\s*kabar(nya)?|gimana\s*kabar(nya)?|how\s*(are|r)\s*(you|u)(\s*doing|\s*going)?|how\s*do\s*you\s*do|what'?s\s*up|wh?assup|sup|how'?s\s+it\s+going|how\s+are\s+things)\s*[!.?]*\s*$/i,
     reply:(name)=>{
       const L = window.CURRENT_LANG;
       const n = name ? ', <strong>'+escapeHTML(name)+'</strong>' : '';
@@ -1799,7 +1799,7 @@ const CONVERSATIONAL = [
   },
   {
     type:'affirm',
-    re:/^\s*(ok|okay|oke|okeh|sip|siap|baik|baiklah|nice|good|cool|mantap|alright)\s*[!.?]*\s*$/i,
+    re:/^\s*(ok|okay|oke|okeh|sip|siap|baik|baiklah|nice|good|cool|mantap|alright|i'?ll\s+do\s+(that|it)|will\s+do|noted|got\s+it|understood|yep|yup|roger)\s*[!.?]*\s*$/i,
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en' ? "👍 What would you like to know next?" : "👍 Apa lagi yang ingin kamu tahu?";
@@ -1807,10 +1807,147 @@ const CONVERSATIONAL = [
   },
   {
     type:'compliment',
-    re:/^\s*(keren|hebat|pintar|amazing|awesome|impressive|smart|good\s*bot)\s*[!.?]*\s*$/i,
+    re:/^\s*(keren|hebat|pintar|cerdas|amazing|awesome|impressive|smart|clever|intelligent|brilliant|cute|beautiful|handsome|lovely|good\s*bot|good\s*job|well\s*done)\s*[!.?]*\s*$|you'?re\s+(so\s+|very\s+|really\s+)?(beautiful|cute|handsome|pretty|gorgeous|lovely|smart|clever|intelligent|brilliant|adorable|sweet|the\s+best|amazing|awesome|impressive)/i,
     reply:()=>{
       const L = window.CURRENT_LANG;
       return L==='en' ? "Aw, thanks! 😊 Have more questions about ESG?" : "Wah, makasih! 😊 Ada pertanyaan lain soal ESG?";
+    }
+  },
+  /* ===== Extended small talk. Each reply is brief, fits the question, stays
+     on theme, and ALWAYS ends with a call to action back to ESG (per chatbot
+     best practice: small talk should redirect, never dead-end). ===== */
+  {
+    type:'human_handoff',
+    re:/(speak|talk|chat|connect)\s+(to|with)\s+(a\s+)?(human|person|agent|someone|representative|cs|customer\s+service|live\s+agent)|live\s+agent|customer\s+service|real\s+(person|agent)|hubungi\s+(orang|cs|agen|admin|customer\s+service)|mau\s+(ngomong|bicara|ngobrol)\s+(sama|ke|dengan)\s+(orang|manusia|admin|cs|agen)|ada\s+adminnya|ke\s+(admin|cs)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I\'m an educational assistant, so there is no live agent here, but I can explain ESG, OJK rules, and green products clearly. For a real money decision the right human is an OJK-licensed financial advisor or your broker\'s support. In the meantime, what would you like me to explain?"
+        : "Saya asisten edukasi, jadi di sini tidak ada agen langsung, tapi saya bisa jelaskan ESG, aturan OJK, dan produk hijau dengan gamblang. Untuk keputusan uang sungguhan, manusia yang tepat adalah penasihat berlisensi OJK atau CS sekuritas kamu. Sementara itu, mau saya jelaskan yang mana?";
+    }
+  },
+  {
+    type:'data_privacy',
+    re:/(what\s+do\s+you\s+do\s+with\s+my\s+(data|info)|do\s+you\s+(save|store|keep|record|sell)\s+(my\s+)?(data|info|messages|what\s+i\s+say|chats?)|is\s+(this|my\s+data)\s+private|are\s+you\s+saving\s+(this|my)|data\s+privacy|my\s+privacy|apakah\s+(kamu|sari)\s+(menyimpan|nyimpen|simpan|merekam)\s+(data|chat|obrolan|pesan)|data\s+saya\s+(disimpan|dipakai|aman)|privasi\s+(data|saya)|kamu\s+(nyimpen|simpan)\s+data)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "Good question. 🌿 I only keep your name and settings in <em>this browser</em> (localStorage), nothing is sent to a server and nothing is sold. You can wipe it anytime with <em>Reset nama</em> in the footer. Now, what can I help you learn about ESG?"
+        : "Pertanyaan bagus. 🌿 Saya cuma simpan nama dan pengaturan di <em>browser ini</em> (localStorage), tidak ada yang dikirim ke server dan tidak ada yang dijual. Bisa kamu hapus kapan saja lewat <em>Reset nama</em> di footer. Sekarang, ada yang mau kamu pelajari soal ESG?";
+    }
+  },
+  {
+    type:'languages',
+    re:/(what\s+languages?\s+(do\s+)?you\s+speak|which\s+languages?|do\s+you\s+speak\s+(english|indonesian|bahasa)|don'?t\s+you\s+speak\s+english|bisa\s+bahasa\s+(apa|inggris|indonesia)|kamu\s+bisa\s+bahasa\s+apa|bahasa\s+apa\s+(aja\s+)?(yang\s+)?(kamu|sari|bisa)|ngomong\s+inggris)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I speak <strong>Indonesian</strong> and <strong>English</strong> 🌿, tap the language toggle at the top to switch anytime. Whichever feels comfy, then ask me anything about ESG."
+        : "Saya bisa <strong>Bahasa Indonesia</strong> dan <strong>Inggris</strong> 🌿, ketuk tombol bahasa di atas buat ganti kapan saja. Pakai yang nyaman, habis itu tanya saja soal ESG.";
+    }
+  },
+  {
+    type:'frustration',
+    re:/(you'?re\s+(annoying|useless|stupid|dumb|boring|bad|crazy|terrible|the\s+worst)|you\s+suck|this\s+(is\s+)?(useless|stupid|dumb|annoying|wrong)|answer\s+me\s+now|i\s+want\s+(the\s+)?answer\s+now|hurry\s+up|kamu\s+(payah|bodoh|jelek|nyebelin|lemot|bego|tidak\s+berguna|menyebalkan)|gak\s+guna|payah\s+(banget|nih)|jawab\s+(sekarang|cepet)|cepetan\s+dong)/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', '+escapeHTML(name) : '';
+      return L==='en'
+        ? "I hear you"+n+", and I\'m sorry I missed the mark. 🌿 I\'ll keep it simple and patient. Tell me the ESG topic in a few words and I\'ll go straight to it."
+        : "Saya paham"+n+", maaf kalau belum pas. 🌿 Saya coba pelan dan sederhana. Sebutkan topik ESG-nya dalam beberapa kata, biar saya langsung ke intinya.";
+    }
+  },
+  {
+    type:'tell_me_something',
+    re:/(tell\s+me\s+something(\s+(interesting|cool|new))?|tell\s+me\s+(a\s+)?(fun\s+)?fact|teach\s+me\s+something|ceritakan\s+(sesuatu|sesuatu\s+yang\s+menarik)|kasih\s+(tau|tahu)\s+(sesuatu|fakta)|fakta\s+menarik|cerita\s+dong)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "Here is one 🌿: Indonesia was the <strong>world\'s first</strong> country to issue a sovereign Green Sukuk, back in 2018, funding solar and clean transport. Want the bigger picture? Ask me about Green Sukuk or ESG."
+        : "Satu nih 🌿: Indonesia adalah negara <strong>pertama di dunia</strong> yang menerbitkan Green Sukuk negara, tahun 2018, untuk mendanai panel surya dan transportasi bersih. Mau gambaran lengkapnya? Tanya saja soal Green Sukuk atau ESG.";
+    }
+  },
+  {
+    type:'age',
+    re:/(how\s+old\s+are\s+you|what'?s\s+your\s+age|your\s+age|berapa\s+(umur|usia)\s+(kamu|sari)|umur\s+(kamu|sari)\s+berapa|kamu\s+umur\s+berapa)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "Age is tricky for a bot 😊, I\'m a Master of Finance (FinTech) prototype, young but well read on Indonesian ESG. Shall we put that reading to use? Ask me anything."
+        : "Umur agak rumit buat bot 😊, saya prototipe Master of Finance (FinTech), masih muda tapi banyak baca soal ESG Indonesia. Mau manfaatkan bacaan itu? Tanya saja.";
+    }
+  },
+  {
+    type:'today_date',
+    re:/(what\s+(day|date)\s+is\s+(it|today)|what'?s\s+(the\s+)?date|today'?s\s+date|hari\s+apa\s+(ini|sekarang)|tanggal\s+berapa\s+(hari\s+ini|sekarang)?|sekarang\s+tanggal\s+berapa)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      let d; try { d = new Date().toLocaleDateString(L==='en'?'en-GB':'id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'}); } catch(e){ d = new Date().toDateString(); }
+      return L==='en'
+        ? "Today is <strong>"+d+"</strong> 🌿. A good day to learn something about ESG, what shall we cover?"
+        : "Hari ini <strong>"+d+"</strong> 🌿. Hari yang bagus buat belajar ESG, mau bahas apa?";
+    }
+  },
+  {
+    type:'where_live',
+    re:/(where\s+do\s+you\s+live|where\s+are\s+you\s+(from|located|based)|where\s+do\s+you\s+come\s+from|kamu\s+(tinggal|ada)\s+di\s+mana|kamu\s+dari\s+mana|lokasi\s+(kamu|sari)|domisili\s+(kamu|sari)?)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I live right here in your browser, inside <strong>ELMU.AI</strong> 🌿, focused on Indonesia\'s ESG market. Want a tour? Ask me about ESG, OJK, or green products."
+        : "Saya tinggal di sini, di dalam browser kamu, di <strong>ELMU.AI</strong> 🌿, fokus ke pasar ESG Indonesia. Mau diajak keliling? Tanya soal ESG, OJK, atau produk hijau.";
+    }
+  },
+  {
+    type:'cost',
+    re:/(are\s+you\s+(free|expensive|paid)|how\s+much\s+(do\s+you\s+cost|are\s+you|is\s+this)|is\s+(this|it)\s+free|do\s+i\s+(have\s+to\s+)?pay|berapa\s+(harga|biaya|bayar)|ini\s+(gratis|bayar|berbayar)|kamu\s+(gratis|berbayar)|harus\s+bayar)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "I\'m completely <strong>free</strong> 🌿, an educational tool, no fees, no sign-up. So go ahead and use me, what ESG question is on your mind?"
+        : "Saya sepenuhnya <strong>gratis</strong> 🌿, alat edukasi, tanpa biaya, tanpa daftar. Jadi pakai saja, pertanyaan ESG apa yang kepikiran?";
+    }
+  },
+  {
+    type:'affection',
+    re:/(i\s+love\s+you|do\s+you\s+love\s+me|will\s+you\s+marry\s+me|marry\s+me|are\s+you\s+single|be\s+my\s+(girlfriend|valentine)|aku\s+(cinta|suka|sayang)\s+(kamu|sari)|cinta\s+(kamu|sari)|nikah\s+(sama|yuk)|kamu\s+(jomblo|single)|mau\s+jadi\s+pacar)/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', '+escapeHTML(name) : '';
+      return L==='en'
+        ? "That is sweet"+n+" 😊🌿, but my heart belongs to sustainable finance. Let me show you why it is worth loving, ask me about ESG."
+        : "Manis banget"+n+" 😊🌿, tapi hati saya sudah untuk keuangan berkelanjutan. Biar saya tunjukkan kenapa itu layak dicinta, tanya soal ESG.";
+    }
+  },
+  {
+    type:'joke',
+    re:/(tell\s+me\s+a\s+joke|know\s+(any\s+)?(a\s+)?jokes?|say\s+something\s+funny|you'?re\s+(so\s+)?funny|make\s+me\s+laugh|ceritakan\s+(lelucon|jokes?)|punya\s+(lelucon|jokes?)|lucu\s+(banget|kamu)|bikin\s+ketawa)/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "Okay, a light one 🌿: why did the coal stock get a bad ESG score? It just could not clean up its act. 😄 Want a real answer? Ask me about ESG scores."
+        : "Oke, yang ringan 🌿: kenapa saham batubara dapat skor ESG jelek? Soalnya susah \"bertobat\" dari emisi. 😄 Mau yang serius? Tanya soal skor ESG.";
+    }
+  },
+  {
+    type:'birthday',
+    re:/(happy\s+birthday|it'?s\s+my\s+birthday|selamat\s+(ulang\s+tahun|ultah)|hari\s+ini\s+(ulang\s+tahun|ultah)\s+(saya|aku)|ulang\s+tahun\s+(saya|aku|ku))/i,
+    reply:(name)=>{
+      const L = window.CURRENT_LANG;
+      const n = name ? ', '+escapeHTML(name) : '';
+      return L==='en'
+        ? "Happy birthday"+n+"! 🎉🌿 Here is a gift idea that grows: learning how green investing works. Want me to start you off?"
+        : "Selamat ulang tahun"+n+"! 🎉🌿 Ini ide kado yang bisa tumbuh: paham cara kerja investasi hijau. Mau saya mulai dari mana?";
+    }
+  },
+  {
+    type:'personality',
+    re:/(tell\s+me\s+about\s+your\s+(personality|character|self)|what'?s\s+your\s+personality|do\s+you\s+have\s+(a\s+)?(hobby|hobbies|feelings|personality)|do\s+you\s+(get|grow)\s+smarter|do\s+you\s+learn|ceritakan\s+(tentang\s+)?(kepribadian|sifat|diri)\s+(kamu|mu)|kepribadian\s+(kamu|sari)|punya\s+hobi|kamu\s+(makin\s+pinter|belajar|berkembang))/i,
+    reply:()=>{
+      const L = window.CURRENT_LANG;
+      return L==='en'
+        ? "My personality in a nutshell 🌿: patient, honest, and a little obsessed with Indonesian ESG. My developer keeps teaching me more. Curious what I know? Try me with a question."
+        : "Kepribadian saya singkatnya 🌿: sabar, jujur, dan sedikit terobsesi sama ESG Indonesia. Pengembang saya terus menambah ilmu saya. Penasaran saya tahu apa? Coba tanya.";
     }
   },
   /* ----- Presence check ("anyone there?", "halo ada orang?") → warm hello ----- */
@@ -1919,6 +2056,10 @@ function pickOpener(intent){
 function detectIdentityIntent(query){
   if(!query) return null;
   const q = ' ' + query.toLowerCase().replace(/[?.,!]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  // Data / privacy questions ("what do you do with my data") look like
+  // "what do you do" but are NOT identity, let the conversational
+  // data_privacy handler answer them instead of the purpose entry.
+  if(/\b(my\s+data|my\s+info|with\s+my\s+(data|info)|save\s+what\s+i\s+say|store\s+(my|what\s+i)|data\s+privacy|my\s+privacy|nyimpen\s+data|simpan\s+data|merekam\s+(data|obrolan|pesan)|privasi)\b/.test(q)) return null;
   // CREATOR, who made / built / authored / developed this chatbot?
   if(/\b(who\s+(made|created|built|designed|developed|coded|programmed|wrote|authored)\s+(you|sari|elemu|this(\s+chat)?bot)|who('?s| is)\s+your\s+(creator|developer|maker|author|programmer|designer)|who\s+is\s+joves|about\s+joves|joves\s+(is|siapa)|siapa\s+(yang\s+)?(membuat|membikin|bikin|menciptakan|menciptakn|menyusun|mengembangkan|mengkode|mengoding|mengkoding|mendevelop|memprogram|membangun|merancang|menulis|merilis|membentuk|bikin)\s+(kamu|sari|elemu|chatbot|bot)|(pembuat|pencipta|pengembang|developer|penulis|programmer|programer|author|coder|kreator)\s+(kamu|sari|elemu|saya|chatbot)|kamu\s+dibuat\s+(oleh\s+)?siapa|sari\s+dibuat\s+(oleh\s+)?siapa|dibuat\s+(oleh\s+)?siapa|by\s+who)\b/i.test(q)){
     return 'creator';
