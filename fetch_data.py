@@ -40,6 +40,7 @@ list manually from their twice-yearly index review notices.
 
 import json
 import datetime
+import re
 import sys
 import time
 
