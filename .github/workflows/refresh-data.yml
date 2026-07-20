@@ -3,10 +3,20 @@
 # ------------------------------------------------------------
 # Runs every day after IDX close (5 PM WIB / 10 AM UTC), pulls
 # fresh stock prices + JCI benchmark + RSS news, commits any
-# changes to stocks.js and news.js. Netlify then auto-redeploys
+# changes to stocks.js and news.js. GitHub Pages then redeploys
 # the site from the new commit, so the live URL stays current.
 #
 # Manual trigger: Actions tab → "Refresh ESG market data" → Run workflow
+#
+# Self-maintenance (added after the June-2026 silent outage, a
+# missing `import re` made every run fail for 6+ weeks):
+#   • On failure, a GitHub ISSUE is opened in this repo (deduped),
+#     so breakage is visible on the repo homepage, not just in
+#     easy-to-miss notification emails.
+#   • A keepalive step resets GitHub's 60-day scheduled-workflow
+#     auto-disable timer on EVERY run, even failing ones, so the
+#     schedule keeps firing even when the repo sees no human
+#     commits for months.
 # ============================================================
 name: Refresh ESG market data
 
@@ -16,9 +26,12 @@ on:
     - cron: '0 10 * * 1-5'   # Monday-Friday only (no weekends)
   workflow_dispatch: {}      # manual trigger from Actions tab
 
-# GITHUB_TOKEN needs write access to push the data update commit
+# contents: push the data commit · actions: keepalive self-enable
+# issues: open the failure-alarm issue
 permissions:
   contents: write
+  actions: write
+  issues: write
 
 jobs:
   refresh:
@@ -38,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install yfinance feedparser
+          pip install --upgrade yfinance feedparser
 
       - name: Run data refresher
         working-directory: ${{ github.workspace }}
@@ -65,3 +78,35 @@ jobs:
       - name: No-op summary
         if: steps.changes.outputs.changed == 'false'
         run: echo "No data changes today — skipping commit."
+
+      # ---- Failure alarm ----------------------------------------
+      # If the refresh failed, open ONE issue (skip when an open one
+      # already exists) so the outage is impossible to miss.
+      - name: Open an alarm issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Daily data refresh is failing"
+          OPEN=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq 'length')
+          if [ "$OPEN" = "0" ]; then
+            BODY=$(printf '%s\n\n%s\n\n%s\n\n%s' \
+              "The scheduled **Refresh ESG market data** workflow failed. stocks.js / news.js will go stale until this is fixed." \
+              "Run log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              "Quick local test: \`pip install -U yfinance feedparser && python fetch_data.py\`" \
+              "Close this issue after the next successful run.")
+            gh issue create --title "$TITLE" --body "$BODY"
+          else
+            echo "An open alarm issue already exists, not creating a duplicate."
+          fi
+
+      # ---- Keepalive --------------------------------------------
+      # GitHub auto-disables scheduled workflows after 60 days without
+      # repository activity. Re-enabling an already-enabled workflow is
+      # a harmless no-op that RESETS that timer, so we do it every run
+      # (even failing ones) and the schedule can never silently stop.
+      - name: Keepalive (reset 60-day auto-disable timer)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/refresh-data.yml/enable"
